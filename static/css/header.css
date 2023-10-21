@@ -1,0 +1,244 @@
+@import "/static/css/variables.css";
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+    color: var(--special);
+}
+
+header {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+
+    width: 100%;
+    height: 5.5rem;
+    background-color: var(--primary);
+    font-family: 'Noto Sans', sans-serif;
+}
+
+#header-skip{
+    width: 1%;
+    height: 100%;
+    overflow: hidden;
+    color: var(--primary);
+    text-decoration: none;
+}
+
+header svg{
+    color: var(--primary-inv);
+}
+header #logo{
+    margin-right: 5%;
+}
+
+h1 {
+    margin-right: 5%;
+    font-family: Quicksand, sans-serif;
+    font-size: 24px;
+    color: var(--primary-inv);
+}
+
+@media only screen and (max-width: 700px){
+    h1{
+        display: none;
+    }
+}
+
+header .search-container{
+    margin-right: 12%;
+    background: #F5F5F5;
+    width: 50%;
+    display: flex;
+    padding: 2px;
+    border-radius: 4px;
+    border: 2px solid #F5F5F5;
+}
+#drop-container{
+    display: flex;
+    justify-content: center;
+    border-radius: 4px;
+    width: 30%;
+    background-color: var(--secondary);
+}
+#searchType{
+    border-radius: 4px;
+    height: 100%;
+    width: 100%;
+    background-color: var(--secondary);
+    color: var(--primary-inv);
+    font-size: 18px;
+    text-indent: 5%;
+}
+#searchType:hover, #searchType:focus{
+    background-color: var(--secondary-inv);
+    color: var(--primary);
+}
+#searchType option:checked{
+    background-color: var(--primary-inv);
+}
+header .search-container input{
+    padding: 10px 25px;
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 18px;
+    color: #000000;
+    background-color: #F5F5F5;
+}
+
+/* Accessibility Toolbar */
+header #toolbarButton {
+    margin-right: 5%;
+    position: relative;
+    cursor: pointer;
+}
+
+/* Style the toolbar */
+header #toolbar {
+    position: absolute;
+    z-index: 2;
+    top: 5.5rem;
+    right: 0;
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    padding: 10px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    font-size: 14px;
+    line-height: 1.5;
+    width: 300px;
+    max-height: calc(100vh - 10.5rem);
+    overflow-y: scroll;
+    border-radius: 8px;
+    color: #000000;
+}
+/* Accessibility Toolbar section headers */
+header .funcTitle{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 0;
+}
+header .funcTitle svg{
+    margin-right: 10px;
+}
+/* Accessibility Toolbar Color Mode */
+.carousel {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.carousel-inner {
+    display: flex;
+    transition: transform 0.3s ease;
+}
+
+.carousel-item {
+    flex: 0 0 100%;
+    text-align: center;
+}
+
+.carousel-item img {
+    width: 91px;
+    height: 91px;
+}
+.carousel-caption {
+    padding: 10px;
+    margin-top: 0;
+}
+.carousel-control {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.carousel-control.prev {
+    left: 10px;
+}
+.carousel-control.prev img{
+    width: 24px;
+    height: 24px;
+    transform: rotate(180deg);
+}
+.carousel-control.next {
+    right: 10px;
+}
+.carousel-control.next img{
+    width: 24px;
+    height: 24px;
+}
+/* Accessibility Toolbar Text Scaling */
+header #textScale{
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+header #min{
+    padding-left: 5px;
+    padding-right: 5px;
+}
+header #max{
+    padding-left: 5px;
+    padding-right: 10px;
+}
+header #percent{
+    -webkit-appearance: none !important;
+    width: 150px;
+    height: 2px;
+    background: black;
+    border: none;
+    outline: none;
+}
+/* Slider thumb for Chromium */
+header #percent::-webkit-slider-thumb{
+    -webkit-appearance: none !important;
+    width: 16px;
+    height: 16px;
+    background: black;
+    border: 2px solid black;
+    border-radius: 50%;
+    cursor: pointer;
+}
+header #percent:focus::-webkit-slider-thumb{
+    box-shadow: 0 0 0 2px #2196f3;
+}
+/* Slider thumb for Firefox */
+header #percent::-moz-range-thumb{
+    appearance: none !important;
+    width: 16px;
+    height: 16px;
+    background: black;
+    border: 2px solid black;
+    border-radius: 50%;
+    cursor: pointer;
+}
+header #percent:focus::-moz-range-thumb{
+    box-shadow: 0 0 0 2px #2196f3;
+}
+header #percentValue{
+    width: 50px;
+    height: 30px;
+    text-align: center;
+    background: #F5F5F5;
+    outline: auto #CDCDCD;
+    border-radius: 4px;
+}
+header #percentValue:focus{
+    outline: auto #000000;
+}
+
+header #user{
+    margin-right: 1%;
+}
+header #user img{
+    height: 56px;
+    width: 56px;
+}

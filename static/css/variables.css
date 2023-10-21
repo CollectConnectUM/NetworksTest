@@ -1,0 +1,18 @@
+:root{
+    /* Color Profiles */
+    --bg-main: #E7DFC5;
+    --primary: #000000;
+    --primary-inv: #FFFFFF;
+    --secondary: #323232;
+    --secondary-inv: #CDCDCD;
+    --special: #000000;
+
+    /* jQuery Icon Colors */
+    --icon-primary: url("/images/ui-icons_000000_256x240.png");
+    --icon-primary-inv: url("/images/ui-icons_FFFFFF_256x240.png");
+    --icon-secondary: url("/images/ui-icons_323232_256x240.png");
+    --icon-secondary-inv: url("/images/ui-icons_CDCDCD_256x240.png");
+
+    /* Text/Content Scale */
+    --scale: 1;
+}

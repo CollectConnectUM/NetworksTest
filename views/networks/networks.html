@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network</title>
+
+    <link rel="icon" type="image/x-icon" href="/static/img/symbol.png">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Quicksand|Noto+Sans">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="/static/css/header.css">
+	<link rel="stylesheet" href="/static/css/footer.css">
+
+    <link rel="stylesheet" href="/static/css/networks.css">
+</head>
+<body>
+    <div id="page-container">
+    <div id="content-wrap">
+        <!-- Include header -->
+        <div id="header"></div>
+
+        <!--page body-->
+        <main>
+            <div id="view">
+                <div id="viewHeader">
+                    <div id="headerButtons">
+                        <button class="headerButton" id="back">Back</button>
+                        <button class="headerButton" id="info">Info</button>
+                    </div>
+                    <div id="viewSelect">
+                        <div id="vsBox">
+                            <button class="viewSButton" id="map">Map</button>
+                            <button class="viewSButton" id="explore">Explore</button>
+                            <button class="viewSButton" id="edit">Edit</button>
+                        </div>
+                    </div>
+                    <div id="infoPanel">
+                        <div class="property" id="Name" style="flex-grow: 0; padding-bottom:0;">
+                            <p id="property-name">Test Network</p>
+                            <p class="propertyInfo">By <span>
+                                <a id="owner">Jenna Mathison</a>
+                            </span></p>
+                        </div>
+                        <div class="property" id="Description">
+                            <p class="propertyName">Description</p>
+                            <p class="propertyInfo">This is a test network</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="SVGDiv">
+                    
+                </div>
+            </div>
+        </main>
+    </div>
+    </div>
+
+        <!-- Include footer -->
+        <div id="footer"></div>
+
+    </div>
+
+    <script src="/views/headers/incorporateHeader.js"></script>
+    <script src="/views/headers/incorporateFooter.js"></script>
+
+    <script type="module" src="./networks.js"></script>
+
+</body>
+</html>

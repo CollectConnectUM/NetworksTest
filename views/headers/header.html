@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+  <link rel="stylesheet" href="/static/css/jquery-ui-1.12.1/jquery-ui.css">
+</head>
+<body>
+<header>
+  <a href="#main-content" id="header-skip">Skip to main content</a>
+  <a href="/" id="logo">
+    <svg id="tn-logo" role="img" aria-labelledby="LogoTitle LogoDesc" xmlns="http://www.w3.org/2000/svg" width="40px" height="62px" viewBox="0 0 104.000000 163.000000" preserveAspectRatio="xMidYMid meet">
+      <title id="LogoTitle">Translation Networks Logo</title>
+      <desc id="LogoDesc">Links to translationnetworks.com.</desc>
+      <g transform="translate(0.000000,163.000000) scale(0.100000,-0.100000)" fill="currentColor" stroke="none">
+        <path d="M370 1413 c-63 -120 -172 -325 -242 -458 l-128 -240 0 -357 0 -358 38 0 c38 0 39 0 87 93 27 50 67 127 90 169 l41 78 115 -170 c112 -167 115 -169 151 -170 l36 0 241 452 241 453 0 363 0 363 -37 -3 -38 -3 -85 -162 c-47 -90 -88 -163 -92 -163 -4 0 -57 74 -119 165 -110 162 -113 165 -148 165 l-36 0 -115 -217z m269 -21 c61 -89 111 -165 111 -168 0 -2 -58 -114 -130 -248 l-130 -243 0 -302 c0 -168 -4 -300 -9 -297 -10 7 -401 581 -401 590 0 9 442 837 445 834 1 -2 53 -76 114 -166z m130 -859 c-111 -208 -203 -380 -205 -382 -2 -2 -4 126 -4 285 l0 289 203 380 202 380 3 -287 2 -287 -201 -378z m-616 -41 c32 -46 57 -87 57 -92 0 -11 -120 -240 -126 -240 -2 0 -4 98 -4 217 0 119 4 213 8 208 5 -6 34 -47 65 -93z"/>
+      </g>
+    </svg>
+  </a>
+  <h1>TRANSLATION<br>NETWORKS</h1>
+
+  <!-- Search and Dropdown -->
+  <div class="search-container">
+    <div id="drop-container">
+      <label for="searchType" class="sr-only">Select search category</label><select id="searchType" onchange="initSearchDropdown()">
+      <option>All Categories</option>
+      <option>Works</option>
+      <option>Collections</option>
+      <option>Networks</option>
+    </select>
+    </div>
+    <label for="inputField" class="sr-only">Input search query for the chosen category</label><input type="text" id="inputField" placeholder="Search in All Categories">
+  </div>
+
+  <!-- Accessibility Toolbar -->
+  <div id="toolbarButton" role="button" tabindex="0">
+    <svg id="accessibility" role="img" aria-labelledby="AccessibilityTitle AccessibilityDesc" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 122.88 122.88" width="48" height="48">
+      <title id="AccessibilityTitle">Accessibility Toolbar</title>
+      <desc id="AccessibilityDesc">An accessibility icon that opens the accessibility toolbar.</desc>
+      <g fill="currentColor" stroke="none">
+      <path d="M61.44,0A61.46,61.46,0,1,1,18,18,61.21,61.21,0,0,1,61.44,0Zm-.39,74.18L52.1,98.91a4.94,4.94,0,0,1-2.58,2.83A5,5,0,0,1,42.7,95.5l6.24-17.28a26.3,26.3,0,0,0,1.17-4,40.64,40.64,0,0,0,.54-4.18c.24-2.53.41-5.27.54-7.9s.22-5.18.29-7.29c.09-2.63-.62-2.8-2.73-3.3l-.44-.1-18-3.39A5,5,0,0,1,27.08,46a5,5,0,0,1,5.05-7.74l19.34,3.63c.77.07,1.52.16,2.31.25a57.64,57.64,0,0,0,7.18.53A81.13,81.13,0,0,0,69.9,42c.9-.1,1.75-.21,2.6-.29l18.25-3.42A5,5,0,0,1,94.5,39a5,5,0,0,1,1.3,7,5,5,0,0,1-3.21,2.09L75.15,51.37c-.58.13-1.1.22-1.56.29-1.82.31-2.72.47-2.61,3.06.08,1.89.31,4.15.61,6.51.35,2.77.81,5.71,1.29,8.4.31,1.77.6,3.19,1,4.55s.79,2.75,1.39,4.42l6.11,16.9a5,5,0,0,1-6.82,6.24,4.94,4.94,0,0,1-2.58-2.83L63,74.23,62,72.4l-1,1.78Zm.39-53.52a8.83,8.83,0,1,1-6.24,2.59,8.79,8.79,0,0,1,6.24-2.59Zm36.35,4.43a51.42,51.42,0,1,0,15,36.35,51.27,51.27,0,0,0-15-36.35Z"/>
+      </g>
+    </svg>
+    <script src="/views/headers/accessibilityToolbar.js"></script>
+  </div>
+
+
+  <!--Accessibility Toolbar-->
+  <div id="toolbar" style="display: none;">
+    <div class="funcTitle">
+      <svg id="palette" aria-hidden="true" role="img" alt="A color palette" xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 1280.000000 1280.000000" preserveAspectRatio="xMidYMid meet">
+        <g transform="translate(0.000000,1280.000000) scale(0.100000,-0.100000)" fill="#000000" stroke="none">
+          <path d="M6135 11194 c-1192 -76 -2249 -543 -3088 -1364 -762 -745 -1247 -1695 -1396 -2737 -38 -261 -46 -384 -45 -698 0 -443 38 -760 139 -1165 89 -351 181 -602 350 -945 185 -376 364 -652 636 -980 118 -143 461 -481 616 -608 711 -581 1539 -940 2440 -1057 312 -41 690 -50 798 -20 182 51 328 143 434 275 130 161 191 350 177 555 -12 197 -68 325 -219 505 -67 80 -137 216 -163 320 -25 96 -25 285 0 380 63 243 225 437 449 540 149 68 141 67 887 75 371 4 686 10 700 13 14 4 70 13 125 22 536 84 1050 351 1447 752 324 327 539 688 672 1133 108 360 133 810 70 1265 -186 1335 -1066 2512 -2379 3180 -582 296 -1185 471 -1865 540 -147 15 -654 27 -785 19z m-840 -1094 c272 -86 474 -296 547 -568 28 -109 28 -287 -1 -397 -74 -281 -295 -502 -576 -576 -114 -30 -280 -30 -394 0 -277 73 -484 271 -571 546 -28 90 -38 267 -20 368 54 313 301 570 614 642 94 22 312 14 401 -15z m2603 15 c315 -66 567 -325 622 -642 18 -101 8 -278 -20 -368 -87 -275 -294 -473 -571 -546 -114 -30 -280 -30 -394 0 -281 74 -502 295 -576 576 -30 112 -30 289 0 399 79 297 323 527 622 585 71 14 242 12 317 -4z m-4308 -2126 c177 -28 313 -100 445 -233 133 -134 200 -272 225 -464 32 -245 -61 -496 -247 -673 -98 -94 -201 -151 -340 -191 -102 -29 -304 -31 -403 -4 -362 99 -600 408 -600 775 0 165 42 311 127 439 175 263 486 401 793 351z m5958 -19 c348 -98 582 -408 582 -770 0 -165 -39 -297 -126 -433 -250 -387 -770 -483 -1146 -210 -122 88 -238 250 -286 399 -88 271 -20 577 175 785 123 130 271 213 438 245 96 19 269 11 363 -16z"/>
+        </g>
+      </svg>
+      <h2>Color Mode</h2>
+    </div>
+
+    <div class="carousel">
+      <div class="carousel-inner">
+        <div class="carousel-item">
+          <img src="/static/img/PaletteDark.png" alt="A circle that is black, beige, dark gray, and white.">
+          <div class="carousel-caption">
+            <h3>Contrast Black</h3>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <img src="/static/img/PaletteLight.png" alt="A circle that is white, beige, light gray, and black.">
+          <div class="carousel-caption">
+            <h3>Contrast White</h3>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <img src="/static/img/PaletteInvert.png" alt="A circle that is white, navy blue, light gray, and black.">
+          <div class="carousel-caption">
+            <h3>Invert Colors</h3>
+          </div>
+        </div>
+        <!-- Meant for user's custom color. Not Yet implemented.
+        <div class="carousel-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="91" height="91" viewBox="0 0 1000 1000">
+            <path stroke="none" fill="#000000" fill-rule="evenodd" d="M 458.500 17.518 C 374.911 25.171, 299.289 51.800, 230.566 97.783 C 148.797 152.494, 86.085 229.871, 49.249 321.500 C 18.303 398.479, 7.835 486.012, 19.532 570 C 41.609 728.520, 144.210 869.149, 288.399 938.520 C 356.545 971.305, 425.179 986.990, 500.500 986.990 C 563.725 986.990, 623.518 975.621, 680.500 952.764 C 833.746 891.294, 944.935 757.499, 976.988 596 C 989.131 534.821, 989.131 468.179, 976.988 407 C 951.706 279.615, 876.558 167.699, 768.500 96.503 C 698.696 50.511, 624.980 24.903, 541 17.470 C 520.945 15.695, 478.140 15.720, 458.500 17.518 M 515.192 36.208 C 514.252 37.148, 514.122 87.617, 514.604 263.958 L 515.223 490.500 678.814 654.204 C 813.383 788.866, 842.659 817.698, 843.833 816.723 C 846.238 814.728, 862.144 796.063, 870.250 785.725 C 880.808 772.260, 899.190 744.314, 908.548 727.500 C 976.452 605.500, 985.757 458.033, 933.726 328.500 C 910.139 269.779, 875.980 218.062, 831 172.971 C 749.638 91.408, 648.587 44.967, 533.050 36.039 C 516.348 34.749, 516.654 34.746, 515.192 36.208 M 459 37.499 C 348.464 47.789, 248.591 94.440, 171.015 172.015 C 92.142 250.888, 45.366 352.576, 36.014 465.500 C 34.735 480.953, 34.735 522.047, 36.014 537.500 C 44.410 638.870, 82.875 731.162, 148.128 806.500 C 152.892 812, 158.423 818.061, 160.419 819.969 L 164.047 823.438 330.024 657.473 L 496 491.508 496 263.754 L 496 36 484.250 36.121 C 477.788 36.188, 466.425 36.808, 459 37.499 M 336.128 677.361 L 176.756 836.746 183.701 843.355 C 214.115 872.299, 259.286 902.986, 299.500 922.021 C 356.387 948.948, 419.100 964.488, 479.750 966.686 L 497 967.311 496.891 748.405 C 496.832 628.007, 496.494 526.907, 496.141 523.738 L 495.500 517.977 336.128 677.361 M 516 742.387 L 516 967.272 527.750 966.589 C 587.219 963.133, 647.087 947.777, 701.500 922.021 C 735.509 905.922, 774.969 880.349, 802.500 856.564 C 815.993 844.907, 829 832.641, 829 831.574 C 829 830.982, 758.575 760.074, 672.500 674 L 516 517.502 516 742.387"/>
+            <path stroke="none" fill="#FFFFFF" fill-rule="evenodd" d="M 516 742.441 C 516 889.100, 516.341 966.093, 516.992 966.495 C 518.197 967.240, 542.032 965.482, 558.500 963.435 C 642.726 952.963, 723.649 918.950, 789.986 866.139 C 799.636 858.456, 823.885 837.057, 827.450 833.078 L 829.399 830.902 673.451 674.951 C 587.679 589.178, 517.164 519, 516.751 519 C 516.338 519, 516 619.548, 516 742.441"/>
+            <path stroke="none" fill="#323232" fill-rule="evenodd" d="M 336.128 677.361 L 176.756 836.746 183.701 843.355 C 214.115 872.299, 259.286 902.986, 299.500 922.021 C 356.387 948.948, 419.100 964.488, 479.750 966.686 L 497 967.311 496.891 748.405 C 496.832 628.007, 496.494 526.907, 496.141 523.738 L 495.500 517.977 336.128 677.361"/>
+            <path stroke="none" fill="#000000" fill-rule="evenodd" d="M 459 37.499 C 348.464 47.789, 248.591 94.440, 171.015 172.015 C 92.142 250.888, 45.366 352.576, 36.014 465.500 C 34.735 480.953, 34.735 522.047, 36.014 537.500 C 44.410 638.870, 82.875 731.162, 148.128 806.500 C 152.892 812, 158.423 818.061, 160.419 819.969 L 164.047 823.438 330.024 657.473 L 496 491.508 496 263.754 L 496 36 484.250 36.121 C 477.788 36.188, 466.425 36.808, 459 37.499"/>
+            <path stroke="none" fill="#E7DFC5" fill-rule="evenodd" d="M 515.192 36.208 C 514.252 37.148, 514.122 87.617, 514.604 263.958 L 515.223 490.500 678.814 654.204 C 813.383 788.866, 842.659 817.698, 843.833 816.723 C 846.238 814.728, 862.144 796.063, 870.250 785.725 C 880.808 772.260, 899.190 744.314, 908.548 727.500 C 976.452 605.500, 985.757 458.033, 933.726 328.500 C 910.139 269.779, 875.980 218.062, 831 172.971 C 749.638 91.408, 648.587 44.967, 533.050 36.039 C 516.348 34.749, 516.654 34.746, 515.192 36.208"/>
+          </svg>
+          <div class="carousel-caption">
+            <h3>Custom</h3>
+          </div>
+        </div> -->
+      </div>
+      <a role="button" aria-label="Previous" class="carousel-control prev" href="#"><img src="/static/img/arrow.png" alt="An arrow pointing left"></a>
+      <a role="button" aria-label="Next" class="carousel-control next" href="#"><img src="/static/img/arrow.png" alt="An arrow pointing right"></a>
+    </div>
+
+    <div class="funcTitle">
+      <svg id="font-size" aria-hidden="true" role="img" alt="Two T's of different sizes" fill="#000000" width="32px" height="32px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+        <path d="M920 416H616c-4.4 0-8 3.6-8 8v112c0 4.4 3.6 8 8 8h48c4.4 0 8-3.6 8-8v-56h60v320h-46c-4.4 0-8 3.6-8 8v48c0 4.4 3.6 8 8 8h164c4.4 0 8-3.6 8-8v-48c0-4.4-3.6-8-8-8h-46V480h60v56c0 4.4 3.6 8 8 8h48c4.4 0 8-3.6 8-8V424c0-4.4-3.6-8-8-8zM656 296V168c0-4.4-3.6-8-8-8H104c-4.4 0-8 3.6-8 8v128c0 4.4 3.6 8 8 8h56c4.4 0 8-3.6 8-8v-64h168v560h-92c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h264c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8h-92V232h168v64c0 4.4 3.6 8 8 8h56c4.4 0 8-3.6 8-8z"/>
+      </svg>
+      <h2>Text Scaling</h2>
+    </div>
+    <div id="textScale">
+      <p id="min">50%</p>
+      <label for="percent" class="sr-only">Text scale slider</label><input type="range" id="percent" name="percent" min="50" max="200" value="100" step="1">
+      <p id="max">200%</p>
+      <label for="percentValue" class="sr-only">Text scale input</label><input type="text" id="percentValue" value="100" />
+    </div>
+
+    </div>
+
+  <!-- Profile Link -->
+  <a href="/profile" id="user">
+    <svg id="user-circle" role="img" aria-labelledby="ProfileTitle" width="64px" height="64px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none">
+      <title id="ProfileTitle">Profile Link</title>
+      <g fill="currentColor" fill-rule="evenodd" clip-rule="evenodd">
+        <path d="M8 3a3 3 0 100 6 3 3 0 000-6zM6.5 6a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z"/>
+        <path d="M.25 8a7.75 7.75 0 1115.5 0A7.75 7.75 0 01.25 8zM8 1.75a6.25 6.25 0 00-5.274 9.604c.15-.194.325-.369.514-.533C3.855 10.286 4.67 10 5.5 10h5c.83 0 1.645.286 2.26.82.189.165.365.34.514.534A6.25 6.25 0 008 1.75zm0 12.5a6.228 6.228 0 01-4.238-1.656c.035-.196.153-.372.462-.641.323-.281.78-.453 1.276-.453h5c.495 0 .953.172 1.276.453.31.269.427.445.462.641A6.228 6.228 0 018 14.25z"/>
+      </g>
+    </svg>
+  </a>
+
+</header>
+<script src="/views/headers/searchDropdownSelection.js"></script>
+
+</body>
+</html>
