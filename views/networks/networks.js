@@ -94,6 +94,18 @@ class Grid {
     } 
 }
 
+class View {
+    constructor(viewType) {
+        this.viewType = viewType;
+    }
+    
+    selectViewType(viewType) {
+        if (this.viewType != viewType) {
+            this.viewType = viewType
+        }
+    }
+}
+
 
 //Functions
 let generateNetwork = function() {
@@ -114,6 +126,12 @@ let initSVG = function(size = {x:"100%", y:"100%"}) {
     return draw;
 }
 
+const initView = function() {
+    let view = new View();
+    view.selectViewType("Map");
+    return view;
+}
+
 //Main Program
 const network = generateNetwork();
 
@@ -121,5 +139,5 @@ console.log(network);
 
 let viewMode = 0;
 let svg = initSVG();
-
+let view = initView();
 
