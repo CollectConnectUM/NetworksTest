@@ -60,7 +60,7 @@ html,body{
     margin-inline: calc(10px * var(--scale));
     margin-right: calc(2.5px * var(--scale));
 
-    font-size: calc(1.8rem * var(--scale));
+    font-size: calc(1.4rem * var(--scale));
 }
 
 
@@ -77,13 +77,13 @@ html,body{
 #vsBox {
     display: flex;
     flex-direction: row;
-    width: calc(45% * var(--scale));
-    height: calc(35% * var(--scale));
+    width: calc(50% * var(--scale));
+    height: calc(45% * var(--scale));
     white-space: nowrap;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     border-radius: calc(10px * var(--scale));
     background-color: var(--primary);
-    min-height: max-content;
+    min-height: fit-content;
 }
 
 .viewSButton {
@@ -91,14 +91,14 @@ html,body{
     height: 60% ;
     width:  28%;
     margin-inline: 1.5%;
-    min-width: min-content;
+    min-width: fit-content;
     min-height: 1.2rem;
     padding: 0;
     border: 0;
     margin: calc(9px * var(--scale));
     background-color: var(--secondary);
     border-radius: calc(20px * var(--scale));
-    font-size: calc(1.25rem * var(--scale));
+    font-size: calc(1rem * var(--scale));
     font-weight: bold;
     color: var(--primary-inv);
     align-items: center;
@@ -119,7 +119,7 @@ html,body{
     display: flex;
     flex-direction: column;
     border: calc(4px * var(--scale)) solid black;
-    height: calc(160% * var(--scale));
+    height: calc(200px * var(--scale));
     min-height: 100%;
     background-color: var(--secondary);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);

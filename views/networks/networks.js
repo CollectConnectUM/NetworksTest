@@ -1,6 +1,7 @@
 //Jenna Mathison
 
-import { SVG } from "https://cdn.skypack.dev/@svgdotjs/svg.js@3.2.0";
+//onst { SVG } = require("@svgdotjs/svg.js");
+//import SVG from "https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.2.0/svg.min.js";
 
 //Defining Network Classes
 class Network {
@@ -12,6 +13,7 @@ class Network {
         this.nodes = [];
         this.edges = [];
 
+        return this
     }
 
     addNode(node) {
@@ -47,6 +49,7 @@ class Node {
         this.icon = undefined;
 
         network.addNode(this);
+        return this
     }
 
     addRelationship(edge) {
@@ -65,6 +68,7 @@ class Edge {
         obj2.addRelationship(this);
 
         network.addEdge(this);
+        return this
     }
 }
 
@@ -82,6 +86,7 @@ class Grid {
                 this.grid[y][x] = undefined;
             }
         }
+        return this
     }
 
     insert(node, pos = [this.network.nodes.length+1,this.network.nodes.length+1]) {

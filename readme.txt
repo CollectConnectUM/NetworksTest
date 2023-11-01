@@ -1,9 +1,13 @@
-This is a local version of the brand new Translation Networks "Networks" View
+This is a test version of the brand new Translation Networks "Networks" View
 
 INSTALL:
-Simply clone this repo using your preffered method
+clone this repo using your preffered method
+cd NetworksTest
+npm install
 
 RUN:
-no "npm install" is required
-run using VS Code Live Server Extension or npm live-server package
+npm run dev
+
+Access sever at: localhost:9000 in your browser
+Close server with: ctrl + c
 
