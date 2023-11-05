@@ -8,6 +8,7 @@ class Network {
     constructor(name, size)  {
         this.name = name;
         this.grid = new Grid(size,this);
+        this.view = VIEWTYPE.Map
 
         this.root = undefined;
         this.nodes = [];
@@ -99,17 +100,11 @@ class Grid {
     } 
 }
 
-class View {
-    constructor(viewType) {
-        this.viewType = viewType;
-    }
-    
-    selectViewType(viewType) {
-        if (this.viewType != viewType) {
-            this.viewType = viewType
-        }
-    }
-}
+const VIEWTYPE = {
+    Map : "map",
+    Explore : "explore",
+    Edit : "edit"
+};
 
 
 //Functions
@@ -131,12 +126,6 @@ let initSVG = function(size = {x:"100%", y:"100%"}) {
     return draw;
 }
 
-const initView = function() {
-    let view = new View();
-    view.selectViewType("Map");
-    return view;
-}
-
 //Main Program
 const network = generateNetwork();
 
@@ -144,5 +133,4 @@ console.log(network);
 
 let viewMode = 0;
 let svg = initSVG();
-let view = initView();
 
