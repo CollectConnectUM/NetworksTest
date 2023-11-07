@@ -2,13 +2,14 @@
 
 //onst { SVG } = require("@svgdotjs/svg.js");
 //import SVG from "https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.2.0/svg.min.js";
+//SVG.js is currently imported through html for client side usage
 
 //Defining Network Classes
 class Network {
-    constructor(name, size)  {
+    constructor(name, size, view = VIEWTYPE.Map)  {
         this.name = name;
         this.grid = new Grid(size,this);
-        this.view = VIEWTYPE.Map
+        this.view = view //Default view for the network map
 
         this.root = undefined;
         this.nodes = [];
@@ -47,7 +48,7 @@ class Node {
         this.position = position;
 
         this.edges = [];
-        this.icon = undefined;
+        this.image = undefined;
 
         network.addNode(this);
         return this
@@ -100,37 +101,204 @@ class Grid {
     } 
 }
 
+//network view types
 const VIEWTYPE = {
     Map : "map",
     Explore : "explore",
     Edit : "edit"
 };
 
+//object for getting color and text variables and a list for updating them via the toolbar
+const VARS = {
+    cs : getComputedStyle(document.documentElement),
+    colorElements : [],
+    sizeElements : []
+};
+
 
 //Functions
-let generateNetwork = function() {
-    let network = new Network("Test Network",[2,2]);
+//draw grid on svg
+let drawGrid = function(network, draw, cellSize = {x: 100, y: 100}) {
+    const gridTable = []
+    const networkGrid = network.grid;
+    let gridGroup = draw.group().addClass("grid").attr({tabindex: "0", role: "grid", "aria-label": "Network Map", "aria-multiselectable": true})
+    for (let y = 0; y < networkGrid.size[1]; y++) {
+        const gridRow = [];
+        let gridRowGroup = gridGroup.group().addClass("gridRow").attr({role: "row"})
+        for (let x = 0; x < networkGrid.size[0]; x++) {
+            let cell = gridRowGroup.group().addClass("cell").attr({})
+            cell.rect(cellSize.x,cellSize.y).fill(VARS.cs.getPropertyValue("--bg-main")).stroke({color: VARS.cs.getPropertyValue("--primary"), width: "2"}).move(cellSize.x * x, cellSize.y * y + 2)
+            gridRow.push(cell)
+        }
+        gridTable.push(gridRow)
+    }
 
-    let rNode = network.addNode(new Node("Root",network,[1,1]))
-    let hNode =network.addNode(new Node("Home",network,[2,2]))
-    let rel = network.addEdge(new Edge("Within",network,rNode,hNode))
+    //setup elements as colors to manage for accessibility
+    VARS.colorElements.push({color: "--bg-main", class: "cell", property: "color"})
+    VARS.colorElements.push({color: "--primary", class: "cell", property: "stroke"})
 
-    return network;
+    return gridTable;
 }
 
-let initSVG = function(size = {x:"100%", y:"100%"}) {
-    //let divSize = {x:document.getElementById("SVGDiv").style.width, y:document.getElementById("SVGDiv").style.height}
-    let draw = SVG().addTo("#SVGDiv").size(size.x,size.y);
-    draw.rect("100%","100%").fill("color: light-grey;")
+let initSVG = function(network, size = {x:"100%", y:"100%"}) {
+    //setup svg element
+    let SVGDiv = document.getElementById("SVGDiv")
+    let draw = SVG().addTo(SVGDiv).size(size.x,size.y).viewbox(0,0,SVGDiv.clientWidth,SVGDiv.clientHeight).attr({id: "SVGDraw"})
+
+    //draw grid
+    let cellSize = {x: 120, y: 120}
+    const gridTable = drawGrid(network, draw, cellSize)
     
+    //draw objects
+    const drawnObjects = []
+    for (let i = 0; i < network.nodes.length; i++) {
+        let node = network.nodes[i]
+        let object = gridTable[node.position[1] - 1][node.position[0] - 1].group().addClass("object").attr({id: node.name + "Group"})
+
+        let image = undefined;
+        if (node.image == undefined) {
+            image = object.circle(24).fill("azure").move((cellSize.x * node.position[0] - (cellSize.x / 2)) - 10, (cellSize.y * node.position[1] - (cellSize.y / 2)) - 20)
+        } else { //Need to test with an image still
+            image = object.image(node.image)
+            image.move((cellSize.x * node.position[0] - (cellSize.x / 2)) - (image.width() / 2), (cellSize.y * node.position[1] - (cellSize.y / 2)) - (image.height() / 2))
+        }
+        image.attr({name: node.name, id: node.name})
+
+        let objText = object.text((add) => {
+            let nameSpan = add.tspan(node.name).dx(0).dy(0).addClass("objectTextName")
+            add.tspan("X" + node.position[0].toString() + " Y" + node.position[1].toString()).dx(-1 * (nameSpan.length() / 1.2)).dy("1em").addClass("objectTextPos")
+        })
+        objText.move(image.x() - (objText.length() / 6), image.y() + image.height())
+
+        //addtextScaling/object scaling here
+
+        drawnObjects.push(object)
+    }
+
+    //draw relationships
+    const drawnRelationships = []
+    for (let i = 0; i < network.edges.length; i++) {
+        let edge = network.edges[i]
+        let rel = draw.group().addClass("relationship")
+
+        let linePos = {
+            x1: 0,
+            y1: 0,
+            x2: 0,
+            y2: 0
+        }
+
+        let object1 = document.getElementById(edge.obj1.name)
+        let object2 = document.getElementById(edge.obj2.name)
+        
+        if (edge.obj1.image == undefined) {
+            linePos.x1 = Number(object1.getAttribute("cx"))
+            linePos.y1 = Number(object1.getAttribute("cy"))
+        } else {
+            //code for if image is there
+        }
+        if (edge.obj2.image == undefined) {
+            linePos.x2 = Number(object2.getAttribute("cx"))
+            linePos.y2 = Number(object2.getAttribute("cy"))
+        } else {
+            //code for if image is there
+        }
+        
+        let relLine = rel.line(linePos.x1, linePos.y1, linePos.x2 , linePos.y2).stroke({width: 4, color: "black"})
+
+        
+        //determie line rotation
+        let rotation = undefined
+        if ((linePos.x1 / linePos.x2) > 0.9 && (linePos.x1 / linePos.x2) < 1.1 ) {
+            rotation = 90
+        } else if ((linePos.y1 / linePos.y2) > 0.9 && (linePos.y1 / linePos.y2) < 1.1 ) {
+            rotation = 0
+        } else if ((linePos.x1 < linePos.x2) && (linePos.y1 < linePos.y2)){
+            rotation = 45
+        } else if ((linePos.x1 > linePos.x2) && (linePos.y1 < linePos.y2)){
+            rotation = - 45
+        }
+
+        //draw relationship text
+        let relText = rel.text((add) => {
+            add.tspan(edge.type).addClass("relText")
+        })
+
+        //set text pos/rotation
+        console.log(rotation)
+        if (rotation == 90) {
+            relText.move(linePos.x1 + (relLine.attr("stroke-width") * 2), linePos.y1 + (relLine.height() / 2))
+            relText.transform({rotate: 0})
+        } else if (rotation == 0) {
+            relText.move(linePos.x1 + relLine.width() / 5, linePos.y1)
+            relText.transform({rotate: 0})
+        } else if (rotation == 45) {
+            relText.move(linePos.x1 + relLine.width() / 3, linePos.y1 + relLine.height() / 3)
+            relText.transform({rotate: rotation})
+        } else if (rotation == -45) {
+            relText.move(linePos.x2, linePos.y1 + relLine.height() / 3)
+            relText.transform({rotate: rotation})
+        }
+
+        drawnRelationships.push(rel)
+
+        //WIP make lines go under objects
+        /*let use1 = document.createElement("use")
+        use1.setAttribute("href", "#" + edge.obj1.name + "Group")
+        use1.setAttribute("x", object1.getAttribute("cx"))
+        use1.setAttribute("y", object1.getAttribute("cy"))
+
+
+        let use2 = document.createElement("use")
+        use2.setAttribute("href", "#" + edge.obj2.name + "Group")
+        use2.setAttribute("x", object2.getAttribute("cx"))
+        use2.setAttribute("y", object2.getAttribute("cy"))
+
+        document.getElementById("SVGDraw").appendChild(use1)
+        document.getElementById("SVGDraw").appendChild(use2)*/
+    }
+
     return draw;
 }
 
 //Main Program
-const network = generateNetwork();
+//Test Network Generation Functions - Editable
 
-console.log(network);
+//2x2 network with root contains home
+let generateNetwork = function() {
+    let network = new Network("Test Network",[2,2]);
 
-let viewMode = 0;
-let svg = initSVG();
+    let rNode = new Node("Root",network,[1,1])
+    let hNode = new Node("Home",network,[2,2])
+    let rel = new Edge("Contains",network,rNode,hNode)
+
+    return network;
+}
+
+//3x3 network with root contains home,usr, and boot
+/*let generateNetwork = function() {
+    let network = new Network("Test Network",[3,3]);
+
+    let rNode = new Node("Root",network,[2,1]) //Root
+
+    let hNode = new Node("Home",network,[1,2]) //Home
+    let hrel = new Edge("Contains",network,rNode,hNode)
+
+    let uNode = new Node("Usr",network,[2,3]) //Usr
+    let urel = new Edge("Contains",network,rNode,uNode)
+
+    let bNode = new Node("Boot",network,[3,2]) //Boot
+    let brel = new Edge("Contains",network,rNode,bNode)
+
+    return network;
+}*/
+
+function main() {
+    const network = generateNetwork();
+    console.log(network);
+
+    let svg = initSVG(network);
+}
+main();
+
 

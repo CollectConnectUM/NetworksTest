@@ -16,7 +16,7 @@ html,body{
     flex-direction: column;
     justify-content:flex-start;
     align-items: center;
-    height: 90vh;
+    height: 85vh;
     width: 100vw;
 
 }
@@ -164,4 +164,22 @@ html,body{
     padding-top: 5vh;
     width: 45%;
     height: 60%;
+}
+
+.objectTextName {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.objectTextPos {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 0.8rem;
+}
+
+.relText {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: bold;
+    font-size: 1rem;
+    fill: var(--primary-inv);
 }
