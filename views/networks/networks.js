@@ -140,20 +140,12 @@ let drawGrid = function(network, draw, cellSize = {x: 100, y: 100}) {
     return gridTable;
 }
 
-let initSVG = function(network, size = {x:"100%", y:"100%"}) {
-    //setup svg element
-    let SVGDiv = document.getElementById("SVGDiv")
-    let draw = SVG().addTo(SVGDiv).size(size.x,size.y).viewbox(0,0,SVGDiv.clientWidth,SVGDiv.clientHeight).attr({id: "SVGDraw"})
-
-    //draw grid
-    let cellSize = {x: 120, y: 120}
-    const gridTable = drawGrid(network, draw, cellSize)
-    
-    //draw objects
-    const drawnObjects = []
+let drawObjects = function(network, draw, cellSize) {
+    let drawnObjects = []
+    let objGroup = draw.group().addClass("Objects")
     for (let i = 0; i < network.nodes.length; i++) {
         let node = network.nodes[i]
-        let object = gridTable[node.position[1] - 1][node.position[0] - 1].group().addClass("object").attr({id: node.name + "Group"})
+        let object = objGroup.group().addClass("object").attr({id: node.name + "Group"})
 
         let image = undefined;
         if (node.image == undefined) {
@@ -174,8 +166,10 @@ let initSVG = function(network, size = {x:"100%", y:"100%"}) {
 
         drawnObjects.push(object)
     }
+    return drawnObjects
+}
 
-    //draw relationships
+let drawRelationships = function(network, draw) {
     const drawnRelationships = []
     for (let i = 0; i < network.edges.length; i++) {
         let edge = network.edges[i]
@@ -225,7 +219,6 @@ let initSVG = function(network, size = {x:"100%", y:"100%"}) {
         })
 
         //set text pos/rotation
-        console.log(rotation)
         if (rotation == 90) {
             relText.move(linePos.x1 + (relLine.attr("stroke-width") * 2), linePos.y1 + (relLine.height() / 2))
             relText.transform({rotate: 0})
@@ -257,6 +250,23 @@ let initSVG = function(network, size = {x:"100%", y:"100%"}) {
         document.getElementById("SVGDraw").appendChild(use1)
         document.getElementById("SVGDraw").appendChild(use2)*/
     }
+    return drawnRelationships
+}
+
+let initSVG = function(network, size = {x:"100%", y:"100%"}) {
+    //setup svg element
+    let SVGDiv = document.getElementById("SVGDiv")
+    let draw = SVG().addTo(SVGDiv).size(size.x,size.y).viewbox(0,0,SVGDiv.clientWidth,SVGDiv.clientHeight).attr({id: "SVGDraw"})
+
+    //draw grid
+    let cellSize = {x: 120, y: 120}
+    const gridTable = drawGrid(network, draw, cellSize)
+    
+    //draw objects
+    const Objects = drawObjects(network, draw, cellSize)
+
+    //draw relationships
+    const Relationships = drawRelationships(network,draw)
 
     return draw;
 }
