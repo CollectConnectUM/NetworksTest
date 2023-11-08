@@ -42,10 +42,11 @@ class Network {
 }
 
 class Node {
-    constructor(name, network, position = undefined)  {
+    constructor(name, network, position = undefined, type = "Object")  {
         this.name = name;
         this.network = network;
         this.position = position;
+        this.type = type;
 
         this.edges = [];
         this.image = undefined;
@@ -121,7 +122,7 @@ const VARS = {
 let drawGrid = function(network, draw, cellSize = {x: 100, y: 100}) {
     const gridTable = []
     const networkGrid = network.grid;
-    let gridGroup = draw.group().addClass("grid").attr({tabindex: "0", role: "grid", "aria-label": "Network Map", "aria-multiselectable": true})
+    let gridGroup = draw.group().addClass("Grid").attr({tabindex: "0", role: "grid", "aria-label": "Network Map", "aria-multiselectable": true})
     for (let y = 0; y < networkGrid.size[1]; y++) {
         const gridRow = [];
         let gridRowGroup = gridGroup.group().addClass("gridRow").attr({role: "row"})
@@ -169,11 +170,12 @@ let drawObjects = function(network, draw, cellSize) {
     return drawnObjects
 }
 
-let drawRelationships = function(network, draw) {
+let drawRelationships = function(network, draw, cellSize) {
     const drawnRelationships = []
+    let relGroup = draw.group().addClass("Relationships")
     for (let i = 0; i < network.edges.length; i++) {
         let edge = network.edges[i]
-        let rel = draw.group().addClass("relationship")
+        let rel = relGroup.group().addClass("relationship")
 
         let linePos = {
             x1: 0,
@@ -182,18 +184,18 @@ let drawRelationships = function(network, draw) {
             y2: 0
         }
 
-        let object1 = document.getElementById(edge.obj1.name)
-        let object2 = document.getElementById(edge.obj2.name)
+        //let object1 = document.getElementById(edge.obj1.name)
+        //let object2 = document.getElementById(edge.obj2.name)
         
         if (edge.obj1.image == undefined) {
-            linePos.x1 = Number(object1.getAttribute("cx"))
-            linePos.y1 = Number(object1.getAttribute("cy"))
+            linePos.x1 = Number(cellSize.x * edge.obj1.position[0]) - (cellSize.x / 2)
+            linePos.y1 = Number(cellSize.y * edge.obj1.position[1]) - (cellSize.y / 2) - 10
         } else {
             //code for if image is there
         }
         if (edge.obj2.image == undefined) {
-            linePos.x2 = Number(object2.getAttribute("cx"))
-            linePos.y2 = Number(object2.getAttribute("cy"))
+            linePos.x2 = Number(cellSize.x * edge.obj2.position[0]) - (cellSize.x / 2) 
+            linePos.y2 = Number(cellSize.y * edge.obj2.position[1]) - (cellSize.y / 2) - 10
         } else {
             //code for if image is there
         }
@@ -262,11 +264,11 @@ let initSVG = function(network, size = {x:"100%", y:"100%"}) {
     let cellSize = {x: 120, y: 120}
     const gridTable = drawGrid(network, draw, cellSize)
     
+    //draw relationships
+    const Relationships = drawRelationships(network,draw, cellSize)
+
     //draw objects
     const Objects = drawObjects(network, draw, cellSize)
-
-    //draw relationships
-    const Relationships = drawRelationships(network,draw)
 
     return draw;
 }
@@ -275,7 +277,7 @@ let initSVG = function(network, size = {x:"100%", y:"100%"}) {
 //Test Network Generation Functions - Editable
 
 //2x2 network with root contains home
-let generateNetwork = function() {
+/*let generateNetwork = function() {
     let network = new Network("Test Network",[2,2]);
 
     let rNode = new Node("Root",network,[1,1])
@@ -283,25 +285,25 @@ let generateNetwork = function() {
     let rel = new Edge("Contains",network,rNode,hNode)
 
     return network;
-}
+}*/
 
-//3x3 network with root contains home,usr, and boot
-/*let generateNetwork = function() {
+//3x3 network with root contains home, usr, and boot
+let generateNetwork = function() {
     let network = new Network("Test Network",[3,3]);
 
-    let rNode = new Node("Root",network,[2,1]) //Root
+    let rNode = new Node("Root",network,[2,1], "Directory") //Root
 
-    let hNode = new Node("Home",network,[1,2]) //Home
+    let hNode = new Node("Home",network,[1,2], "Directory") //Home
     let hrel = new Edge("Contains",network,rNode,hNode)
 
-    let uNode = new Node("Usr",network,[2,3]) //Usr
+    let uNode = new Node("Usr",network,[2,3], "Directory") //Usr
     let urel = new Edge("Contains",network,rNode,uNode)
 
-    let bNode = new Node("Boot",network,[3,2]) //Boot
+    let bNode = new Node("Boot",network,[3,2], "Directory") //Boot
     let brel = new Edge("Contains",network,rNode,bNode)
 
     return network;
-}*/
+}
 
 function main() {
     const network = generateNetwork();
