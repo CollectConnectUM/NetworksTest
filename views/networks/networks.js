@@ -281,15 +281,72 @@ let initSVG = function(network, size = {x:"100%", y:"100%"}) {
 
 //Starts the Camera Controller for svg
 let initCamera = function(svg) {
-    const camera = {down: false, x: 0, y: 0}
+    //setup camera object
+    const camera = {down: false, x: 0, y: 0, w: 0, h: 0}
 
-    svg.mousedown((m) => {camera.down = true})
-    svg.mouseup((m) => {camera.down = false})
+    const svgDiv = document.getElementById("SVGDiv")
+    const vb = svg.viewbox()
+    camera.x = vb.x
+    camera.y = vb.y
+    camera.w = vb.w
+    camera.h = vb.h
+
+    console.log(camera)
+
+    //vbmove function
+    function vbMove() {
+        svg.viewbox(camera.x.toString() + " " + camera.y.toString() + " " + camera.w.toString() + " " + camera.h.toString())
+    }
+
+    //mouse events for controlling viewbox translation
+    const move = {x: 0, y: 0, startX: 0, startY: 0}
+    svg.mousedown((m) => {
+        camera.down = true
+        move.x = m.clientX
+        move.y = m.clientY
+        move.startX = m.clientX
+        move.startY = m.clientY
+    })
+
     svg.mousemove((m) => {
-        if (camera.down == true) {
+        if (camera.down === true) {
+            if ((svgDiv.clientWidth) > (m.clientX - move.startX) && (svgDiv.clientHeight) > (m.clientY - move.startY)) {
+                let difX = move.x - m.clientX
+                let difY = move.y - m.clientY
 
+                camera.x = camera.x + difX
+                camera.y = camera.y + difY
+                camera.w = camera.w + difX
+                camera.h = camera.h + difY
+
+                vbMove()
+
+                move.x = m.clientX
+                move.y = m.clientY
+            } else {
+                camera.down = false
+            }
         }
     })
+
+    svg.mouseup((m) => {
+        if (camera.down === true) {
+            camera.down = false
+            let difX = move.x - m.clientX
+            let difY = move.y - m.clientY
+
+            camera.x = camera.x + difX
+            camera.y = camera.y + difY
+            camera.w = camera.w + difX
+            camera.h = camera.h + difY
+
+            vbMove()
+        }
+    })
+
+    //mouse scrolling to zoom viewbox in/out 
+
+
 }
 
 //Main Program
@@ -299,8 +356,8 @@ let initCamera = function(svg) {
 /*let generateNetwork = function() {
     let network = new Network("Test Network",[2,2]);
 
-    let rNode = new Node("Root",network,[1,1])
-    let hNode = new Node("Home",network,[2,2])
+    let rNode = new Node("Root",network,[1,1], "Directory")
+    let hNode = new Node("Home",network,[2,2], "Directory")
     let rel = new Edge("Contains",network,rNode,hNode)
 
     return network;
