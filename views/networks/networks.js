@@ -291,8 +291,6 @@ let initCamera = function(svg) {
     camera.w = vb.w
     camera.h = vb.h
 
-    console.log(camera)
-
     //vbmove function
     function vbMove() {
         svg.viewbox(camera.x.toString() + " " + camera.y.toString() + " " + camera.w.toString() + " " + camera.h.toString())
@@ -357,7 +355,6 @@ let initCamera = function(svg) {
         newCam.w = camera.w + scale * 2
         newCam.h = camera.h + scale * 2 
 
-        console.log(camera)
         if (newCam.w > 0 && newCam.h > 0) {
             camera = newCam
             vbMove()
