@@ -361,6 +361,7 @@ let initCamera = function(svg) {
         }
     }
 
+    return camera
 }
 
 //Main Program
