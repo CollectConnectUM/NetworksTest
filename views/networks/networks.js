@@ -261,8 +261,14 @@ let initSVG = function(network, size = {x:"100%", y:"100%"}) {
     let draw = SVG().addTo(SVGDiv).size(size.x,size.y).viewbox(0,0,SVGDiv.clientWidth,SVGDiv.clientHeight).attr({id: "SVGDraw"})
 
     //draw grid
-    let cellSize = {x: 120, y: 120}
+    const cellSize = {x: 120, y: 120}
     const gridTable = drawGrid(network, draw, cellSize)
+
+    //setup viewbox
+    const viewSize = {x: 0, y: 0, offset: 20}
+    viewSize.x = gridTable.length * cellSize.x + (viewSize.offset * 2)
+    viewSize.y = gridTable[0].length * cellSize.y + (viewSize.offset * 2)
+    draw.viewbox((-1 *viewSize.offset).toString() + " " + (-1 *viewSize.offset).toString() + " " + viewSize.x.toString() + " " + viewSize.y.toString())
     
     //draw relationships
     const Relationships = drawRelationships(network,draw, cellSize)
@@ -271,6 +277,19 @@ let initSVG = function(network, size = {x:"100%", y:"100%"}) {
     const Objects = drawObjects(network, draw, cellSize)
 
     return draw;
+}
+
+//Starts the Camera Controller for svg
+let initCamera = function(svg) {
+    const camera = {down: false, x: 0, y: 0}
+
+    svg.mousedown((m) => {camera.down = true})
+    svg.mouseup((m) => {camera.down = false})
+    svg.mousemove((m) => {
+        if (camera.down == true) {
+
+        }
+    })
 }
 
 //Main Program
@@ -310,6 +329,7 @@ function main() {
     console.log(network);
 
     let svg = initSVG(network);
+    let camera = initCamera(svg);
 }
 main();
 
