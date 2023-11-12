@@ -282,7 +282,7 @@ let initSVG = function(network, size = {x:"100%", y:"100%"}) {
 //Starts the Camera Controller for svg
 let initCamera = function(svg) {
     //setup camera object
-    const camera = {down: false, x: 0, y: 0, w: 0, h: 0}
+    let camera = {down: false, x: 0, y: 0, w: 0, h: 0}
 
     const svgDiv = document.getElementById("SVGDiv")
     const vb = svg.viewbox()
@@ -345,7 +345,24 @@ let initCamera = function(svg) {
     })
 
     //mouse scrolling to zoom viewbox in/out 
+    let svgElement = document.getElementById("SVGDraw")
+    svgElement.onwheel = (m) => {
+        m.preventDefault()
 
+        let scale = m.deltaY / 10
+        
+        let newCam = {down: camera.down, x: 0, y: 0, w: 0, h: 0}
+        newCam.x = camera.x - scale
+        newCam.y = camera.y - scale
+        newCam.w = camera.w + scale * 2
+        newCam.h = camera.h + scale * 2 
+
+        console.log(camera)
+        if (newCam.w > 0 && newCam.h > 0) {
+            camera = newCam
+            vbMove()
+        }
+    }
 
 }
 
