@@ -137,9 +137,8 @@ html,body{
 
 #property-name {
     margin:0;
-    font-size: calc(1.5rem * var(--scale));
+    font-size: calc(1.3rem * var(--scale));
     font-weight: bold;
-    text-wrap: nowrap;
 }
 
 .propertyName {

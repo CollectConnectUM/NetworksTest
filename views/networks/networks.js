@@ -6,87 +6,106 @@
 
 //Defining Network Classes
 class Network {
-    constructor(name, size, view = VIEWTYPE.Map)  {
-        this.name = name;
-        this.grid = new Grid(size,this);
+    constructor(id, name, author, size, view = VIEWTYPE.Map)  {
+        this.id = id
+        this.name = name
+        this.author = author
+        this.grid = new Grid(size,this)
         this.view = view //Default view for the network map
 
-        this.root = undefined;
-        this.nodes = [];
-        this.edges = [];
+        this.root = undefined
+        this.nodes = []
+        this.edges = []
+
+        this.description = "Network Description"
 
         return this
     }
 
     addNode(node) {
         if (this.nodes.length == 0) {
-            this.root = node;
+            this.root = node
         }
-        this.nodes.push(node);
-        node.network = this;
+        this.nodes.push(node)
+        node.network = this
 
         if (node.position != undefined) {
-            this.grid.insert(node,[node.position[0],node.position[1]]);
+            this.grid.insert(node,[node.position[0],node.position[1]])
         } else {
-            this.grid.insert(node);
+            this.grid.insert(node)
         }
 
-        return node;
+        return this
     }
 
     addEdge(edge) {
-        this.edges.push(edge);
-        edge.network = this;
-        return edge;
+        this.edges.push(edge)
+        edge.network = this
+        return this
+    }
+
+    addDescription(desc) {
+        this.description = desc
+        return this
     }
 }
 
 class Node {
-    constructor(name, network, position = undefined, type = "Object")  {
-        this.name = name;
-        this.network = network;
-        this.position = position;
-        this.type = type;
+    constructor(id, name, network, position = undefined, type = "Object")  {
+        this.id = id
+        this.name = name
+        this.network = network
+        this.position = position
+        this.type = type
 
-        this.edges = [];
-        this.image = undefined;
+        this.edges = []
+        this.image = undefined
 
-        network.addNode(this);
+        this.description = "Node Description"
+
+        network.addNode(this)
         return this
     }
 
     addRelationship(edge) {
-        this.edges.push(edge);
+        this.edges.push(edge)
+        return this
+    }
+
+    addDescription(desc) {
+        this.description = desc
+        return this
     }
 }
 
 class Edge {
-    constructor(type, network, obj1, obj2)  {
-        this.type = type;
-        this.network = network;
-        this.obj1 = obj1;
-        this.obj2 = obj2;
+    constructor(id, type, network, obj1, obj2)  {
+        this.id = id
+        this.type = type
+        this.network = network
+        this.obj1 = obj1
+        this.obj2 = obj2
 
-        obj1.addRelationship(this);
-        obj2.addRelationship(this);
+        obj1.addRelationship(this)
+        obj2.addRelationship(this)
 
-        network.addEdge(this);
+        network.addEdge(this)
         return this
     }
 }
 
 class Grid {
     constructor(size, network) {
-        this.size = size;
-        this.network = network;
+        this.size = size
+        this.network = network
 
-        this.grid = [];
+        this.grid = []
         for (let y = 0; y <= size[0]; y++) {
-            this.grid.push([]);
+            this.grid.push([])
         }
         for(let y = 1; y <= size[0]; y++) {
             for (let x = 1; x <= size[1]; x++) {
-                this.grid[y][x] = undefined;
+                this.grid[y][x] = undefined
             }
         }
         return this
@@ -94,11 +113,11 @@ class Grid {
 
     insert(node, pos = [this.network.nodes.length+1,this.network.nodes.length+1]) {
         if (node.position != undefined) {
-            this.grid[node.position[0]][node.position[1]] = node;
+            this.grid[node.position[0]][node.position[1]] = node
         } else {
-            this.grid[pos[0]][pos[1]] = node;
+            this.grid[pos[0]][pos[1]] = node
         }
-        return true;
+        return this
     } 
 }
 
@@ -119,12 +138,12 @@ const VARS = {
 
 //Functions
 //draw grid on svg
-let drawGrid = function(network, draw, cellSize = {x: 100, y: 100}) {
+const drawGrid = function(network, draw, cellSize = {x: 100, y: 100}) {
     const gridTable = []
-    const networkGrid = network.grid;
+    const networkGrid = network.grid
     let gridGroup = draw.group().addClass("Grid").attr({tabindex: "0", role: "grid", "aria-label": "Network Map", "aria-multiselectable": true})
     for (let y = 0; y < networkGrid.size[1]; y++) {
-        const gridRow = [];
+        const gridRow = []
         let gridRowGroup = gridGroup.group().addClass("gridRow").attr({role: "row"})
         for (let x = 0; x < networkGrid.size[0]; x++) {
             let cell = gridRowGroup.group().addClass("cell").attr({})
@@ -138,10 +157,10 @@ let drawGrid = function(network, draw, cellSize = {x: 100, y: 100}) {
     VARS.colorElements.push({color: "--bg-main", class: "cell", property: "color"})
     VARS.colorElements.push({color: "--primary", class: "cell", property: "stroke"})
 
-    return gridTable;
+    return gridTable
 }
 
-let drawObjects = function(network, draw, cellSize) {
+const drawObjects = function(network, draw, cellSize) {
     let drawnObjects = []
     let objGroup = draw.group().addClass("Objects")
     for (let i = 0; i < network.nodes.length; i++) {
@@ -170,7 +189,7 @@ let drawObjects = function(network, draw, cellSize) {
     return drawnObjects
 }
 
-let drawRelationships = function(network, draw, cellSize) {
+const drawRelationships = function(network, draw, cellSize) {
     const drawnRelationships = []
     let relGroup = draw.group().addClass("Relationships")
     for (let i = 0; i < network.edges.length; i++) {
@@ -255,7 +274,7 @@ let drawRelationships = function(network, draw, cellSize) {
     return drawnRelationships
 }
 
-let initSVG = function(network, size = {x:"100%", y:"100%"}) {
+const initSVG = function(network, size = {x:"100%", y:"100%"}) {
     //setup svg element
     let SVGDiv = document.getElementById("SVGDiv")
     let draw = SVG().addTo(SVGDiv).size(size.x,size.y).viewbox(0,0,SVGDiv.clientWidth,SVGDiv.clientHeight).attr({id: "SVGDraw"})
@@ -280,7 +299,7 @@ let initSVG = function(network, size = {x:"100%", y:"100%"}) {
 }
 
 //Starts the Camera Controller for svg
-let initCamera = function(svg) {
+const initCamera = function(svg) {
     //setup camera object
     let camera = {down: false, x: 0, y: 0, w: 0, h: 0}
 
@@ -364,44 +383,58 @@ let initCamera = function(svg) {
     return camera
 }
 
+//Info Panel intitialization function
+const initInfoPanel = function(network) {
+    const nameElement = document.getElementById("property-name")
+    const authorElement = document.getElementById("owner")
+    const descDiv = document.getElementById("Description")
+    const descElement = descDiv.getElementsByClassName("propertyDescription")
+
+    nameElement.innerHTML = network.name
+    authorElement.innerHTML = network.author
+    descElement.innerHTML = network.description
+}
+
 //Main Program
 //Test Network Generation Functions - Editable
 
 //2x2 network with root contains home
 /*let generateNetwork = function() {
-    let network = new Network("Test Network",[2,2]);
+    let network = new Network(0, "Linux Directories Small", "Developer", [2,2])
 
-    let rNode = new Node("Root",network,[1,1], "Directory")
-    let hNode = new Node("Home",network,[2,2], "Directory")
-    let rel = new Edge("Contains",network,rNode,hNode)
+    let rNode = new Node(0, "Root", network,[1,1], "Directory")
+    let hNode = new Node(1, "Home", network,[2,2], "Directory")
+    let rel = new Edge(0, "Contains", network, rNode, hNode)
 
-    return network;
+    return network
 }*/
 
 //3x3 network with root contains home, usr, and boot
 let generateNetwork = function() {
-    let network = new Network("Test Network",[3,3]);
+    let network = new Network(0, "Linux Directories Large", "Developer", [3,3])
 
-    let rNode = new Node("Root",network,[2,1], "Directory") //Root
+    let rNode = new Node(0, "Root", network,[2,1], "Directory") //Root
 
-    let hNode = new Node("Home",network,[1,2], "Directory") //Home
-    let hrel = new Edge("Contains",network,rNode,hNode)
+    let hNode = new Node(1, "Home", network,[1,2], "Directory") //Home
+    let hrel = new Edge(0, "Contains", network, rNode, hNode)
 
-    let uNode = new Node("Usr",network,[2,3], "Directory") //Usr
-    let urel = new Edge("Contains",network,rNode,uNode)
+    let uNode = new Node(2, "Usr", network,[2,3], "Directory") //Usr
+    let urel = new Edge(1, "Contains", network, rNode, uNode)
 
-    let bNode = new Node("Boot",network,[3,2], "Directory") //Boot
-    let brel = new Edge("Contains",network,rNode,bNode)
+    let bNode = new Node(3, "Boot", network,[3,2], "Directory") //Boot
+    let brel = new Edge(2, "Contains", network, rNode, bNode)
 
-    return network;
+    return network
 }
 
 function main() {
-    const network = generateNetwork();
-    console.log(network);
+    const network = generateNetwork()
+    console.log(network)
 
-    let svg = initSVG(network);
-    let camera = initCamera(svg);
+    const svg = initSVG(network)
+
+    initCamera(svg)
+    initInfoPanel(network)
 }
 main();
 
