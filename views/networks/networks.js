@@ -366,7 +366,7 @@ const initCamera = function(svg) {
     svgElement.onwheel = (m) => {
         m.preventDefault()
 
-        let scale = m.deltaY / 10
+        let scale = m.deltaY
         
         let newCam = {down: camera.down, x: 0, y: 0, w: 0, h: 0}
         newCam.x = camera.x - scale
