@@ -141,7 +141,7 @@ const VARS = {
 const drawGrid = function(network, draw, cellSize = {x: 100, y: 100}) {
     const gridTable = []
     const networkGrid = network.grid
-    let gridGroup = draw.group().addClass("Grid").attr({tabindex: "0", role: "grid", "aria-label": "Network Map", "aria-multiselectable": true})
+    let gridGroup = draw.group().addClass("Grid").attr({id: "network-map", tabindex: "0", role: "grid", "aria-label": "Network Map", "aria-multiselectable": true})
     for (let y = 0; y < networkGrid.size[1]; y++) {
         const gridRow = []
         let gridRowGroup = gridGroup.group().addClass("gridRow").attr({role: "row"})
@@ -380,7 +380,7 @@ const initCamera = function(svg) {
         }
     }
 
-    return camera
+    return true
 }
 
 //Info Panel intitialization function
@@ -393,6 +393,27 @@ const initInfoPanel = function(network) {
     nameElement.innerHTML = network.name
     authorElement.innerHTML = network.author
     descElement.innerHTML = network.description
+
+    return true
+}
+
+//Toggle visible of the SVG Grid when the grid button is pressed
+const initGridButton = function() {
+    const gb = document.getElementById("grid-button")
+    const svgGrid = document.getElementById("network-map")
+
+    let visible = true
+    gb.onclick = (m) => {
+        if (visible) {
+            svgGrid.setAttribute("visibility", "hidden")
+            visible = false
+        } else {
+            svgGrid.setAttribute("visibility", "visible")
+            visible = true
+        }
+    }
+
+    return true
 }
 
 //Main Program
@@ -435,6 +456,7 @@ function main() {
 
     initCamera(svg)
     initInfoPanel(network)
+    initGridButton()
 }
 main();
 
