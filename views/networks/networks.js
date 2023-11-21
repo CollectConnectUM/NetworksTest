@@ -3,6 +3,8 @@
 //onst { SVG } = require("@svgdotjs/svg.js");
 //import SVG from "https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.2.0/svg.min.js";
 //SVG.js is currently imported through html for client side usage
+import draw from "./draw.js"
+import Network from "/js-scripts/Networks.js"
 
 //Defining Network Classes
 class Network {
