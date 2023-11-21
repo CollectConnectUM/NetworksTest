@@ -4,6 +4,9 @@ const path = require("path")
 const bodyParser = require("body-parser")
 const PORT = 9000;
 
+//import Networks Database
+const Networks = require("./js-scripts/Networks.js")
+
 //Setup view engine
 app.set("view engine", "jade");
 app.set("views", path.join(__dirname, "views"));
@@ -20,7 +23,23 @@ app.get('/', (req, res) => {
 });
 
 app.get("/networks", (req, res) => {
-    res.render("networks/networks.jade")
+    const defaultNetworkID = 0
+    res.redirect("/networks/" + defaultNetworkID.toString())
+});
+
+
+//Main Network load Function
+app.get("/networks/*", (req, res) => {
+    const data = {}
+    const parts = req.url.split('/');
+
+    if (parts.length = 3) {
+        data["id"] = parts[2]
+    } else {
+        data["id"] = 0
+    }
+
+    res.render("networks/networks.jade", { data: encodeURIComponent(JSON.stringify(data)) })
 });
 
 app.get("/*", (req, res) => {
