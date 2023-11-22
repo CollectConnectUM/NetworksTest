@@ -59,19 +59,37 @@ class Network {
             for (let i = 0; i < this.edges.length; i++) {
                 this.edges[i].network = undefined
                 this.edges[i].obj1 = this.edges[i].obj1.id
-                this.edges[i].obj2 = this.edges[i].obj1.id
+                this.edges[i].obj2 = this.edges[i].obj2.id
             }
         }
         return this
     }
 
-    static toNetwork(networkObj) {
-        
+    static toNetwork(networkObject) {
+        const obj = networkObject
+        const network = new Network(obj.id, obj.name, obj.author, obj.grid)
+
+        const nodes = []
+        for (let i = 0; i < obj.nodes.length; i++) {
+            const curNode = obj.nodes[i]
+            const node = new Node(curNode.id, curNode.name, network, curNode.position, curNode.type, curNode.author)
+            nodes.push(node)
+        }
+
+        const edges = []
+        for (let i = 0; i < obj.edges.length; i++) {
+            const curEdge = obj.edges[i]
+            let obj1 = nodes.find((node) => node.id == curEdge.obj1)
+            let obj2 = nodes.find((node) => node.id == curEdge.obj2)
+            const edge = new Edge(curEdge.id, curEdge.type, network, obj1, obj2)
+            edges.push(edge)
+        }
+        return network
     }
 }
 
 class Node {
-    constructor(id, name, network, position = undefined, type = "Object", author="Unknown")  {
+    constructor(id, name, network, position, type = "Object", author="Unknown")  {
         this.id = id
         this.name = name
         this.network = network
@@ -156,10 +174,10 @@ const VARS = {
 const Draw = {
     SVG: undefined,
     Objects: [],
-    RelationShips: [],
+    Relationships: [],
 
     //draw grid on svg
-    init: function() {
+    init: function(network, size, SVGDiv) {
          const svg = SVG().addTo(SVGDiv).size(size.x,size.y).viewbox(0,0,SVGDiv.clientWidth,SVGDiv.clientHeight).attr({id: "SVGDraw"})
          Draw.SVG = svg
          return svg
@@ -213,11 +231,9 @@ const Draw = {
             //Add to Draw Objects List
             Draw.Objects.push(object)
         }
-        return drawnObjects
     },
 
     drawRelationships: function(network, svg, cellSize) {
-        const drawnRelationships = []
         let relGroup = svg.group().addClass("Relationships")
         for (let i = 0; i < network.edges.length; i++) {
             let edge = network.edges[i]
@@ -281,9 +297,8 @@ const Draw = {
                 relText.transform({rotate: rotation})
             }
     
-            drawnRelationships.push(rel)
+            Draw.Relationships.push(rel)
         }
-        return drawnRelationships
     }
 }
 
@@ -292,7 +307,7 @@ const Draw = {
 const initSVG = function(network, size = {x:"100%", y:"100%"}) {
     //setup svg element
     const SVGDiv = document.getElementById("SVGDiv")
-    const svg = Draw.init(network, size)
+    const svg = Draw.init(network, size, SVGDiv)
 
     //draw grid
     const cellSize = {x: 120, y: 120}
@@ -439,11 +454,8 @@ function main() {
     const network = Network.toNetwork(data.network)
     console.log("Network:", network)
 
-    /*const network = Networks.getNetwork("LinuxLarge") //Supply the Test Network Here
-    console.log(network)
-
     initSVG(network)
     initCamera()
     initInfoPanel(network)
-    initGridButton()*/
+    initGridButton()
 } main();

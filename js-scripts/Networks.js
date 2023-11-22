@@ -56,15 +56,37 @@ class Network {
             for (let i = 0; i < this.edges.length; i++) {
                 this.edges[i].network = undefined
                 this.edges[i].obj1 = this.edges[i].obj1.id
-                this.edges[i].obj2 = this.edges[i].obj1.id
+                this.edges[i].obj2 = this.edges[i].obj2.id
             }
         }
         return this
     }
+
+    static toNetwork(networkObject) {
+        const obj = networkObject
+        const network = new Network(obj.id, obj.name, obj.author, obj.grid)
+
+        const nodes = []
+        for (let i = 0; i < obj.nodes.length; i++) {
+            const curNode = obj.nodes[i]
+            const node = new Node(curNode.id, curNode.name, network, curNode.position, curNode.type, curNode.author)
+            nodes.push(node)
+        }
+
+        const edges = []
+        for (let i = 0; i < obj.edges.length; i++) {
+            const curEdge = obj.edges[i]
+            let obj1 = nodes.find((node) => node.id == curEdge.obj1)
+            let obj2 = nodes.find((node) => node.id == curEdge.obj2)
+            const edge = new Edge(curEdge.id, curEdge.type, network, obj1, obj2)
+            edges.push(edge)
+        }
+        return network
+    }
 }
 
 class Node {
-    constructor(id, name, network, position = undefined, type = "Object", author="Unknown")  {
+    constructor(id, name, network, position, type = "Object", author="Unknown")  {
         this.id = id
         this.name = name
         this.network = network
