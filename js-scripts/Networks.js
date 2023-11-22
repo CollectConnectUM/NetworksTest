@@ -2,12 +2,12 @@
 
 //Defining Network Classes
 class Network {
-    constructor(id, name, author, size, view = VIEWTYPE.Map)  {
+    constructor(id, name, author, size)  {
         this.id = id
         this.name = name
         this.author = author
         this.grid = new Grid(size,this)
-        this.view = view //Default view for the network map
+        
 
         this.root = undefined
         this.nodes = []
@@ -47,12 +47,13 @@ class Network {
 }
 
 class Node {
-    constructor(id, name, network, position = undefined, type = "Object")  {
+    constructor(id, name, network, position = undefined, type = "Object", author="Unknown")  {
         this.id = id
         this.name = name
         this.network = network
         this.position = position
         this.type = type
+        this.author = author
 
         this.edges = []
         this.image = undefined
@@ -120,55 +121,98 @@ class Grid {
 
 
 //Networks Database
-const Networks = {
-    LinuxSmall: genLinuxSmall,
-    LinuxLarge: genLinuxLarge,
-    Babel: genBabel
-}
+const Networks = [
+    {
+        id: 0,
+        generate: genLinuxSmall
+    },
+    {
+        id: 1,
+        generate: genLinuxLarge
+    },
+    {
+        id: 2,
+        generate: genBabel
+
+    }
+]
 
 //Linux Directories Small Network
-function genLinuxLarge(){
-    let network = new Network(0, "Linux Directories Large", "Developer", [3,3])
+function genLinuxLarge(id){
+    const network = new Network(id, "Linux Directories Large", "Developer", [3,3])
 
-    let rNode = new Node(0, "Root", network,[2,1], "Directory") //Root
+    const rNode = new Node(0, "Root", network,[2,1], "Directory") //Root
 
-    let hNode = new Node(1, "Home", network,[1,2], "Directory") //Home
-    let hrel = new Edge(0, "Contains", network, rNode, hNode)
+    const hNode = new Node(1, "Home", network,[1,2], "Directory") //Home
+    const hrel = new Edge(0, "Contains", network, rNode, hNode)
 
-    let uNode = new Node(2, "Usr", network,[2,3], "Directory") //Usr
-    let urel = new Edge(1, "Contains", network, rNode, uNode)
+    const uNode = new Node(2, "Usr", network,[2,3], "Directory") //Usr
+    const urel = new Edge(1, "Contains", network, rNode, uNode)
 
-    let bNode = new Node(3, "Boot", network,[3,2], "Directory") //Boot
-    let brel = new Edge(2, "Contains", network, rNode, bNode)
+    const bNode = new Node(3, "Boot", network,[3,2], "Directory") //Boot
+    const brel = new Edge(2, "Contains", network, rNode, bNode)
 
     return network
 }
 
 //Linux Directories Small Network
-function genLinuxSmall() {
-    let network = new Network(0, "Linux Directories Small", "Developer", [2,2])
+function genLinuxSmall(id) {
+    const network = new Network(0, "Linux Directories Small", "Developer", [2,2])
 
-    let rNode = new Node(0, "Root", network,[1,1], "Directory")
-    let hNode = new Node(1, "Home", network,[2,2], "Directory")
-    let rel = new Edge(0, "Contains", network, rNode, hNode)
+    const rNode = new Node(0, "Root", network,[1,1], "Directory")
+    const hNode = new Node(1, "Home", network,[2,2], "Directory")
+    const rel = new Edge(0, "Contains", network, rNode, hNode)
 
     return network
 }
 
 //Babel Network
-function genBabel() {
-    return undefined
+function genBabel(id) {
+    const network = new Network(id, "Babel", "Ali Bolcakan", [12, 7])
+    network.addDescription("This is a copy of Mapping Tower of Babel translators and translations by merrill, links to Hathi Trust catalog material by bolcakan.")
+
+    const bible = new Node(0, "King James Bible", network, [1,1], "Book")
+    const penta = new Node(1, "Pentateuch", network, [5,4], "Book")
+
+    const bibleToPenta = new Edge(0, "Translated From", network, bible, penta)
+
+    return network
 }
     
 
 //Returns network object based on networkName
 module.exports = {
-    getNetwork: function(networkName) {
-        if (Networks[networkName] != undefined) {
-            const network = Networks[networkName]()
-            return network
-        } else {
-            return "ERROR: Network Not Found"
+    getNetwork: function(networkID) {
+        for (let i = 0; i < Networks.length; i++) {
+            const network = Networks[i]
+            if (network.id == networkID) {
+                return network.generate()
+            }
         }
+        return "Network Not Found"
+    },
+
+    //Function for sending network over URI
+    stringifyNetwork: function(key, value) {
+        if (key === "grid") {
+            return "grid"
+        } else if (key === "root") {
+            return "root"
+        } else if (key === "nodes") {
+            return "nodes"
+        } else if (key === "edges") {
+            return "edges"
+        } else if (key === "obj1") {
+            return "obj1"
+        } else if ( key ==="obj2") {
+            return "obj2"
+        } else if ( key === "grid") {
+            return "grid"
+        }
+        return value
+    },
+
+    parseNetwork: function(key,value) {
+        
     }
 }

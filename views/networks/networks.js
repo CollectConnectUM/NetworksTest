@@ -3,14 +3,6 @@
 //onst { SVG } = require("@svgdotjs/svg.js");
 //import SVG from "https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.2.0/svg.min.js";
 //SVG.js is currently imported through html for client side usage
-import draw from "./draw.js"
-
-//network view types
-const VIEWTYPE = {
-    Map : "map",
-    Explore : "explore",
-    Edit : "edit"
-};
 
 //object for getting color and text variables and a list for updating them via the toolbar
 const VARS = {
@@ -19,171 +11,164 @@ const VARS = {
     sizeElements : []
 };
 
+//Draw Object and Functions
+const Draw = {
+    SVG: undefined,
+    Objects: [],
+    RelationShips: [],
 
-//Functions
-//draw grid on svg
-const drawGrid = function(network, draw, cellSize = {x: 100, y: 100}) {
-    const gridTable = []
-    const networkGrid = network.grid
-    let gridGroup = draw.group().addClass("Grid").attr({id: "network-map", tabindex: "0", role: "grid", "aria-label": "Network Map", "aria-multiselectable": true})
-    for (let y = 0; y < networkGrid.size[1]; y++) {
-        const gridRow = []
-        let gridRowGroup = gridGroup.group().addClass("gridRow").attr({role: "row"})
-        for (let x = 0; x < networkGrid.size[0]; x++) {
-            let cell = gridRowGroup.group().addClass("cell").attr({})
-            cell.rect(cellSize.x,cellSize.y).fill(VARS.cs.getPropertyValue("--bg-main")).stroke({color: VARS.cs.getPropertyValue("--primary"), width: "2"}).move(cellSize.x * x, cellSize.y * y + 2)
-            gridRow.push(cell)
+    //draw grid on svg
+    init: function() {
+         const svg = SVG().addTo(SVGDiv).size(size.x,size.y).viewbox(0,0,SVGDiv.clientWidth,SVGDiv.clientHeight).attr({id: "SVGDraw"})
+         Draw.SVG = svg
+         return svg
+    },
+    drawGrid: function(network, svg, cellSize = {x: 100, y: 100}) {
+        const gridTable = []
+        const networkGrid = network.grid
+        let gridGroup = svg.group().addClass("Grid").attr({id: "network-map", tabindex: "0", role: "grid", "aria-label": "Network Map", "aria-multiselectable": true})
+        for (let y = 0; y < networkGrid.size[1]; y++) {
+            const gridRow = []
+            let gridRowGroup = gridGroup.group().addClass("gridRow").attr({role: "row"})
+            for (let x = 0; x < networkGrid.size[0]; x++) {
+                let cell = gridRowGroup.group().addClass("cell").attr({})
+                cell.rect(cellSize.x,cellSize.y).fill(VARS.cs.getPropertyValue("--bg-main")).stroke({color: VARS.cs.getPropertyValue("--primary"), width: "2"}).move(cellSize.x * x, cellSize.y * y + 2)
+                gridRow.push(cell)
+            }
+            gridTable.push(gridRow)
         }
-        gridTable.push(gridRow)
+    
+        //setup elements as colors to manage for accessibility
+        VARS.colorElements.push({color: "--bg-main", class: "cell", property: "color"})
+        VARS.colorElements.push({color: "--primary", class: "cell", property: "stroke"})
+    
+        return gridTable
+    },
+
+    drawObjects: function(network, svg, cellSize) {
+        let objGroup = svg.group().addClass("Objects")
+        for (let i = 0; i < network.nodes.length; i++) {
+            let node = network.nodes[i]
+            let object = objGroup.group().addClass("object").attr({id: node.name + "Group"})
+    
+            let image = undefined;
+            if (node.image == undefined) {
+                image = object.circle(24).fill("azure").move((cellSize.x * node.position[0] - (cellSize.x / 2)) - 10, (cellSize.y * node.position[1] - (cellSize.y / 2)) - 20)
+            } else { //Need to test with an image still
+                image = object.image(node.image)
+                image.move((cellSize.x * node.position[0] - (cellSize.x / 2)) - (image.width() / 2), (cellSize.y * node.position[1] - (cellSize.y / 2)) - (image.height() / 2))
+            }
+            image.attr({name: node.name, id: node.name})
+    
+            let objText = object.text((add) => {
+                let nameSpan = add.tspan(node.name).dx(0).dy(0).addClass("objectTextName")
+                add.tspan("X" + node.position[0].toString() + " Y" + node.position[1].toString()).dx(-1 * (nameSpan.length() / 1.2)).dy("1em").addClass("objectTextPos")
+            })
+            objText.move(image.x() - (objText.length() / 6), image.y() + image.height())
+    
+            //addtextScaling/object scaling here
+    
+            //Add to Draw Objects List
+            Draw.Objects.push(object)
+        }
+        return drawnObjects
+    },
+
+    drawRelationships: function(network, svg, cellSize) {
+        const drawnRelationships = []
+        let relGroup = svg.group().addClass("Relationships")
+        for (let i = 0; i < network.edges.length; i++) {
+            let edge = network.edges[i]
+            let rel = relGroup.group().addClass("relationship")
+    
+            let linePos = {
+                x1: 0,
+                y1: 0,
+                x2: 0,
+                y2: 0
+            }
+    
+            //let object1 = document.getElementById(edge.obj1.name)
+            //let object2 = document.getElementById(edge.obj2.name)
+            
+            if (edge.obj1.image == undefined) {
+                linePos.x1 = Number(cellSize.x * edge.obj1.position[0]) - (cellSize.x / 2)
+                linePos.y1 = Number(cellSize.y * edge.obj1.position[1]) - (cellSize.y / 2) - 10
+            } else {
+                //code for if image is there
+            }
+            if (edge.obj2.image == undefined) {
+                linePos.x2 = Number(cellSize.x * edge.obj2.position[0]) - (cellSize.x / 2) 
+                linePos.y2 = Number(cellSize.y * edge.obj2.position[1]) - (cellSize.y / 2) - 10
+            } else {
+                //code for if image is there
+            }
+            
+            let relLine = rel.line(linePos.x1, linePos.y1, linePos.x2 , linePos.y2).stroke({width: 4, color: "black"})
+    
+            
+            //determie line rotation
+            let rotation = undefined
+            if ((linePos.x1 / linePos.x2) > 0.9 && (linePos.x1 / linePos.x2) < 1.1 ) {
+                rotation = 90
+            } else if ((linePos.y1 / linePos.y2) > 0.9 && (linePos.y1 / linePos.y2) < 1.1 ) {
+                rotation = 0
+            } else if ((linePos.x1 < linePos.x2) && (linePos.y1 < linePos.y2)){
+                rotation = 45
+            } else if ((linePos.x1 > linePos.x2) && (linePos.y1 < linePos.y2)){
+                rotation = - 45
+            }
+    
+            //draw relationship text
+            let relText = rel.text((add) => {
+                add.tspan(edge.type).addClass("relText")
+            })
+    
+            //set text pos/rotation
+            if (rotation == 90) {
+                relText.move(linePos.x1 + (relLine.attr("stroke-width") * 2), linePos.y1 + (relLine.height() / 2))
+                relText.transform({rotate: 0})
+            } else if (rotation == 0) {
+                relText.move(linePos.x1 + relLine.width() / 5, linePos.y1)
+                relText.transform({rotate: 0})
+            } else if (rotation == 45) {
+                relText.move(linePos.x1 + relLine.width() / 3, linePos.y1 + relLine.height() / 3)
+                relText.transform({rotate: rotation})
+            } else if (rotation == -45) {
+                relText.move(linePos.x2, linePos.y1 + relLine.height() / 3)
+                relText.transform({rotate: rotation})
+            }
+    
+            drawnRelationships.push(rel)
+        }
+        return drawnRelationships
     }
-
-    //setup elements as colors to manage for accessibility
-    VARS.colorElements.push({color: "--bg-main", class: "cell", property: "color"})
-    VARS.colorElements.push({color: "--primary", class: "cell", property: "stroke"})
-
-    return gridTable
-}
-
-const drawObjects = function(network, draw, cellSize) {
-    let drawnObjects = []
-    let objGroup = draw.group().addClass("Objects")
-    for (let i = 0; i < network.nodes.length; i++) {
-        let node = network.nodes[i]
-        let object = objGroup.group().addClass("object").attr({id: node.name + "Group"})
-
-        let image = undefined;
-        if (node.image == undefined) {
-            image = object.circle(24).fill("azure").move((cellSize.x * node.position[0] - (cellSize.x / 2)) - 10, (cellSize.y * node.position[1] - (cellSize.y / 2)) - 20)
-        } else { //Need to test with an image still
-            image = object.image(node.image)
-            image.move((cellSize.x * node.position[0] - (cellSize.x / 2)) - (image.width() / 2), (cellSize.y * node.position[1] - (cellSize.y / 2)) - (image.height() / 2))
-        }
-        image.attr({name: node.name, id: node.name})
-
-        let objText = object.text((add) => {
-            let nameSpan = add.tspan(node.name).dx(0).dy(0).addClass("objectTextName")
-            add.tspan("X" + node.position[0].toString() + " Y" + node.position[1].toString()).dx(-1 * (nameSpan.length() / 1.2)).dy("1em").addClass("objectTextPos")
-        })
-        objText.move(image.x() - (objText.length() / 6), image.y() + image.height())
-
-        //addtextScaling/object scaling here
-
-        drawnObjects.push(object)
-    }
-    return drawnObjects
-}
-
-const drawRelationships = function(network, draw, cellSize) {
-    const drawnRelationships = []
-    let relGroup = draw.group().addClass("Relationships")
-    for (let i = 0; i < network.edges.length; i++) {
-        let edge = network.edges[i]
-        let rel = relGroup.group().addClass("relationship")
-
-        let linePos = {
-            x1: 0,
-            y1: 0,
-            x2: 0,
-            y2: 0
-        }
-
-        //let object1 = document.getElementById(edge.obj1.name)
-        //let object2 = document.getElementById(edge.obj2.name)
-        
-        if (edge.obj1.image == undefined) {
-            linePos.x1 = Number(cellSize.x * edge.obj1.position[0]) - (cellSize.x / 2)
-            linePos.y1 = Number(cellSize.y * edge.obj1.position[1]) - (cellSize.y / 2) - 10
-        } else {
-            //code for if image is there
-        }
-        if (edge.obj2.image == undefined) {
-            linePos.x2 = Number(cellSize.x * edge.obj2.position[0]) - (cellSize.x / 2) 
-            linePos.y2 = Number(cellSize.y * edge.obj2.position[1]) - (cellSize.y / 2) - 10
-        } else {
-            //code for if image is there
-        }
-        
-        let relLine = rel.line(linePos.x1, linePos.y1, linePos.x2 , linePos.y2).stroke({width: 4, color: "black"})
-
-        
-        //determie line rotation
-        let rotation = undefined
-        if ((linePos.x1 / linePos.x2) > 0.9 && (linePos.x1 / linePos.x2) < 1.1 ) {
-            rotation = 90
-        } else if ((linePos.y1 / linePos.y2) > 0.9 && (linePos.y1 / linePos.y2) < 1.1 ) {
-            rotation = 0
-        } else if ((linePos.x1 < linePos.x2) && (linePos.y1 < linePos.y2)){
-            rotation = 45
-        } else if ((linePos.x1 > linePos.x2) && (linePos.y1 < linePos.y2)){
-            rotation = - 45
-        }
-
-        //draw relationship text
-        let relText = rel.text((add) => {
-            add.tspan(edge.type).addClass("relText")
-        })
-
-        //set text pos/rotation
-        if (rotation == 90) {
-            relText.move(linePos.x1 + (relLine.attr("stroke-width") * 2), linePos.y1 + (relLine.height() / 2))
-            relText.transform({rotate: 0})
-        } else if (rotation == 0) {
-            relText.move(linePos.x1 + relLine.width() / 5, linePos.y1)
-            relText.transform({rotate: 0})
-        } else if (rotation == 45) {
-            relText.move(linePos.x1 + relLine.width() / 3, linePos.y1 + relLine.height() / 3)
-            relText.transform({rotate: rotation})
-        } else if (rotation == -45) {
-            relText.move(linePos.x2, linePos.y1 + relLine.height() / 3)
-            relText.transform({rotate: rotation})
-        }
-
-        drawnRelationships.push(rel)
-
-        //WIP make lines go under objects
-        /*let use1 = document.createElement("use")
-        use1.setAttribute("href", "#" + edge.obj1.name + "Group")
-        use1.setAttribute("x", object1.getAttribute("cx"))
-        use1.setAttribute("y", object1.getAttribute("cy"))
-
-
-        let use2 = document.createElement("use")
-        use2.setAttribute("href", "#" + edge.obj2.name + "Group")
-        use2.setAttribute("x", object2.getAttribute("cx"))
-        use2.setAttribute("y", object2.getAttribute("cy"))
-
-        document.getElementById("SVGDraw").appendChild(use1)
-        document.getElementById("SVGDraw").appendChild(use2)*/
-    }
-    return drawnRelationships
 }
 
 const initSVG = function(network, size = {x:"100%", y:"100%"}) {
     //setup svg element
-    let SVGDiv = document.getElementById("SVGDiv")
-    let draw = SVG().addTo(SVGDiv).size(size.x,size.y).viewbox(0,0,SVGDiv.clientWidth,SVGDiv.clientHeight).attr({id: "SVGDraw"})
+    const SVGDiv = document.getElementById("SVGDiv")
+    const svg = Draw.init(network, size)
 
     //draw grid
     const cellSize = {x: 120, y: 120}
-    const gridTable = drawGrid(network, draw, cellSize)
+    const gridTable = Draw.drawGrid(network, svg, cellSize)
 
     //setup viewbox
     const viewSize = {x: 0, y: 0, offset: 20}
     viewSize.x = gridTable.length * cellSize.x + (viewSize.offset * 2)
     viewSize.y = gridTable[0].length * cellSize.y + (viewSize.offset * 2)
-    draw.viewbox((-1 *viewSize.offset).toString() + " " + (-1 *viewSize.offset).toString() + " " + viewSize.x.toString() + " " + viewSize.y.toString())
+    svg.viewbox((-1 *viewSize.offset).toString() + " " + (-1 *viewSize.offset).toString() + " " + viewSize.x.toString() + " " + viewSize.y.toString())
     
-    //draw relationships
-    const Relationships = drawRelationships(network,draw, cellSize)
-
+    //Draw relationships
+    Draw.drawRelationships(network,svg, cellSize)
     //draw objects
-    const Objects = drawObjects(network, draw, cellSize)
-
-    return draw;
+    Draw.drawObjects(network, svg, cellSize)
 }
 
 //Starts the Camera Controller for svg
-const initCamera = function(svg) {
+const initCamera = function() {
+    const svg = Draw.SVG
     //setup camera object
     let camera = {down: false, x: 0, y: 0, w: 0, h: 0}
 
@@ -300,17 +285,19 @@ const initGridButton = function() {
     return true
 }
 
+
+
 //Main Program
 function main() {
+    console.log(data)
     data = JSON.parse(decodeURIComponent(data));
-    console.log(data.id)
+    console.log(data.network)
 
     /*const network = Networks.getNetwork("LinuxLarge") //Supply the Test Network Here
     console.log(network)
 
-    const svg = initSVG(network)
-
-    initCamera(svg)
+    initSVG(network)
+    initCamera()
     initInfoPanel(network)
     initGridButton()*/
 } main();

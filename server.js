@@ -2,6 +2,9 @@ const express = require("express");
 const app = express();
 const path = require("path")
 const bodyParser = require("body-parser")
+const http = require("http")
+const server = http.Server(app)
+const io = require('socket.io')(server)
 const PORT = 9000;
 
 //import Networks Database
@@ -23,35 +26,36 @@ app.get('/', (req, res) => {
 });
 
 app.get("/networks", (req, res) => {
-    const defaultNetworkID = 0
-    res.redirect("/networks/" + defaultNetworkID.toString())
+    res.redirect("/networks/0")
 });
 
 
 //Main Network load Function
 app.get("/networks/*", (req, res) => {
-    const data = {}
     const parts = req.url.split('/');
 
+    let id = undefined
     if (parts.length = 3) {
-        data["id"] = parts[2]
+        id = parts[2]
     } else {
-        data["id"] = 0
+        id = 0
     }
+    
+    let network = Networks.getNetwork(id)
+    //console.log(network)
 
-    res.render("networks/networks.jade", { data: encodeURIComponent(JSON.stringify(data)) })
+    const data = {}
+    data["network"] = network
+
+    res.render("networks/networks.jade", { data: encodeURIComponent(JSON.stringify(data, Networks.stringifyNetwork))})
 });
 
 app.get("/*", (req, res) => {
-    res.redirect("/networks")
+    res.redirect("/networks/0")
 });
 
 //Start server listening
-const server = app.listen(PORT, function (err) {
+app.listen(PORT, function (err) {
     if(err){console.log(err)}
     console.log("Server listening on port", PORT)
-});
-
-server.on("connection", (socket) => {
-    console.log(socket.address)
 });
