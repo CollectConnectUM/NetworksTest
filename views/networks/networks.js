@@ -1,15 +1,156 @@
 //Jenna Mathison
 
-//onst { SVG } = require("@svgdotjs/svg.js");
 //import SVG from "https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.2.0/svg.min.js";
 //SVG.js is currently imported through html for client side usage
+
+//Start Network Classes
+class Network {
+    constructor(id, name, author, size)  {
+        this.id = id
+        this.name = name
+        this.author = author
+        this.grid = new Grid(size,this)
+        
+
+        this.root = undefined
+        this.nodes = []
+        this.edges = []
+
+        this.description = "Network Description"
+
+        return this
+    }
+
+    addNode(node) {
+        if (this.nodes.length == 0) {
+            this.root = node
+        }
+        this.nodes.push(node)
+        node.network = this
+
+        if (node.position != undefined) {
+            this.grid.insert(node,[node.position[0],node.position[1]])
+        } else {
+            this.grid.insert(node)
+        }
+
+        return this
+    }
+
+    addEdge(edge) {
+        this.edges.push(edge)
+        edge.network = this
+        return this
+    }
+
+    addDescription(desc) {
+        this.description = desc
+        return this
+    }
+
+    toJSON(key) {
+        if (key === "network") {
+            this.grid = this.grid.size
+            this.root = undefined
+            for (let i = 0; i < this.nodes.length; i++) {
+                this.nodes[i].network = undefined
+                this.nodes[i].edges = []
+            }
+            for (let i = 0; i < this.edges.length; i++) {
+                this.edges[i].network = undefined
+                this.edges[i].obj1 = this.edges[i].obj1.id
+                this.edges[i].obj2 = this.edges[i].obj1.id
+            }
+        }
+        return this
+    }
+
+    static toNetwork(networkObj) {
+        
+    }
+}
+
+class Node {
+    constructor(id, name, network, position = undefined, type = "Object", author="Unknown")  {
+        this.id = id
+        this.name = name
+        this.network = network
+        this.position = position
+        this.type = type
+        this.author = author
+
+        this.edges = []
+        this.image = undefined
+
+        this.description = "Node Description"
+
+        network.addNode(this)
+        return this
+    }
+
+    addRelationship(edge) {
+        this.edges.push(edge)
+        return this
+    }
+
+    addDescription(desc) {
+        this.description = desc
+        return this
+    }
+}
+
+class Edge {
+    constructor(id, type, network, obj1, obj2)  {
+        this.id = id
+        this.type = type
+        this.network = network
+        this.obj1 = obj1
+        this.obj2 = obj2
+
+        obj1.addRelationship(this)
+        obj2.addRelationship(this)
+
+        network.addEdge(this)
+        return this
+    }
+}
+
+class Grid {
+    constructor(size, network) {
+        this.size = size
+        this.network = network
+
+        this.grid = []
+        for (let y = 0; y <= size[0]; y++) {
+            this.grid.push([])
+        }
+        for(let y = 1; y <= size[0]; y++) {
+            for (let x = 1; x <= size[1]; x++) {
+                this.grid[y][x] = undefined
+            }
+        }
+        return this
+    }
+
+    insert(node, pos = [this.network.nodes.length+1,this.network.nodes.length+1]) {
+        if (node.position != undefined) {
+            this.grid[node.position[0]][node.position[1]] = node
+        } else {
+            this.grid[pos[0]][pos[1]] = node
+        }
+        return this
+    } 
+}
+//End Network Classes
+
+
 
 //object for getting color and text variables and a list for updating them via the toolbar
 const VARS = {
     cs : getComputedStyle(document.documentElement),
     colorElements : [],
     sizeElements : []
-};
+}
 
 //Draw Object and Functions
 const Draw = {
@@ -23,6 +164,7 @@ const Draw = {
          Draw.SVG = svg
          return svg
     },
+
     drawGrid: function(network, svg, cellSize = {x: 100, y: 100}) {
         const gridTable = []
         const networkGrid = network.grid
@@ -145,6 +287,8 @@ const Draw = {
     }
 }
 
+
+//Client Functions
 const initSVG = function(network, size = {x:"100%", y:"100%"}) {
     //setup svg element
     const SVGDiv = document.getElementById("SVGDiv")
@@ -289,9 +433,11 @@ const initGridButton = function() {
 
 //Main Program
 function main() {
-    console.log(data)
     data = JSON.parse(decodeURIComponent(data));
-    console.log(data.network)
+    console.log("Data:", data.network)
+
+    const network = Network.toNetwork(data.network)
+    console.log("Network:", network)
 
     /*const network = Networks.getNetwork("LinuxLarge") //Supply the Test Network Here
     console.log(network)

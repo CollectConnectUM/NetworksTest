@@ -1,6 +1,6 @@
 //Handles Networks Database - constant pre-generated Networks for now
 
-//Defining Network Classes
+//Start Network Classes
 class Network {
     constructor(id, name, author, size)  {
         this.id = id
@@ -42,6 +42,23 @@ class Network {
 
     addDescription(desc) {
         this.description = desc
+        return this
+    }
+
+    toJSON(key) {
+        if (key === "network") {
+            this.grid = this.grid.size
+            this.root = undefined
+            for (let i = 0; i < this.nodes.length; i++) {
+                this.nodes[i].network = undefined
+                this.nodes[i].edges = []
+            }
+            for (let i = 0; i < this.edges.length; i++) {
+                this.edges[i].network = undefined
+                this.edges[i].obj1 = this.edges[i].obj1.id
+                this.edges[i].obj2 = this.edges[i].obj1.id
+            }
+        }
         return this
     }
 }
@@ -117,6 +134,7 @@ class Grid {
         return this
     } 
 }
+//End Network Classes
 
 
 
@@ -190,29 +208,5 @@ module.exports = {
             }
         }
         return "Network Not Found"
-    },
-
-    //Function for sending network over URI
-    stringifyNetwork: function(key, value) {
-        if (key === "grid") {
-            return "grid"
-        } else if (key === "root") {
-            return "root"
-        } else if (key === "nodes") {
-            return "nodes"
-        } else if (key === "edges") {
-            return "edges"
-        } else if (key === "obj1") {
-            return "obj1"
-        } else if ( key ==="obj2") {
-            return "obj2"
-        } else if ( key === "grid") {
-            return "grid"
-        }
-        return value
-    },
-
-    parseNetwork: function(key,value) {
-        
     }
 }
