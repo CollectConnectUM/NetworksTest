@@ -50,17 +50,12 @@ html,body{
     color: var(--primary-inv);
     font-weight: bold;
     font-size: calc(1.2rem * var(--scale));
-    transition-duration: 0.15s;
+    transition-duration: 0.1s;
 }
 
 .headerButton:hover {
-    width: calc(75px * var(--scale));
-    height: calc(60px * var(--scale));
-    margin: calc(15px * var(--scale));
-    margin-inline: calc(10px * var(--scale));
-    margin-right: calc(2.5px * var(--scale));
-
-    font-size: calc(1.4rem * var(--scale));
+    background-color: var(--secondary-inv);
+    color: var(--special)
 }
 
 
@@ -77,27 +72,27 @@ html,body{
 #vsBox {
     display: flex;
     flex-direction: row;
-    width: calc(50% * var(--scale));
-    height: calc(45% * var(--scale));
+    width: calc(20% * var(--scale));
+    height: calc(50%  * var(--scale));;
     white-space: nowrap;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     border-radius: calc(10px * var(--scale));
     background-color: var(--primary);
+    min-width: fit-content;
     min-height: fit-content;
 }
 
 .viewSButton {
-    flex-grow:1;
-    height: 60% ;
-    width:  28%;
-    margin-inline: 1.5%;
+    height: 80%;
+    width:  50%;
+    margin-inline: 0px;
     min-width: fit-content;
-    min-height: 1.2rem;
+    min-height: fit-content;
     padding: 0;
     border: 0;
-    margin: calc(9px * var(--scale));
+    margin: calc(4px * var(--scale));
     background-color: var(--secondary);
-    border-radius: calc(20px * var(--scale));
+    border-radius: calc(10px * var(--scale));
     font-size: calc(1rem * var(--scale));
     font-weight: bold;
     color: var(--primary-inv);
@@ -110,6 +105,12 @@ html,body{
 
 .viewSButton:hover {
     background-color: var(--secondary-inv);
+    color: var(--special)
+}
+
+.VBSelected {
+    background-color: var(--secondary-inv);
+    color: var(--special)
 }
 
 
@@ -125,7 +126,8 @@ html,body{
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     border-radius: calc(10px * var(--scale));
     border: 0;
-    margin: calc(10px * var(--scale));
+    margin: 10px;
+    opacity: 0.95;
 }
 
 .property {
@@ -137,7 +139,7 @@ html,body{
 
 #property-name {
     margin:0;
-    font-size: calc(1.3rem * var(--scale));
+    font-size: calc(1.4rem * var(--scale));
     font-weight: bold;
 }
 
@@ -150,19 +152,24 @@ html,body{
 
 .propertyInfo {
     margin: 0;
-    font-size: calc(1rem * var(--scale));
+    font-size: calc(0.8rem * var(--scale));
 }
 
 #owner {
     text-decoration: underline;
+    transition-duration: 0.05s;
+}
+
+#owner:hover {
+    color: lightskyblue;
 }
 
 
 /*SVG CSS*/
 #SVGDiv {
-    padding-top: 5vh;
-    width: 45%;
-    height: 60%;
+    padding-top: 24px;
+    width: 100%;
+    height: 82%;
 }
 
 .objectTextName {

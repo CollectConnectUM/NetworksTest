@@ -444,7 +444,38 @@ const initGridButton = function() {
     return true
 }
 
+//View Controller and Init Function
+const ViewController = {
+    view: "",
+    changeView: function(newView) {
+        this.view = newView
+    }
+}
 
+function initViewController(newView = "Map") {
+    ViewController.changeView(newView)
+
+    const mapButton = $("#map-button")
+    const editButton = $("#edit-button")
+
+    if (newView == "Map") {
+        mapButton.addClass("VBSelected")
+    } else if(newView == "Edit") {
+        editButton.addClass("VBSelected")
+    }
+
+    mapButton.click((m) => {
+        ViewController.changeView("Map")
+        mapButton.addClass("VBSelected")
+        editButton.removeClass("VBSelected")
+    })
+
+    editButton.click((m) => {
+        ViewController.changeView("Edit")
+        editButton.addClass("VBSelected")
+        mapButton.removeClass("VBSelected")
+    })
+}
 
 //Main Program
 function main() {
@@ -458,4 +489,5 @@ function main() {
     initCamera()
     initInfoPanel(network)
     initGridButton()
+    initViewController()
 } main();
