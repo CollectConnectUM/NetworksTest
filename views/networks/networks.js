@@ -317,12 +317,15 @@ const initSVG = function(network, size = {x:"100%", y:"100%"}) {
 
     const gridTable = Draw.drawGrid(network, svg, cellSize)
 
-    //setup viewbox
+    //Setup Initial Viewbox based on Network Size
+    const clientSize = {w: SVGDiv.clientWidth, h: SVGDiv.clientHeight}
     const svgSize = {x: 0, y: 0, w: 0, h: 0}
+
     svgSize.x = 0
-    svgSize.y = 0
-    svgSize.w = (gridTable.length * cellSize.x)
-    svgSize.h = (gridTable[0].length * cellSize.y) + (gridTable.length * 2)
+    svgSize.y = (-1) * cellSize.y
+    svgSize.w = (gridTable[0].length * cellSize.x)
+    svgSize.h = ((gridTable.length + 2) * cellSize.y) + (gridTable.length * 2)
+
     svg.viewbox(svgSize.x.toString() + " " + svgSize.y.toString() + " " + svgSize.w.toString() + " " + svgSize.h.toString())
     //svg.viewbox((1 * (svgSize.x/3)).toString() + " " + (-1 * (svgSize.x/4)).toString() + " " + svgSize.x.toString() + " " + svgSize.y.toString())
     
