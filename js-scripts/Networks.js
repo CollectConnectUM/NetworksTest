@@ -8,7 +8,6 @@ class Network {
         this.author = author
         this.grid = new Grid(size,this)
         
-
         this.root = undefined
         this.nodes = []
         this.edges = []
@@ -65,11 +64,13 @@ class Network {
     static toNetwork(networkObject) {
         const obj = networkObject
         const network = new Network(obj.id, obj.name, obj.author, obj.grid)
+        network.addDescription(obj.description)
 
         const nodes = []
         for (let i = 0; i < obj.nodes.length; i++) {
             const curNode = obj.nodes[i]
             const node = new Node(curNode.id, curNode.name, network, curNode.position, curNode.type, curNode.author)
+            node.addDescription(curNode.description)
             nodes.push(node)
         }
 
@@ -197,7 +198,7 @@ function genLinuxLarge(id){
 
 //Linux Directories Small Network
 function genLinuxSmall(id) {
-    const network = new Network(0, "Linux Directories Small", "Developer", [2,2])
+    const network = new Network(id, "Linux Directories Small", "Developer", [2,2])
 
     const rNode = new Node(0, "Root", network,[1,1], "Directory")
     const hNode = new Node(1, "Home", network,[2,2], "Directory")
@@ -226,7 +227,7 @@ module.exports = {
         for (let i = 0; i < Networks.length; i++) {
             const network = Networks[i]
             if (network.id == networkID) {
-                return network.generate()
+                return network.generate(network.id)
             }
         }
         return "Network Not Found"

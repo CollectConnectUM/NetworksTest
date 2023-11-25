@@ -105,12 +105,12 @@ html,body{
 
 .viewSButton:hover {
     background-color: var(--secondary-inv);
-    color: var(--special)
+    color: var(--primary)
 }
 
 .VBSelected {
     background-color: var(--secondary-inv);
-    color: var(--special)
+    color: var(--primary)
 }
 
 
@@ -120,7 +120,7 @@ html,body{
     display: flex;
     flex-direction: column;
     border: calc(4px * var(--scale)) solid black;
-    height: calc(200px * var(--scale));
+    height: fit-content;
     min-height: 100%;
     background-color: var(--secondary);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
@@ -165,6 +165,8 @@ html,body{
 }
 
 
+
+
 /*SVG CSS*/
 #SVGDiv {
     padding-top: 24px;
@@ -172,15 +174,28 @@ html,body{
     height: 82%;
 }
 
+.gridCell {
+    fill: var(--bg-main);
+    stroke: var(--primary);
+}
+
+/*Object CSS*/
 .objectTextName {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-weight: bold;
     font-size: 1.2rem;
+    fill: var(--primary-inv);
 }
 
 .objectTextPos {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 0.8rem;
+    fill: var(--primary-inv);
+}
+
+/*Relationship CSS*/
+.relLine {
+    stroke: var(--primary);
 }
 
 .relText {

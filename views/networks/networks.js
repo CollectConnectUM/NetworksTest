@@ -11,7 +11,6 @@ class Network {
         this.author = author
         this.grid = new Grid(size,this)
         
-
         this.root = undefined
         this.nodes = []
         this.edges = []
@@ -68,11 +67,13 @@ class Network {
     static toNetwork(networkObject) {
         const obj = networkObject
         const network = new Network(obj.id, obj.name, obj.author, obj.grid)
+        network.addDescription(obj.description)
 
         const nodes = []
         for (let i = 0; i < obj.nodes.length; i++) {
             const curNode = obj.nodes[i]
             const node = new Node(curNode.id, curNode.name, network, curNode.position, curNode.type, curNode.author)
+            node.addDescription(curNode.description)
             nodes.push(node)
         }
 
@@ -186,21 +187,22 @@ const Draw = {
     drawGrid: function(network, svg, cellSize = {x: 100, y: 100}) {
         const gridTable = []
         const networkGrid = network.grid
-        let gridGroup = svg.group().addClass("Grid").attr({id: "network-map", tabindex: "0", role: "grid", "aria-label": "Network Map", "aria-multiselectable": true})
+        let nmString = `network map with ${networkGrid.size[1]} rows and ${networkGrid.size[0]} columns`
+        let gridGroup = svg.group().addClass("Grid").attr({id: "network-map", tabindex: "0", "aria-label": nmString})
         for (let y = 0; y < networkGrid.size[1]; y++) {
             const gridRow = []
             let gridRowGroup = gridGroup.group().addClass("gridRow").attr({role: "row"})
             for (let x = 0; x < networkGrid.size[0]; x++) {
-                let cell = gridRowGroup.group().addClass("cell").attr({})
-                cell.rect(cellSize.x,cellSize.y).fill(VARS.cs.getPropertyValue("--bg-main")).stroke({color: VARS.cs.getPropertyValue("--primary"), width: "2"}).move(cellSize.x * x, cellSize.y * y + 2)
+                let cell = gridRowGroup.group().addClass("cell").attr({role: "gridCell"})
+                cell.rect(cellSize.x,cellSize.y).fill("white").stroke({color: "black", width: "2"}).move(cellSize.x * x, cellSize.y * y + 2).addClass("gridCell")
                 gridRow.push(cell)
             }
             gridTable.push(gridRow)
         }
     
         //setup elements as colors to manage for accessibility
-        VARS.colorElements.push({color: "--bg-main", class: "cell", property: "color"})
-        VARS.colorElements.push({color: "--primary", class: "cell", property: "stroke"})
+        /*VARS.colorElements.push({color: "--bg-main", class: "cell", property: "color"})
+        VARS.colorElements.push({color: "--primary", class: "cell", property: "stroke"})*/
     
         return gridTable
     },
@@ -213,7 +215,7 @@ const Draw = {
     
             let image = undefined;
             if (node.image == undefined) {
-                image = object.circle(24).fill("azure").move((cellSize.x * node.position[0] - (cellSize.x / 2)) - 10, (cellSize.y * node.position[1] - (cellSize.y / 2)) - 20)
+                image = object.circle(24).fill("skyblue").move((cellSize.x * node.position[0] - (cellSize.x / 2)) - 10, (cellSize.y * node.position[1] - (cellSize.y / 2)) - 20)
             } else { //Need to test with an image still
                 image = object.image(node.image)
                 image.move((cellSize.x * node.position[0] - (cellSize.x / 2)) - (image.width() / 2), (cellSize.y * node.position[1] - (cellSize.y / 2)) - (image.height() / 2))
@@ -226,7 +228,7 @@ const Draw = {
             })
             objText.move(image.x() - (objText.length() / 6), image.y() + image.height())
     
-            //addtextScaling/object scaling here
+            //addtextScaling/object scaling here -- maybe not...
     
             //Add to Draw Objects List
             Draw.Objects.push(object)
@@ -262,7 +264,7 @@ const Draw = {
                 //code for if image is there
             }
             
-            let relLine = rel.line(linePos.x1, linePos.y1, linePos.x2 , linePos.y2).stroke({width: 4, color: "black"})
+            let relLine = rel.line(linePos.x1, linePos.y1, linePos.x2 , linePos.y2).stroke({width: 4, color: "black"}).addClass("relLine")
     
             
             //determie line rotation
@@ -279,7 +281,7 @@ const Draw = {
     
             //draw relationship text
             let relText = rel.text((add) => {
-                add.tspan(edge.type).addClass("relText")
+                add.tspan(edge.type).addClass("relText").attr({"aria-hidden": "true"})
             })
     
             //set text pos/rotation
@@ -311,13 +313,18 @@ const initSVG = function(network, size = {x:"100%", y:"100%"}) {
 
     //draw grid
     const cellSize = {x: 120, y: 120}
+
+
     const gridTable = Draw.drawGrid(network, svg, cellSize)
 
     //setup viewbox
-    const viewSize = {x: 0, y: 0, offset: 20}
-    viewSize.x = gridTable.length * cellSize.x + (viewSize.offset * 2)
-    viewSize.y = gridTable[0].length * cellSize.y + (viewSize.offset * 2)
-    svg.viewbox((-1 *viewSize.offset).toString() + " " + (-1 *viewSize.offset).toString() + " " + viewSize.x.toString() + " " + viewSize.y.toString())
+    const svgSize = {x: 0, y: 0, w: 0, h: 0}
+    svgSize.x = 0
+    svgSize.y = 0
+    svgSize.w = (gridTable.length * cellSize.x)
+    svgSize.h = (gridTable[0].length * cellSize.y) + (gridTable.length * 2)
+    svg.viewbox(svgSize.x.toString() + " " + svgSize.y.toString() + " " + svgSize.w.toString() + " " + svgSize.h.toString())
+    //svg.viewbox((1 * (svgSize.x/3)).toString() + " " + (-1 * (svgSize.x/4)).toString() + " " + svgSize.x.toString() + " " + svgSize.y.toString())
     
     //Draw relationships
     Draw.drawRelationships(network,svg, cellSize)
@@ -416,7 +423,7 @@ const initInfoPanel = function(network) {
     const nameElement = document.getElementById("property-name")
     const authorElement = document.getElementById("owner")
     const descDiv = document.getElementById("Description")
-    const descElement = descDiv.getElementsByClassName("propertyDescription")
+    const descElement = descDiv.getElementsByClassName("propertyInfo")[0]
 
     nameElement.innerHTML = network.name
     authorElement.innerHTML = network.author
