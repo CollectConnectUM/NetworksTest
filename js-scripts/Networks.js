@@ -2,7 +2,7 @@
 
 //Start Network Classes
 class Network {
-    constructor(id, name, author, size)  {
+    constructor(id, name, author, size, description = "None")  {
         this.id = id
         this.name = name
         this.author = author
@@ -12,7 +12,7 @@ class Network {
         this.nodes = []
         this.edges = []
 
-        this.description = "Network Description"
+        this.description = description
 
         return this
     }
@@ -63,14 +63,12 @@ class Network {
 
     static toNetwork(networkObject) {
         const obj = networkObject
-        const network = new Network(obj.id, obj.name, obj.author, obj.grid)
-        network.addDescription(obj.description)
+        const network = new Network(obj.id, obj.name, obj.author, obj.grid, obj.description)
 
         const nodes = []
         for (let i = 0; i < obj.nodes.length; i++) {
             const curNode = obj.nodes[i]
-            const node = new Node(curNode.id, curNode.name, network, curNode.position, curNode.type, curNode.author)
-            node.addDescription(curNode.description)
+            const node = new Node(curNode.id, curNode.name, network, curNode.position, curNode.type, curNode.author, curNode.description)
             nodes.push(node)
         }
 
@@ -87,7 +85,7 @@ class Network {
 }
 
 class Node {
-    constructor(id, name, network, position, type = "Object", author="Unknown")  {
+    constructor(id, name, network, position, type = "Object", author="None", description = "None")  {
         this.id = id
         this.name = name
         this.network = network
@@ -98,7 +96,7 @@ class Node {
         this.edges = []
         this.image = undefined
 
-        this.description = "Node Description"
+        this.description = description
 
         network.addNode(this)
         return this

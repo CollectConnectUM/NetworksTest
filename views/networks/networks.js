@@ -5,7 +5,7 @@
 
 //Start Network Classes
 class Network {
-    constructor(id, name, author, size)  {
+    constructor(id, name, author, size, description = "None")  {
         this.id = id
         this.name = name
         this.author = author
@@ -15,7 +15,7 @@ class Network {
         this.nodes = []
         this.edges = []
 
-        this.description = "Network Description"
+        this.description = description
 
         return this
     }
@@ -66,14 +66,12 @@ class Network {
 
     static toNetwork(networkObject) {
         const obj = networkObject
-        const network = new Network(obj.id, obj.name, obj.author, obj.grid)
-        network.addDescription(obj.description)
+        const network = new Network(obj.id, obj.name, obj.author, obj.grid, obj.description)
 
         const nodes = []
         for (let i = 0; i < obj.nodes.length; i++) {
             const curNode = obj.nodes[i]
-            const node = new Node(curNode.id, curNode.name, network, curNode.position, curNode.type, curNode.author)
-            node.addDescription(curNode.description)
+            const node = new Node(curNode.id, curNode.name, network, curNode.position, curNode.type, curNode.author, curNode.description)
             nodes.push(node)
         }
 
@@ -90,7 +88,7 @@ class Network {
 }
 
 class Node {
-    constructor(id, name, network, position, type = "Object", author="Unknown")  {
+    constructor(id, name, network, position, type = "Object", author="None", description = "None")  {
         this.id = id
         this.name = name
         this.network = network
@@ -101,7 +99,7 @@ class Node {
         this.edges = []
         this.image = undefined
 
-        this.description = "Node Description"
+        this.description = description
 
         network.addNode(this)
         return this
@@ -346,7 +344,7 @@ const initSVG = function(network, size = {x:"100%", y:"100%"}) {
 const initCamera = function() {
     const svg = Draw.SVG
     //setup camera object
-    let camera = {down: false, x: 0, y: 0, w: 0, h: 0}
+    let camera = {down: false, x: 0, y: 0, w: 0, h: 0, scale: {value: 0, factor: 25}}
 
     const svgDiv = document.getElementById("SVGDiv")
     const vb = svg.viewbox()
@@ -434,14 +432,35 @@ const initCamera = function() {
         }
     })
 
+    function roundToNearest(numToRound, numToRoundTo) {
+        numToRoundTo = 1 / (numToRoundTo);
+    
+        return Math.round(numToRound * numToRoundTo) / numToRoundTo;
+    }
+
     //mouse scrolling to zoom viewbox in/out 
     let svgElement = document.getElementById("SVGDraw")
     svgElement.onwheel = (m) => {
         m.preventDefault()
 
-        let scale = m.deltaY
-        
-        let newCam = {down: camera.down, x: 0, y: 0, w: 0, h: 0}
+        const scaleFactor = camera.scale.factor
+        let scale = Math.round(m.deltaY)
+
+        if (Math.abs(scale) >= (scaleFactor / 2)) {
+            scale = roundToNearest(scale, scaleFactor)
+        } else if (Math.abs(scale) >= (scaleFactor / 4)) {
+            scale = scale > 0 ? (scaleFactor / 2) : (-1) * (scaleFactor / 2)
+        } else if (Math.abs(scale) >= (scaleFactor / 8)) {
+            scale = scale > 0 ? (scaleFactor / 4) : (-1) * (scaleFactor / 4)
+        } else {
+            scale = scale * scaleFactor / 10
+        }
+
+        let numFactor = scale / scaleFactor
+
+        camera.scale.value = camera.scale.value + numFactor
+
+        let newCam = {down: camera.down, x: 0, y: 0, w: 0, h: 0, scale: {value: camera.scale.value, factor: camera.scale.factor}}
         newCam.x = camera.x - scale
         newCam.y = camera.y - scale
         newCam.w = camera.w + scale * 2
