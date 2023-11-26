@@ -366,13 +366,27 @@ const initCamera = function() {
     svg.mousemove((m) => {
         if (camera.down === true) {
             if ((svgDiv.clientWidth) > (m.clientX - move.startX) && (svgDiv.clientHeight) > (m.clientY - move.startY)) {
+                
                 let difX = move.x - m.clientX
-                let difY = move.y - m.clientY
+                if (m.clientX > move.x) {
+                    camera.x = camera.x + difX
+                    camera.w = camera.w + difX / 2
+                } else {
+                    camera.x = camera.x + difX
+                    camera.w = camera.w + difX / 2
+                }
 
-                camera.x = camera.x + difX
-                camera.y = camera.y + difY
-                camera.w = camera.w + difX
-                camera.h = camera.h + difY
+                let difY = move.y - m.clientY
+                if (m.clientY > move.y) {
+                    camera.y = camera.y + difY
+                    camera.h = camera.h + difY / 2
+                } else {
+                    camera.y = camera.y + difY
+                    camera.h = camera.h + difY / 2
+                }
+
+                camera.w = camera.w > 0 ? camera.w : 1
+                camera.h = camera.h > 0 ? camera.h : 1
 
                 vbMove()
 
@@ -387,13 +401,27 @@ const initCamera = function() {
     svg.mouseup((m) => {
         if (camera.down === true) {
             camera.down = false
-            let difX = move.x - m.clientX
-            let difY = move.y - m.clientY
 
-            camera.x = camera.x + difX
-            camera.y = camera.y + difY
-            camera.w = camera.w + difX
-            camera.h = camera.h + difY
+            let difX = move.x - m.clientX
+            if (m.clientX > move.x) {
+                camera.x = camera.x + difX
+                camera.w = camera.w + difX / 2
+            } else {
+                camera.x = camera.x + difX
+                camera.w = camera.w + difX / 2
+            }
+
+            let difY = move.y - m.clientY
+            if (m.clientY > move.y) {
+                camera.y = camera.y + difY
+                camera.h = camera.h + difY / 2
+            } else {
+                camera.y = camera.y + difY
+                camera.h = camera.h + difY / 2
+            }
+
+            camera.w = camera.w > 0 ? camera.w : 1
+            camera.h = camera.h > 0 ? camera.h : 1
 
             vbMove()
         }
@@ -411,6 +439,9 @@ const initCamera = function() {
         newCam.y = camera.y - scale
         newCam.w = camera.w + scale * 2
         newCam.h = camera.h + scale * 2 
+
+        newCam.w = newCam.w > 0 ? newCam.w : 1
+        newCam.h = newCam.h > 0 ? newCam.h : 1
 
         if (newCam.w > 0 && newCam.h > 0) {
             camera = newCam
