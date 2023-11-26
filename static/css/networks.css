@@ -53,6 +53,7 @@ html,body{
     font-weight: bold;
     font-size: calc(1rem * var(--scale));
     transition-duration: 0.1s;
+    border: 0;
 }
 
 .headerButton:hover {
@@ -184,14 +185,20 @@ html,body{
 .objectTextName {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-weight: bold;
-    font-size: 1.2rem;
+    font-size: 1rem;
+    text-align: center;
     fill: var(--primary-inv);
 }
 
 .objectTextPos {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 0.8rem;
+    text-align: center;
     fill: var(--primary-inv);
+}
+
+.objectSelected {
+    fill: skyblue;
 }
 
 /*Relationship CSS*/
@@ -202,6 +209,6 @@ html,body{
 .relText {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-weight: bold;
-    font-size: 1rem;
+    font-size: 0.8rem;
     fill: var(--primary-inv);
 }

@@ -46,6 +46,10 @@ app.get("/networks/*", (req, res) => {
 
     const data = {}
     data["network"] = network
+    
+    if (network === "Network Not Found") {
+        res.redirect("/networks")
+    }
 
     res.render("networks/networks.jade", { data: encodeURIComponent(JSON.stringify(data, Networks.stringifyNetwork))})
 });

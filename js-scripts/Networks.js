@@ -181,6 +181,7 @@ const Networks = [
 //Linux Directories Small Network
 function genLinuxLarge(id){
     const network = new Network(id, "Linux Directories Large", "Jenna Mathison", [3,3])
+    network.addDescription("Network Map containing Linux Directories - This map contains 3 directory within the root directory")
 
     const rNode = new Node(0, "Root", network,[2,1], "Directory") //Root
 
@@ -199,6 +200,7 @@ function genLinuxLarge(id){
 //Linux Directories Small Network
 function genLinuxSmall(id) {
     const network = new Network(id, "Linux Directories Small", "Jenna Mathison", [2,2])
+    network.addDescription("Network Map containing Linux Directories - This map contains only 1 directory within the root directory")
 
     const rNode = new Node(0, "Root", network,[1,1], "Directory")
     const hNode = new Node(1, "Home", network,[2,2], "Directory")

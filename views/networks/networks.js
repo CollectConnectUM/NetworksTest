@@ -187,13 +187,13 @@ const Draw = {
     drawGrid: function(network, svg, cellSize = {x: 100, y: 100}) {
         const gridTable = []
         const networkGrid = network.grid
-        let nmString = `network map with ${networkGrid.size[1]} rows and ${networkGrid.size[0]} columns`
-        let gridGroup = svg.group().addClass("Grid").attr({id: "network-map", tabindex: "0", "aria-label": nmString})
+        let nmString = "Network Map"
+        let gridGroup = svg.group().addClass("Grid").attr({id: "network-map", tabindex: "0", role: "grid", "aria-label": nmString})
         for (let y = 0; y < networkGrid.size[1]; y++) {
             const gridRow = []
             let gridRowGroup = gridGroup.group().addClass("gridRow").attr({role: "row"})
             for (let x = 0; x < networkGrid.size[0]; x++) {
-                let cell = gridRowGroup.group().addClass("cell").attr({role: "gridCell"})
+                let cell = gridRowGroup.group().addClass("cell").attr({role: "gridcell"})
                 cell.rect(cellSize.x,cellSize.y).fill("white").stroke({color: "black", width: "2"}).move(cellSize.x * x, cellSize.y * y + 2).addClass("gridCell")
                 gridRow.push(cell)
             }
@@ -223,10 +223,17 @@ const Draw = {
             image.attr({name: node.name, id: node.name})
     
             let objText = object.text((add) => {
-                let nameSpan = add.tspan(node.name).dx(0).dy(0).addClass("objectTextName")
-                add.tspan("X" + node.position[0].toString() + " Y" + node.position[1].toString()).dx(-1 * (nameSpan.length() / 1.2)).dy("1em").addClass("objectTextPos")
+                let nameSpan = add.tspan(node.name)
+                nameSpan.dx(0).dy(0).addClass("objectTextName")
+
+                let posSpan = add.tspan("X" + node.position[0].toString() + " Y" + node.position[1].toString())
+                if (posSpan.length() <= nameSpan.length()) {
+                    posSpan.dx(((-1) * nameSpan.length()) + ((nameSpan.length() - posSpan.length()) / 2)).dy("1em").addClass("objectTextPos")
+                } else {
+                    posSpan.dx(((-1) * nameSpan.length()) - ((posSpan.length() - nameSpan.length()) / 3)).dy("1em").addClass("objectTextPos")
+                }
             })
-            objText.move(image.x() - (objText.length() / 6), image.y() + image.height())
+            objText.move(image.x() + image.width() / 2 , image.y() + image.height()).attr({"text-anchor": "middle" })
     
             //addtextScaling/object scaling here -- maybe not...
     
@@ -264,7 +271,7 @@ const Draw = {
                 //code for if image is there
             }
             
-            let relLine = rel.line(linePos.x1, linePos.y1, linePos.x2 , linePos.y2).stroke({width: 4, color: "black"}).addClass("relLine")
+            let relLine = rel.line(linePos.x1, linePos.y1, linePos.x2 , linePos.y2).stroke({width: 2, color: "black"}).addClass("relLine")
     
             
             //determie line rotation
