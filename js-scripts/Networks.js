@@ -209,13 +209,50 @@ function genLinuxSmall(id) {
 
 //Babel Network
 function genBabel(id) {
-    const network = new Network(id, "Babel", "Ali Bolcakan", [12, 7])
+    const network = new Network(id, "Babel", "Ali Bolcakan", [8, 7])
     network.addDescription("This is a copy of Mapping Tower of Babel translators and translations by merrill, links to Hathi Trust catalog material by bolcakan.")
 
-    const bible = new Node(0, "King James Bible", network, [1,1], "Book")
-    const penta = new Node(1, "Pentateuch", network, [5,4], "Book")
+    //Root and Bottom of Network
+    const penta = new Node(0, "Pentateuch", network, [1,2], "Book")
+    const septua  = new Node(1, "Septuagint", network, [1,4], "Book")
 
-    const bibleToPenta = new Edge(0, "Translated From", network, bible, penta)
+    const bible = new Node(2, "King James Bible", network, [4,5], "Book")
+    const william = new Node(3, "William Tyndale", network, [2,6], "Person")
+    const tyndalesOld = new Node(4, "Tyndale's Old Testament", network, [3,6], "Book")
+
+    const translation = new Node(5, "Translation", network, [1,7], "Book")
+
+    const pts = new Edge(0, "Translated To", network, penta, septua)
+    const ptt = new Edge(1, "Translated To", network, penta, tyndalesOld)
+
+    const stt = new Edge(2, "Translated To", network, septua, tyndalesOld)
+    const stb = new Edge(3, "Translated To", network, septua, bible)
+
+    const wtt = new Edge(4, "Author", network, william, tyndalesOld)
+
+
+    //Middle of Network
+    const jerome = new Node(6, "Jerome", network, [2,1], "Person")
+    const vulgate = new Node(7, "Vulgate", network, [3,2], "Book")
+    const dieGantze = new Node(8, "Die gantze Heilige Schrifft", network, [3,3], "Book")
+    const mLuther = new Node(9, "Martin Luther", network, [4,3], "Person")
+
+    const ptj = new Edge(5, "Author", network, penta, jerome)
+
+    const drBible = new Node(10, "Douay-Reims Bible", network, [5,4], "Book")
+
+
+    //Right  of Network
+    const schrift = new Node(11, "Die Schrift", network, [6,4], "Book")
+    const mBuber = new Node(12, "Martin Buber", network, [7,3], "Person")
+    const franz = new Node(13, "Franz Rozenzwieg", network, [8,4], "Person")
+
+
+
+    const moses = new Node(14, "The Five Books of Moses", network, [7,1], "Book")
+    const everett = new Node(15, "Everett Fox", network, [8,1], "Person")
+
+
 
     return network
 }

@@ -161,29 +161,19 @@ class Grid {
 //End Network Classes
 
 
-
-//object for getting color and text variables and a list for updating them via the toolbar
-const VARS = {
-    cs : getComputedStyle(document.documentElement),
-    colorElements : [],
-    sizeElements : []
-}
-
 //Draw Object and Functions
 const Draw = {
     SVG: undefined,
+    Grid: [],
     Objects: [],
     Relationships: [],
 
     //draw grid on svg
     init: function(network, size, SVGDiv) {
-         const svg = SVG().addTo(SVGDiv).size(size.x,size.y).viewbox(0,0,SVGDiv.clientWidth,SVGDiv.clientHeight).attr({id: "SVGDraw"})
-         Draw.SVG = svg
-         return svg
+         this.SVG = SVG().addTo(SVGDiv).size(size.x,size.y).viewbox(0,0,SVGDiv.clientWidth,SVGDiv.clientHeight).attr({id: "SVGDraw"})
     },
 
-    drawGrid: function(network, svg, cellSize = {x: 100, y: 100}) {
-        const gridTable = []
+    drawGrid: function(network, svg, cellSize) {
         const networkGrid = network.grid
         let nmString = "Network Map"
         let gridGroup = svg.group().addClass("Grid").attr({id: "network-map", tabindex: "0", role: "grid", "aria-label": nmString})
@@ -195,116 +185,137 @@ const Draw = {
                 cell.rect(cellSize.x,cellSize.y).fill("white").stroke({color: "black", width: "2"}).move(cellSize.x * x, cellSize.y * y + 2).addClass("gridCell")
                 gridRow.push(cell)
             }
-            gridTable.push(gridRow)
+            Draw.Grid.push(gridRow)
         }
-    
-        //setup elements as colors to manage for accessibility
-        /*VARS.colorElements.push({color: "--bg-main", class: "cell", property: "color"})
-        VARS.colorElements.push({color: "--primary", class: "cell", property: "stroke"})*/
-    
-        return gridTable
+    },
+
+
+    //draw object methods
+    drawObject: function(group,cellSize,node) {
+        const object = group.group().addClass("object").attr({id: "object"+ node.id})
+
+        //object image
+        let image = undefined;
+        if (node.image == undefined) {
+            image = object.circle(24).fill("skyblue").move((cellSize.x * node.position[0] - (cellSize.x / 2)) - 10, (cellSize.y * node.position[1] - (cellSize.y / 2)) - 20)
+        } else { //Need to test with an image still
+            image = object.image(node.image)
+            image.move((cellSize.x * node.position[0] - (cellSize.x / 2)) - (image.width() / 2), (cellSize.y * node.position[1] - (cellSize.y / 2)) - (image.height() / 2))
+        }
+        image.addClass("objectImage").attr({})
+
+        //object text
+        let objText = object.text((add) => {
+            let nameSpan = add.tspan(node.name)
+            nameSpan.dx(0).dy(0).addClass("objectTextName")
+
+            let posSpan = add.tspan("X" + node.position[0].toString() + " Y" + node.position[1].toString()).newLine()
+            posSpan.dx(0).dy("1em").addClass("objectTextPos")
+        })
+        objText.move(image.x() + (image.width() / 2) , image.y() + image.height()).attr({"text-anchor": "middle" })
+
+        //Add to Draw Objects List
+        Draw.Objects.push(object)
     },
 
     drawObjects: function(network, svg, cellSize) {
-        let objGroup = svg.group().addClass("Objects")
+        const objGroup = svg.group().addClass("Objects")
         for (let i = 0; i < network.nodes.length; i++) {
-            let node = network.nodes[i]
-            let object = objGroup.group().addClass("object").attr({id: node.name + "Group"})
-    
-            let image = undefined;
-            if (node.image == undefined) {
-                image = object.circle(24).fill("skyblue").move((cellSize.x * node.position[0] - (cellSize.x / 2)) - 10, (cellSize.y * node.position[1] - (cellSize.y / 2)) - 20)
-            } else { //Need to test with an image still
-                image = object.image(node.image)
-                image.move((cellSize.x * node.position[0] - (cellSize.x / 2)) - (image.width() / 2), (cellSize.y * node.position[1] - (cellSize.y / 2)) - (image.height() / 2))
-            }
-            image.attr({name: node.name, id: node.name})
-    
-            let objText = object.text((add) => {
-                let nameSpan = add.tspan(node.name)
-                nameSpan.dx(0).dy(0).addClass("objectTextName")
-
-                let posSpan = add.tspan("X" + node.position[0].toString() + " Y" + node.position[1].toString())
-                if (posSpan.length() <= nameSpan.length()) {
-                    posSpan.dx(((-1) * nameSpan.length()) + ((nameSpan.length() - posSpan.length()) / 2)).dy("1em").addClass("objectTextPos")
-                } else {
-                    posSpan.dx(((-1) * nameSpan.length()) - ((posSpan.length() - nameSpan.length()) / 3)).dy("1em").addClass("objectTextPos")
-                }
-            })
-            objText.move(image.x() + image.width() / 2 , image.y() + image.height()).attr({"text-anchor": "middle" })
-    
-            //addtextScaling/object scaling here -- maybe not...
-    
-            //Add to Draw Objects List
-            Draw.Objects.push(object)
+            const node = network.nodes[i]
+            Draw.drawObject(objGroup, cellSize, node)
         }
     },
 
+
+    //draw relationship methods
+    drawRelationship: function(group, cellSize, edge) {
+        const rel = group.group().addClass("relationship").attr({id: "rel" + edge.id})
+    
+        const linePos = {
+            x1: 0,
+            y1: 0,
+            x2: 0,
+            y2: 0
+        }
+        
+        if (edge.obj1.image == undefined) {
+            linePos.x1 = Number(cellSize.x * edge.obj1.position[0]) - (cellSize.x / 2)
+            linePos.y1 = Number(cellSize.y * edge.obj1.position[1]) - (cellSize.y / 2) - 10
+        } else {
+            //code for if image is there
+        }
+        if (edge.obj2.image == undefined) {
+            linePos.x2 = Number(cellSize.x * edge.obj2.position[0]) - (cellSize.x / 2) 
+            linePos.y2 = Number(cellSize.y * edge.obj2.position[1]) - (cellSize.y / 2) - 10
+        } else {
+            //code for if image is there
+        }
+        
+        let relLine = rel.line(linePos.x1, linePos.y1, linePos.x2 , linePos.y2).stroke({width: 2, color: "black"}).addClass("relLine")
+        
+        //draw relationship text
+        let relText = rel.text((add) => {
+            add.tspan(edge.type).addClass("relText").attr({"aria-hidden": "true"})
+        })
+        relText.attr({"text-anchor": "middle"})
+        
+        //determie line rotation
+        const rotation = {
+            w: linePos.x2 - linePos.x1,
+            h: linePos.y2 - linePos.y1,
+            rotate: 0
+        }
+        rotation.rotate = (Math.atan(rotation.w/rotation.h) * 180 / Math.PI)
+        rotation.rotate = rotation.rotate > 0 ? 90 - rotation.rotate : -90 - rotation.rotate 
+        console.log(rotation.rotate)
+
+        const amove = {x: 25, y: 25}
+        if (Math.abs(rotation.rotate) < 1) {
+            amove.x = 0
+            amove.y = -10
+        } else if (Math.abs(Math.abs(rotation.rotate) - 90) < 1) {
+            amove.x = -10
+            amove.y = 0
+        }
+        console.log(amove)
+
+        relText.amove(relLine.cx() + amove.x, relLine.cy() + amove.y)
+        relText.rotate(rotation.rotate)
+
+        /*let rotation = undefined
+        if ((linePos.x1 / linePos.x2) > 0.9 && (linePos.x1 / linePos.x2) < 1.1 ) {
+            rotation = 90
+        } else if ((linePos.y1 / linePos.y2) > 0.9 && (linePos.y1 / linePos.y2) < 1.1 ) {
+            rotation = 0
+        } else if ((linePos.x1 < linePos.x2) && (linePos.y1 < linePos.y2)){
+            rotation = 45
+        } else if ((linePos.x1 > linePos.x2) && (linePos.y1 < linePos.y2)){
+            rotation = - 45
+        }
+
+        //set text pos/rotation
+        if (rotation == 90) {
+            relText.move(linePos.x1 + (relLine.attr("stroke-width") * 2), linePos.y1 + (relLine.height() / 2))
+            relText.transform({rotate: 0})
+        } else if (rotation == 0) {
+            relText.move(linePos.x1 + relLine.width() / 5, linePos.y1)
+            relText.transform({rotate: 0})
+        } else if (rotation == 45) {
+            relText.move(linePos.x1 + relLine.width() / 3, linePos.y1 + relLine.height() / 3)
+            relText.transform({rotate: rotation})
+        } else if (rotation == -45) {
+            relText.move(linePos.x2, linePos.y1 + relLine.height() / 3)
+            relText.transform({rotate: rotation})
+        }*/
+
+        Draw.Relationships.push(rel)
+    },
+
     drawRelationships: function(network, svg, cellSize) {
-        let relGroup = svg.group().addClass("Relationships")
+        const relGroup = svg.group().addClass("Relationships")
         for (let i = 0; i < network.edges.length; i++) {
-            let edge = network.edges[i]
-            let rel = relGroup.group().addClass("relationship")
-    
-            let linePos = {
-                x1: 0,
-                y1: 0,
-                x2: 0,
-                y2: 0
-            }
-    
-            //let object1 = document.getElementById(edge.obj1.name)
-            //let object2 = document.getElementById(edge.obj2.name)
-            
-            if (edge.obj1.image == undefined) {
-                linePos.x1 = Number(cellSize.x * edge.obj1.position[0]) - (cellSize.x / 2)
-                linePos.y1 = Number(cellSize.y * edge.obj1.position[1]) - (cellSize.y / 2) - 10
-            } else {
-                //code for if image is there
-            }
-            if (edge.obj2.image == undefined) {
-                linePos.x2 = Number(cellSize.x * edge.obj2.position[0]) - (cellSize.x / 2) 
-                linePos.y2 = Number(cellSize.y * edge.obj2.position[1]) - (cellSize.y / 2) - 10
-            } else {
-                //code for if image is there
-            }
-            
-            let relLine = rel.line(linePos.x1, linePos.y1, linePos.x2 , linePos.y2).stroke({width: 2, color: "black"}).addClass("relLine")
-    
-            
-            //determie line rotation
-            let rotation = undefined
-            if ((linePos.x1 / linePos.x2) > 0.9 && (linePos.x1 / linePos.x2) < 1.1 ) {
-                rotation = 90
-            } else if ((linePos.y1 / linePos.y2) > 0.9 && (linePos.y1 / linePos.y2) < 1.1 ) {
-                rotation = 0
-            } else if ((linePos.x1 < linePos.x2) && (linePos.y1 < linePos.y2)){
-                rotation = 45
-            } else if ((linePos.x1 > linePos.x2) && (linePos.y1 < linePos.y2)){
-                rotation = - 45
-            }
-    
-            //draw relationship text
-            let relText = rel.text((add) => {
-                add.tspan(edge.type).addClass("relText").attr({"aria-hidden": "true"})
-            })
-    
-            //set text pos/rotation
-            if (rotation == 90) {
-                relText.move(linePos.x1 + (relLine.attr("stroke-width") * 2), linePos.y1 + (relLine.height() / 2))
-                relText.transform({rotate: 0})
-            } else if (rotation == 0) {
-                relText.move(linePos.x1 + relLine.width() / 5, linePos.y1)
-                relText.transform({rotate: 0})
-            } else if (rotation == 45) {
-                relText.move(linePos.x1 + relLine.width() / 3, linePos.y1 + relLine.height() / 3)
-                relText.transform({rotate: rotation})
-            } else if (rotation == -45) {
-                relText.move(linePos.x2, linePos.y1 + relLine.height() / 3)
-                relText.transform({rotate: rotation})
-            }
-    
-            Draw.Relationships.push(rel)
+            const edge = network.edges[i]
+            Draw.drawRelationship(relGroup, cellSize, edge)
         }
     }
 }
@@ -312,37 +323,34 @@ const Draw = {
 
 //Client Functions
 const initSVG = function(network, size = {x:"100%", y:"100%"}) {
-    //setup svg element
+    //Setup svg element
     const SVGDiv = document.getElementById("SVGDiv")
-    const svg = Draw.init(network, size, SVGDiv)
+    Draw.init(network, size, SVGDiv)
 
-    //draw grid
-    const cellSize = {x: 120, y: 120}
-
-
-    const gridTable = Draw.drawGrid(network, svg, cellSize)
+    //Draw grid
+    const cellSize = {x: 150, y: 100}
+    Draw.drawGrid(network, Draw.SVG, cellSize)
 
     //Setup Initial Viewbox based on Network Size
-    const clientSize = {w: SVGDiv.clientWidth, h: SVGDiv.clientHeight}
     const svgSize = {x: 0, y: 0, w: 0, h: 0}
 
     svgSize.x = 0
     svgSize.y = (-1) * cellSize.y
-    svgSize.w = (gridTable[0].length * cellSize.x)
-    svgSize.h = ((gridTable.length + 2) * cellSize.y) + (gridTable.length * 2)
+    svgSize.w = (Draw.Grid[0].length * cellSize.x)
+    svgSize.h = ((Draw.Grid.length + 2) * cellSize.y) + (Draw.Grid.length * 2)
 
-    svg.viewbox(svgSize.x.toString() + " " + svgSize.y.toString() + " " + svgSize.w.toString() + " " + svgSize.h.toString())
-    //svg.viewbox((1 * (svgSize.x/3)).toString() + " " + (-1 * (svgSize.x/4)).toString() + " " + svgSize.x.toString() + " " + svgSize.y.toString())
+    Draw.SVG.viewbox(svgSize.x.toString() + " " + svgSize.y.toString() + " " + svgSize.w.toString() + " " + svgSize.h.toString())
     
     //Draw relationships
-    Draw.drawRelationships(network,svg, cellSize)
-    //draw objects
-    Draw.drawObjects(network, svg, cellSize)
+    Draw.drawRelationships(network, Draw.SVG, cellSize)
+    //Draw objects
+    Draw.drawObjects(network, Draw.SVG, cellSize)
 }
 
 //Starts the Camera Controller for svg
 const initCamera = function() {
     const svg = Draw.SVG
+    const svgElement = document.getElementById("SVGDraw")
     //setup camera object
     let camera = {down: false, x: 0, y: 0, w: 0, h: 0, scale: {value: 0, factor: 25}}
 
@@ -361,11 +369,13 @@ const initCamera = function() {
     //mouse events for controlling viewbox translation
     const move = {x: 0, y: 0, startX: 0, startY: 0}
     svg.mousedown((m) => {
-        camera.down = true
-        move.x = m.clientX
-        move.y = m.clientY
-        move.startX = m.clientX
-        move.startY = m.clientY
+        if (m.buttons >= 1) {
+            camera.down = true
+            move.x = m.clientX
+            move.y = m.clientY
+            move.startX = m.clientX
+            move.startY = m.clientY
+        }
     })
 
     svg.mousemove((m) => {
@@ -439,7 +449,6 @@ const initCamera = function() {
     }
 
     //mouse scrolling to zoom viewbox in/out 
-    let svgElement = document.getElementById("SVGDraw")
     svgElement.onwheel = (m) => {
         m.preventDefault()
 
@@ -475,6 +484,8 @@ const initCamera = function() {
         }
     }
 
+    svgElement.oncontextmenu = (m) => m.preventDefault()
+
     return true
 }
 
@@ -499,12 +510,14 @@ const initGridButton = function() {
 
     let visible = true
     gb.onclick = (m) => {
-        if (visible) {
-            svgGrid.setAttribute("visibility", "hidden")
-            visible = false
-        } else {
-            svgGrid.setAttribute("visibility", "visible")
-            visible = true
+        if (m.button == 0) {
+            if (visible) {
+                svgGrid.setAttribute("visibility", "hidden")
+                visible = false
+            } else {
+                svgGrid.setAttribute("visibility", "visible")
+                visible = true
+            }
         }
     }
 

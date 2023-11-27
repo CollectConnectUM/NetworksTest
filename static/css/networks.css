@@ -184,17 +184,19 @@ html,body{
 /*Object CSS*/
 .objectTextName {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
-    font-weight: bold;
+    
     font-size: 1rem;
     text-align: center;
     fill: var(--primary-inv);
+    text-rendering: optimizeLegibility;
 }
 
 .objectTextPos {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
-    font-size: 0.8rem;
+    font-size: 0.6rem;
     text-align: center;
     fill: var(--primary-inv);
+    text-rendering: optimizeLegibility;
 }
 
 .objectSelected {
@@ -208,7 +210,8 @@ html,body{
 
 .relText {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
-    font-weight: bold;
+    
     font-size: 0.8rem;
     fill: var(--primary-inv);
+    text-rendering: optimizeLegibility;
 }
