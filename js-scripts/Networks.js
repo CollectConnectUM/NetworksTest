@@ -217,7 +217,7 @@ function genBabel(id) {
     const septua  = new Node(1, "Septuagint", network, [1,4], "Book")
 
     const bible = new Node(2, "King James Bible", network, [4,5], "Book")
-    const william = new Node(3, "William Tyndale", network, [2,6], "Person")
+    const william = new Node(3, "William Tyndale", network, [1,6], "Person")
     const tyndalesOld = new Node(4, "Tyndale's Old Testament", network, [3,6], "Book")
 
     const translation = new Node(5, "Translation", network, [1,7], "Book")
@@ -228,31 +228,45 @@ function genBabel(id) {
     const stt = new Edge(2, "Translated To", network, septua, tyndalesOld)
     const stb = new Edge(3, "Translated To", network, septua, bible)
 
-    const wtt = new Edge(4, "Author", network, william, tyndalesOld)
+    const wtt = new Edge(4, "Translator", network, william, tyndalesOld)
 
 
     //Middle of Network
     const jerome = new Node(6, "Jerome", network, [2,1], "Person")
     const vulgate = new Node(7, "Vulgate", network, [3,2], "Book")
     const dieGantze = new Node(8, "Die gantze Heilige Schrifft", network, [3,3], "Book")
-    const mLuther = new Node(9, "Martin Luther", network, [4,3], "Person")
+    const mLuther = new Node(9, "Martin Luther", network, [5,3], "Person")
 
-    const ptj = new Edge(5, "Author", network, penta, jerome)
+    const ptj = new Edge(5, "Translated From", network, penta, jerome)
+    const stj= new Edge(6, "Translated To", network, septua, jerome)
+    const jtv = new Edge(7, "Translated To", network, jerome, vulgate)
 
-    const drBible = new Node(10, "Douay-Reims Bible", network, [5,4], "Book")
+    const vtdg = new Edge(8, "Translated To", network, vulgate, dieGantze)
+
+    const mtdg = new Edge(9, "Author", network, mLuther, dieGantze)
+    const mtw = new Edge(10, "", network, mLuther, william)
+
+    const drBible = new Node(10, "Douay-Reims Bible", network, [5,2], "Book")
+
+    const vtdr = new Edge(11, "Translated To", network, vulgate, drBible)
 
 
     //Right  of Network
-    const schrift = new Node(11, "Die Schrift", network, [6,4], "Book")
-    const mBuber = new Node(12, "Martin Buber", network, [7,3], "Person")
-    const franz = new Node(13, "Franz Rozenzwieg", network, [8,4], "Person")
+    const schrift = new Node(11, "Die Schrift", network, [6,5], "Book")
+    const mBuber = new Node(12, "Martin Buber", network, [7,4], "Person")
+    const franz = new Node(13, "Franz Rozenzwieg", network, [8,5], "Person")
 
+    const ptds = new Edge(12, "Translated To", network, penta, schrift)
+    const dstmb = new Edge(13, "Translator", network, schrift, mBuber)
+    const dstf = new Edge(14, "Translator", network, schrift, franz)
 
+    const mbtf = new Edge(15, "Associate", network, mBuber, franz)
 
     const moses = new Node(14, "The Five Books of Moses", network, [7,1], "Book")
     const everett = new Node(15, "Everett Fox", network, [8,1], "Person")
 
-
+    const ptm = new Edge(16, "Translated From ", network, penta, moses)
+    const mte = new Edge(17, "Author", network, moses, everett)
 
     return network
 }

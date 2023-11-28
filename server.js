@@ -38,8 +38,11 @@ app.get("/networks/*", (req, res) => {
     if (parts.length = 3) {
         id = parts[2]
     } else {
-        id = 0
+        res.redirect("/networks")
     }
+
+    if (isNaN(id)) 
+        res.redirect("/networks")
     
     let network = Networks.getNetwork(id)
     //console.log(network)
@@ -55,7 +58,7 @@ app.get("/networks/*", (req, res) => {
 });
 
 app.get("/*", (req, res) => {
-    res.redirect("/networks/0")
+    res.redirect("/")
 });
 
 //Start server listening

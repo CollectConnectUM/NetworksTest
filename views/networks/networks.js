@@ -1,7 +1,7 @@
 //Jenna Mathison
 
-//import SVG from "https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.2.0/svg.min.js";
-//SVG.js is currently imported through html for client side usage
+//SVG.js import function
+await import("https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.2.0/svg.min.js")
 
 //Start Network Classes
 class Network {
@@ -163,35 +163,35 @@ class Grid {
 
 //Draw Object and Functions
 const Draw = {
+    CellSize: {x: 150, y:150}, //default cellSize
+
     SVG: undefined,
-    Grid: [],
-    Objects: [],
-    Relationships: [],
+    Grid: undefined,
+    Objects: undefined,
+    Relationships: undefined,
 
     //draw grid on svg
-    init: function(network, size, SVGDiv) {
-         this.SVG = SVG().addTo(SVGDiv).size(size.x,size.y).viewbox(0,0,SVGDiv.clientWidth,SVGDiv.clientHeight).attr({id: "SVGDraw"})
+    init: function(SVGDiv) {
+        Draw.SVG = SVG().addTo(SVGDiv).size("100%","100%").viewbox(0,0,SVGDiv.clientWidth,SVGDiv.clientHeight).attr({id: "SVGDraw"})
+        Draw.Grid = Draw.SVG.group().addClass("Grid").attr({id: "network-map", tabindex: "0", role: "grid", "aria-label": "Network Map"})
+        Draw.RelationshipGroup = Draw.SVG.group().addClass("Relationships")
+        Draw.ObjectGroup = Draw.SVG.group().addClass("Objects")
     },
 
-    drawGrid: function(network, svg, cellSize) {
+    drawGrid: function(network, cellSize = Draw.CellSize) {
         const networkGrid = network.grid
-        let nmString = "Network Map"
-        let gridGroup = svg.group().addClass("Grid").attr({id: "network-map", tabindex: "0", role: "grid", "aria-label": nmString})
         for (let y = 0; y < networkGrid.size[1]; y++) {
-            const gridRow = []
-            let gridRowGroup = gridGroup.group().addClass("gridRow").attr({role: "row"})
+            let gridRow = Draw.Grid.group().addClass("gridRow").attr({role: "row"})
             for (let x = 0; x < networkGrid.size[0]; x++) {
-                let cell = gridRowGroup.group().addClass("cell").attr({role: "gridcell"})
+                let cell = gridRow.group().addClass("cell").attr({role: "gridcell"})
                 cell.rect(cellSize.x,cellSize.y).fill("white").stroke({color: "black", width: "2"}).move(cellSize.x * x, cellSize.y * y + 2).addClass("gridCell")
-                gridRow.push(cell)
             }
-            Draw.Grid.push(gridRow)
         }
     },
 
 
     //draw object methods
-    drawObject: function(group,cellSize,node) {
+    drawObject: function(node, cellSize = Draw.CellSize, group = Draw.ObjectGroup) {
         const object = group.group().addClass("object").attr({id: "object"+ node.id})
 
         //object image
@@ -213,22 +213,18 @@ const Draw = {
             posSpan.dx(0).dy("1em").addClass("objectTextPos")
         })
         objText.move(image.x() + (image.width() / 2) , image.y() + image.height()).attr({"text-anchor": "middle" })
-
-        //Add to Draw Objects List
-        Draw.Objects.push(object)
     },
 
-    drawObjects: function(network, svg, cellSize) {
-        const objGroup = svg.group().addClass("Objects")
+    drawObjects: function(network) {
         for (let i = 0; i < network.nodes.length; i++) {
             const node = network.nodes[i]
-            Draw.drawObject(objGroup, cellSize, node)
+            Draw.drawObject(node)
         }
     },
 
 
     //draw relationship methods
-    drawRelationship: function(group, cellSize, edge) {
+    drawRelationship: function(edge, cellSize = Draw.CellSize, group = Draw.RelationshipGroup) {
         const rel = group.group().addClass("relationship").attr({id: "rel" + edge.id})
     
         const linePos = {
@@ -267,84 +263,79 @@ const Draw = {
         }
         rotation.rotate = (Math.atan(rotation.w/rotation.h) * 180 / Math.PI)
         rotation.rotate = rotation.rotate > 0 ? 90 - rotation.rotate : -90 - rotation.rotate 
-        console.log(rotation.rotate)
 
         const amove = {x: 25, y: 25}
-        if (Math.abs(rotation.rotate) < 1) {
+        let absRotate = Math.abs(rotation.rotate)
+        if (absRotate < 7.5) {
             amove.x = 0
             amove.y = -10
-        } else if (Math.abs(Math.abs(rotation.rotate) - 90) < 1) {
-            amove.x = -10
-            amove.y = 0
+        } else if (absRotate >= 7.5 && absRotate < 22.5 ){
+            amove.x = 5
+            amove.y = -10
+        } else if (absRotate >= 22.5 && absRotate < 37.5 ){
+            amove.x = 10
+            amove.y = -15
+        } else if (absRotate >= 37.5 && absRotate < 52.5 ){
+            amove.x = 10
+            amove.y = -10
+        } else if (absRotate >= 52.5 && absRotate < 67.5 ){
+            amove.x = 15
+            amove.y = -10
+        } else if (absRotate >= 67.5 && absRotate < 82.5 ){
+            amove.x = 15
+            amove.y = -5
+        } else if (absRotate >= 82.5) {
+            amove.x = 15
+            amove.y = 20
         }
-        console.log(amove)
+        if (rotation.rotate < 0) {
+            amove.x = amove.x * -1
+            amove.y = amove.y 
+        }
+        
+        console.log(rotation.rotate, amove)
 
         relText.amove(relLine.cx() + amove.x, relLine.cy() + amove.y)
         relText.rotate(rotation.rotate)
-
-        /*let rotation = undefined
-        if ((linePos.x1 / linePos.x2) > 0.9 && (linePos.x1 / linePos.x2) < 1.1 ) {
-            rotation = 90
-        } else if ((linePos.y1 / linePos.y2) > 0.9 && (linePos.y1 / linePos.y2) < 1.1 ) {
-            rotation = 0
-        } else if ((linePos.x1 < linePos.x2) && (linePos.y1 < linePos.y2)){
-            rotation = 45
-        } else if ((linePos.x1 > linePos.x2) && (linePos.y1 < linePos.y2)){
-            rotation = - 45
-        }
-
-        //set text pos/rotation
-        if (rotation == 90) {
-            relText.move(linePos.x1 + (relLine.attr("stroke-width") * 2), linePos.y1 + (relLine.height() / 2))
-            relText.transform({rotate: 0})
-        } else if (rotation == 0) {
-            relText.move(linePos.x1 + relLine.width() / 5, linePos.y1)
-            relText.transform({rotate: 0})
-        } else if (rotation == 45) {
-            relText.move(linePos.x1 + relLine.width() / 3, linePos.y1 + relLine.height() / 3)
-            relText.transform({rotate: rotation})
-        } else if (rotation == -45) {
-            relText.move(linePos.x2, linePos.y1 + relLine.height() / 3)
-            relText.transform({rotate: rotation})
-        }*/
-
-        Draw.Relationships.push(rel)
     },
 
-    drawRelationships: function(network, svg, cellSize) {
-        const relGroup = svg.group().addClass("Relationships")
+    drawRelationships: function(network) {
         for (let i = 0; i < network.edges.length; i++) {
             const edge = network.edges[i]
-            Draw.drawRelationship(relGroup, cellSize, edge)
+            Draw.drawRelationship(edge)
         }
     }
 }
 
 
 //Client Functions
-const initSVG = function(network, size = {x:"100%", y:"100%"}) {
+
+//SVG Initialization Function
+const initSVG = function(network) {
     //Setup svg element
     const SVGDiv = document.getElementById("SVGDiv")
-    Draw.init(network, size, SVGDiv)
+    Draw.init(SVGDiv)
 
     //Draw grid
-    const cellSize = {x: 150, y: 100}
-    Draw.drawGrid(network, Draw.SVG, cellSize)
+    Draw.drawGrid(network)
 
     //Setup Initial Viewbox based on Network Size
     const svgSize = {x: 0, y: 0, w: 0, h: 0}
 
+
+    const cellSize = Draw.CellSize
+    const gridChildren = Draw.Grid.children()
     svgSize.x = 0
     svgSize.y = (-1) * cellSize.y
-    svgSize.w = (Draw.Grid[0].length * cellSize.x)
-    svgSize.h = ((Draw.Grid.length + 2) * cellSize.y) + (Draw.Grid.length * 2)
+    svgSize.w = (gridChildren.length * cellSize.x)
+    svgSize.h = ((gridChildren[0].children().length + 2) * cellSize.y) + (gridChildren.length * 2)
 
     Draw.SVG.viewbox(svgSize.x.toString() + " " + svgSize.y.toString() + " " + svgSize.w.toString() + " " + svgSize.h.toString())
     
     //Draw relationships
-    Draw.drawRelationships(network, Draw.SVG, cellSize)
+    Draw.drawRelationships(network)
     //Draw objects
-    Draw.drawObjects(network, Draw.SVG, cellSize)
+    Draw.drawObjects(network)
 }
 
 //Starts the Camera Controller for svg
@@ -380,36 +371,31 @@ const initCamera = function() {
 
     svg.mousemove((m) => {
         if (camera.down === true) {
-            if ((svgDiv.clientWidth) > (m.clientX - move.startX) && (svgDiv.clientHeight) > (m.clientY - move.startY)) {
-                
-                let difX = move.x - m.clientX
-                if (m.clientX > move.x) {
-                    camera.x = camera.x + difX
-                    camera.w = camera.w + difX / 2
-                } else {
-                    camera.x = camera.x + difX
-                    camera.w = camera.w + difX / 2
-                }
-
-                let difY = move.y - m.clientY
-                if (m.clientY > move.y) {
-                    camera.y = camera.y + difY
-                    camera.h = camera.h + difY / 2
-                } else {
-                    camera.y = camera.y + difY
-                    camera.h = camera.h + difY / 2
-                }
-
-                camera.w = camera.w > 0 ? camera.w : 1
-                camera.h = camera.h > 0 ? camera.h : 1
-
-                vbMove()
-
-                move.x = m.clientX
-                move.y = m.clientY
+            let difX = move.x - m.clientX
+            if (m.clientX > move.x) {
+                camera.x = camera.x + difX
+                camera.w = camera.w + difX / 2
             } else {
-                camera.down = false
+                camera.x = camera.x + difX
+                camera.w = camera.w + difX / 2
             }
+
+            let difY = move.y - m.clientY
+            if (m.clientY > move.y) {
+                camera.y = camera.y + difY
+                camera.h = camera.h + difY / 2
+            } else {
+                camera.y = camera.y + difY
+                camera.h = camera.h + difY / 2
+            }
+
+            camera.w = camera.w > 0 ? camera.w : 1
+            camera.h = camera.h > 0 ? camera.h : 1
+
+            vbMove()
+
+            move.x = m.clientX
+            move.y = m.clientY
         }
     })
 
