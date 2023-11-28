@@ -68,7 +68,7 @@ class Network {
         const nodes = []
         for (let i = 0; i < obj.nodes.length; i++) {
             const curNode = obj.nodes[i]
-            const node = new Node(curNode.id, curNode.name, network, curNode.position, curNode.type, curNode.author, curNode.description)
+            const node = new Node(curNode.id, curNode.name, network, curNode.position, curNode.type, curNode.author, curNode.description, curNode.image)
             nodes.push(node)
         }
 
@@ -85,7 +85,7 @@ class Network {
 }
 
 class Node {
-    constructor(id, name, network, position, type = "Object", author="None", description = "None")  {
+    constructor(id, name, network, position, type = "Object", author="None", description = "None", image = undefined)  {
         this.id = id
         this.name = name
         this.network = network
@@ -94,7 +94,7 @@ class Node {
         this.author = author
 
         this.edges = []
-        this.image = undefined
+        this.image = image
 
         this.description = description
 
@@ -109,6 +109,11 @@ class Node {
 
     addDescription(desc) {
         this.description = desc
+        return this
+    }
+
+    addImage(image) {
+        this.image = image
         return this
     }
 }
@@ -209,18 +214,18 @@ function genLinuxSmall(id) {
 
 //Babel Network
 function genBabel(id) {
-    const network = new Network(id, "Babel", "Ali Bolcakan", [8, 7])
+    const network = new Network(id, "Babel", "Ali Bolcakan", [9, 7])
     network.addDescription("This is a copy of Mapping Tower of Babel translators and translations by merrill, links to Hathi Trust catalog material by bolcakan.")
 
     //Root and Bottom of Network
-    const penta = new Node(0, "Pentateuch", network, [1,2], "Book")
-    const septua  = new Node(1, "Septuagint", network, [1,4], "Book")
+    const penta = new Node(0, "Pentateuch", network, [1,2], "Book").addImage("https://s3.amazonaws.com/translationnetworkss3bucket/workImages/1439874999640.jpg")
+    const septua  = new Node(1, "Septuagint", network, [1,4], "Book").addImage("https://s3.amazonaws.com/translationnetworkss3bucket/workImages/1439875160308.jpg")
 
-    const bible = new Node(2, "King James Bible", network, [4,5], "Book")
-    const william = new Node(3, "William Tyndale", network, [1,6], "Person")
-    const tyndalesOld = new Node(4, "Tyndale's Old Testament", network, [3,6], "Book")
+    const bible = new Node(2, "King James Bible", network, [5,5], "Book").addImage("https://s3.amazonaws.com/translationnetworkss3bucket/workImages/1439875160299.jpg")
+    const william = new Node(3, "William Tyndale", network, [2,6], "Person").addImage("https://s3.amazonaws.com/translationnetworkss3bucket/workImages/1458833902131.jpg")
+    const tyndalesOld = new Node(4, "Tyndale's Old Testament", network, [4,6], "Book").addImage("https://s3.amazonaws.com/translationnetworkss3bucket/workImages/1439875151684.gif")
 
-    const translation = new Node(5, "Translation", network, [1,7], "Book")
+    const translation = new Node(5, "Translation", network, [1,7], "Book").addImage("https://s3.amazonaws.com/translationnetworkss3bucket/workImages/1439875011975.png")
 
     const pts = new Edge(0, "Translated To", network, penta, septua)
     const ptt = new Edge(1, "Translated To", network, penta, tyndalesOld)
@@ -232,10 +237,10 @@ function genBabel(id) {
 
 
     //Middle of Network
-    const jerome = new Node(6, "Jerome", network, [2,1], "Person")
-    const vulgate = new Node(7, "Vulgate", network, [3,2], "Book")
-    const dieGantze = new Node(8, "Die gantze Heilige Schrifft", network, [3,3], "Book")
-    const mLuther = new Node(9, "Martin Luther", network, [5,3], "Person")
+    const jerome = new Node(6, "Jerome", network, [2,1], "Person").addImage("/static/img/node_author.png")
+    const vulgate = new Node(7, "Vulgate", network, [3,2], "Book").addImage("https://s3.amazonaws.com/translationnetworkss3bucket/workImages/1439875011771.jpg")
+    const dieGantze = new Node(8, "Die gantze Heilige Schrifft", network, [3,3], "Book").addImage("https://s3.amazonaws.com/translationnetworkss3bucket/workImages/1439875015412.jpg")
+    const mLuther = new Node(9, "Martin Luther", network, [4,3], "Person").addImage("/static/img/node_author.png")
 
     const ptj = new Edge(5, "Translated From", network, penta, jerome)
     const stj= new Edge(6, "Translated To", network, septua, jerome)
@@ -246,15 +251,15 @@ function genBabel(id) {
     const mtdg = new Edge(9, "Author", network, mLuther, dieGantze)
     const mtw = new Edge(10, "", network, mLuther, william)
 
-    const drBible = new Node(10, "Douay-Reims Bible", network, [5,2], "Book")
+    const drBible = new Node(10, "Douay-Reims Bible", network, [5,3], "Book").addImage("https://s3.amazonaws.com/translationnetworkss3bucket/workImages/1439874959537.png")
 
     const vtdr = new Edge(11, "Translated To", network, vulgate, drBible)
 
 
     //Right  of Network
-    const schrift = new Node(11, "Die Schrift", network, [6,5], "Book")
-    const mBuber = new Node(12, "Martin Buber", network, [7,4], "Person")
-    const franz = new Node(13, "Franz Rozenzwieg", network, [8,5], "Person")
+    const schrift = new Node(11, "Die Schrift", network, [6,3], "Book").addImage("https://s3.amazonaws.com/translationnetworkss3bucket/workImages/1439875150010.jpg")
+    const mBuber = new Node(12, "Martin Buber", network, [7,2], "Person").addImage("/static/img/node_author.png")
+    const franz = new Node(13, "Franz Rozenzwieg", network, [8,3], "Person").addImage("/static/img/node_author.png")
 
     const ptds = new Edge(12, "Translated To", network, penta, schrift)
     const dstmb = new Edge(13, "Translator", network, schrift, mBuber)
@@ -262,8 +267,8 @@ function genBabel(id) {
 
     const mbtf = new Edge(15, "Associate", network, mBuber, franz)
 
-    const moses = new Node(14, "The Five Books of Moses", network, [7,1], "Book")
-    const everett = new Node(15, "Everett Fox", network, [8,1], "Person")
+    const moses = new Node(14, "The Five Books of Moses", network, [7,1], "Book").addImage("https://s3.amazonaws.com/translationnetworkss3bucket/workImages/1439875149973.jpg")
+    const everett = new Node(15, "Everett Fox", network, [9,1], "Person").addImage("/static/img/node_author.png")
 
     const ptm = new Edge(16, "Translated From ", network, penta, moses)
     const mte = new Edge(17, "Author", network, moses, everett)
