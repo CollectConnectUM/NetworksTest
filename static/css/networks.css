@@ -122,19 +122,52 @@ html,body{
 /*info panel css*/
 #infoPanel {
     width:25%;
+    height: fit-content;
+    max-height: 75vh;
     display: flex;
     flex-direction: column;
-    border: calc(4px * var(--scale)) solid black;
-    height: fit-content;
-    min-height: 100%;
+    justify-content: left;
+    border: 0;
     background-color: var(--secondary);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     border-radius: calc(10px * var(--scale));
-    border: 0;
     margin: calc(10px * var(--scale));
     opacity: 0.95;
-    max-height: 75vh;
 }
+
+
+#collapseDiv {
+    display: flex;
+    flex-direction: row;
+}
+
+#infoCollapseButton {
+    background: transparent;
+    border: none;
+    width: fit-content;
+    height: fit-content;
+    margin: 0;
+    margin-right: calc(5px * var(--scale));
+    margin-top: calc(2px * var(--scale));
+}
+
+#collapseText {
+    font-size: calc(1rem * var(--scale));
+}
+
+
+#infoList {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    overflow:auto;
+}
+
+.ILCollapse {
+    visibility: collapse;
+    height: 0;
+}
+
 
 .property {
     display:flex;
@@ -150,7 +183,7 @@ html,body{
 }
 
 .propertyName {
-    font-size: calc(1.2rem * var(--scale));
+    font-size: calc(1rem * var(--scale));
     font-weight: bold;
     margin: 0;
     padding-bottom: calc(0.2rem * var(--scale));
@@ -217,4 +250,4 @@ html,body{
     font-size: 0.8rem;
     fill: var(--special);
     text-rendering: optimizeLegibility;
-}
+} 
