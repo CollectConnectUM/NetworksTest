@@ -560,6 +560,26 @@ const initGridButton = function() {
     return true
 }
 
+const showModal = function() {
+    var modal = document.getElementById("modal");
+    var btn = document.getElementById("info-button");
+    var span = document.getElementsByClassName("close")[0];
+
+    btn.onclick = function() {
+        modal.style.display = "block";
+    }
+
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+}
+
 //View Controller and Init Function
 const ViewController = {
     view: "",
@@ -646,6 +666,11 @@ function main() {
     initInfoPanel(network)
     initGridButton()
     initViewController()
+<<<<<<< HEAD
     initShortcuts()
 
 }main();
+=======
+    showModal();
+}main();
+>>>>>>> f6b8cf5 (Added modal for info page)
