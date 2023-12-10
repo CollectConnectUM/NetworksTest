@@ -178,9 +178,6 @@ html,body{
     height: 0;
 }
 
-
-
-
 .property {
     display:flex;
     flex-direction: column;
@@ -207,7 +204,7 @@ html,body{
 }
 
 #owner {
-    color: lightskyblue;
+    color: dodgerblue;
     transition-duration: 0.05s;
 }
 
