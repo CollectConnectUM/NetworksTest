@@ -666,11 +666,7 @@ function main() {
     initInfoPanel(network)
     initGridButton()
     initViewController()
-<<<<<<< HEAD
     initShortcuts()
+    showModal()
 
 }main();
-=======
-    showModal();
-}main();
->>>>>>> f6b8cf5 (Added modal for info page)
