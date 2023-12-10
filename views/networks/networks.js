@@ -499,16 +499,42 @@ const initCamera = function() {
     return true
 }
 
-//Info Panel intitialization function
+//Info Panel init text elements and collpase function
 const initInfoPanel = function(network) {
+    //Init Collapse Text
+    const collapseName = document.getElementById("collapseName")
+    collapseName.innerHTML = network.name
+
+    //Init Name/Owner Text
     const nameElement = document.getElementById("property-name")
     const authorElement = document.getElementById("owner")
-    const descDiv = document.getElementById("Description")
-    const descElement = descDiv.getElementsByClassName("propertyInfo")[0]
-
     nameElement.innerHTML = network.name
     authorElement.innerHTML = network.author
+
+    //Init Description Text
+    const descDiv = document.getElementById("Description")
+    const descElement = descDiv.getElementsByClassName("propertyInfo")[0]
     descElement.innerHTML = network.description
+
+    //Init Collapse Behavior
+    const cButton = $("#collapseButton")
+    let collapsed = false
+    cButton.on("click",(m) => {
+        const infoList = $("#infoList")
+        const collapseName = $("#collapseName")
+        const cIcon = $("#collapseIcon")
+        if (!collapsed) {
+            collapsed = true
+            infoList.addClass("ILCollapse")
+            collapseName.removeClass("nameCollapse")
+            cIcon.attr("src","/static/img/arrow-left.svg");
+        } else {
+            collapsed = false
+            infoList.removeClass("ILCollapse")
+            collapseName.addClass("nameCollapse")
+            cIcon.attr("src","/static/img/arrow.svg");
+        }
+    })
 
     return true
 }

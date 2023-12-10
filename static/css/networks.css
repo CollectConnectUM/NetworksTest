@@ -139,22 +139,32 @@ html,body{
 #collapseDiv {
     display: flex;
     flex-direction: row;
+    align-items: center;
+    margin: calc(4px * var(--scale));
+    margin-inline: calc(12px * var(--scale));
 }
 
-#infoCollapseButton {
+#collapseName {
+    flex-grow: 1;
+    font-size: calc(1rem * var(--scale));
+    margin: 0;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: clip;
+}
+
+.nameCollapse {
+    visibility: hidden;
+}
+
+
+#collapseButton {
     background: transparent;
     border: none;
     width: fit-content;
     height: fit-content;
     margin: 0;
-    margin-right: calc(5px * var(--scale));
-    margin-top: calc(2px * var(--scale));
 }
-
-#collapseText {
-    font-size: calc(1rem * var(--scale));
-}
-
 
 #infoList {
     margin: 0;
@@ -167,6 +177,8 @@ html,body{
     visibility: collapse;
     height: 0;
 }
+
+
 
 
 .property {
