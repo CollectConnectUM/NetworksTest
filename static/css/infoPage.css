@@ -54,7 +54,7 @@
     justify-content: center;
     width: 100%;
 }
-.column{
+.column {
     display: flex;
     flex-direction: column;
     margin-right: 40px;
@@ -63,26 +63,26 @@
     min-height: 45vh;
     max-height: 100vh;
 }
-.infoType{
+.infoType {
     align-items: flex-start;
     height: 33%;
     margin-top: 10px;
     width: 100%;
 }
-.infoTitle{
+.infoTitle {
     display: inline-block;
     vertical-align: middle;
     margin-top: 0;
     margin-bottom: 5px;
     color: var(--special);
 }
-.infoTitle svg{
+.infoTitle svg {
     display: inline-block;
     vertical-align: middle;
     width: calc(24px * var(--scale));
     height: calc(24px * var(--scale));
 }
-.infoTitle h3{
+.infoTitle h3 {
     display: inline-block;
     vertical-align: middle;
     margin-top: 0;
@@ -93,7 +93,7 @@
     text-align: left;
     word-break: break-all;
 }
-.infoBox{
+.infoBox {
     border-radius: 10px;
     height: 62%;
     width: 100%;
@@ -104,10 +104,10 @@
     word-wrap: break-word;
     padding-left: 1rem;
 }
-.infoBox a{
+.infoBox a {
     color: var(--primary-inv);
 }
-.infoBox a:hover{
+.infoBox a:hover {
     color: var(--primary-inv);
     text-decoration: underline;
     font-weight: normal;
@@ -119,9 +119,9 @@
 .infoBox li:first-of-type{
     margin-top: 10px;
 }
-#desc{
+#desc {
     height: 66%;
 }
-#descBox{
+#descBox {
     height: 88%;
 }
