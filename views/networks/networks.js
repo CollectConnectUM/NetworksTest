@@ -10,7 +10,7 @@ class Network {
         this.name = name
         this.author = author
         this.grid = new Grid(size,this)
-        
+
         this.root = undefined
         this.nodes = []
         this.edges = []
@@ -161,7 +161,7 @@ class Grid {
             this.grid[pos[0]][pos[1]] = node
         }
         return this
-    } 
+    }
 }
 //End Network Classes
 
@@ -178,7 +178,7 @@ const Draw = {
     //draw grid on svg
     init: function(SVGDiv) {
         Draw.SVG = SVG().addTo(SVGDiv).size("100%","100%").viewbox(0,0,SVGDiv.clientWidth,SVGDiv.clientHeight).attr({id: "SVGDraw"})
-        Draw.Grid = Draw.SVG.group().addClass("Grid").attr({id: "network-map", tabindex: "0", role: "grid", "aria-label": "Network Map"})
+        Draw.Grid = Draw.SVG.group().addClass("Grid").attr({id: "network-map", tabindex: "0", role: "grid", "aria-label": "Network Map", "visibility": "visible"})
         Draw.Relationships = Draw.SVG.group().addClass("Relationships")
         Draw.Objects = Draw.SVG.group().addClass("Objects")
 
@@ -248,14 +248,14 @@ const Draw = {
     //draw relationship methods
     drawRelationship: function(edge, cellSize = Draw.CellSize, group = Draw.Relationships) {
         const rel = group.group().addClass("relationship").attr({id: "rel" + edge.id})
-    
+
         const linePos = {
             x1: 0,
             y1: 0,
             x2: 0,
             y2: 0
         }
-        
+
         let obj1Image = edge.obj1.image
         if (obj1Image == undefined | obj1Image == "") {
             linePos.x1 = Number(cellSize.x * edge.obj1.position[0]) - (cellSize.x / 2)
@@ -268,22 +268,22 @@ const Draw = {
 
         let obj2Image = edge.obj2.image
         if (obj2Image == undefined | obj2Image == "") {
-            linePos.x2 = Number(cellSize.x * edge.obj2.position[0]) - (cellSize.x / 2) 
+            linePos.x2 = Number(cellSize.x * edge.obj2.position[0]) - (cellSize.x / 2)
             linePos.y2 = Number(cellSize.y * edge.obj2.position[1]) - (cellSize.y / 2) - 10
         } else {
             let obj2Image = Draw.Objects.find("#object"+edge.obj2.id)[0].first()
-            linePos.x2 = obj2Image.x() + Draw.CellSize.x / 2 
+            linePos.x2 = obj2Image.x() + Draw.CellSize.x / 2
             linePos.y2 = obj2Image.y() + Draw.CellSize.y / 2 - 10
         }
-        
+
         let relLine = rel.line(linePos.x1, linePos.y1, linePos.x2 , linePos.y2).stroke({width: 2, color: "black"}).addClass("relLine")
-        
+
         //draw relationship text
         let relText = rel.text((add) => {
             add.tspan(edge.type).addClass("relText").attr({"aria-hidden": "true"})
         })
         relText.attr({"text-anchor": "middle"})
-        
+
         //Determie line rotation
         const rotation = {
             w: linePos.x2 - linePos.x1,
@@ -291,7 +291,7 @@ const Draw = {
             rotate: 0
         }
         rotation.rotate = (Math.atan(rotation.w/rotation.h) * 180 / Math.PI)
-        rotation.rotate = rotation.rotate > 0 ? 90 - rotation.rotate : -90 - rotation.rotate 
+        rotation.rotate = rotation.rotate > 0 ? 90 - rotation.rotate : -90 - rotation.rotate
 
         //Determine line movement
         const amove = {x: 25, y: 25}
@@ -320,7 +320,7 @@ const Draw = {
         }
         if (rotation.rotate < 0) {
             amove.x = amove.x * -1
-            amove.y = amove.y 
+            amove.y = amove.y
         }
 
         relText.amove(relLine.cx() + amove.x, relLine.cy() + amove.y)
@@ -350,14 +350,14 @@ const initSVG = function(network) {
     const svgSize = {x: 0, y: 0, w: 0, h: 0}
     const cellSize = Draw.CellSize
     const gridChildren = Draw.Grid.children()
-    
+
     svgSize.x = 0
     svgSize.y = (-1) * cellSize.y
     svgSize.w = (gridChildren.length * cellSize.x)
     svgSize.h = ((gridChildren[0].children().length + 2) * cellSize.y) + (gridChildren.length * 2)
 
     Draw.SVG.viewbox(svgSize.x.toString() + " " + svgSize.y.toString() + " " + svgSize.w.toString() + " " + svgSize.h.toString())
-    
+
     //Draw relationships and objects
     Draw.drawObjects(network).drawRelationships(network)
 }
@@ -454,11 +454,11 @@ const initCamera = function() {
 
     function roundToNearest(numToRound, numToRoundTo) {
         numToRoundTo = 1 / (numToRoundTo);
-    
+
         return Math.round(numToRound * numToRoundTo) / numToRoundTo;
     }
 
-    //mouse scrolling to zoom viewbox in/out 
+    //mouse scrolling to zoom viewbox in/out
     svgElement.onwheel = (m) => {
         m.preventDefault()
 
@@ -483,7 +483,7 @@ const initCamera = function() {
         newCam.x = camera.x - scale
         newCam.y = camera.y - scale
         newCam.w = camera.w + scale * 2
-        newCam.h = camera.h + scale * 2 
+        newCam.h = camera.h + scale * 2
 
         newCam.w = newCam.w > 0 ? newCam.w : 1
         newCam.h = newCam.h > 0 ? newCam.h : 1
@@ -499,16 +499,42 @@ const initCamera = function() {
     return true
 }
 
-//Info Panel intitialization function
+//Info Panel init text elements and collpase function
 const initInfoPanel = function(network) {
+    //Init Collapse Text
+    const collapseName = document.getElementById("collapseName")
+    collapseName.innerHTML = network.name
+
+    //Init Name/Owner Text
     const nameElement = document.getElementById("property-name")
     const authorElement = document.getElementById("owner")
-    const descDiv = document.getElementById("Description")
-    const descElement = descDiv.getElementsByClassName("propertyInfo")[0]
-
     nameElement.innerHTML = network.name
     authorElement.innerHTML = network.author
+
+    //Init Description Text
+    const descDiv = document.getElementById("Description")
+    const descElement = descDiv.getElementsByClassName("propertyInfo")[0]
     descElement.innerHTML = network.description
+
+    //Init Collapse Behavior
+    const cButton = $("#collapseButton")
+    let collapsed = false
+    cButton.on("click",(m) => {
+        const infoList = $("#infoList")
+        const collapseName = $("#collapseName")
+        const cIcon = $("#collapseIcon")
+        if (!collapsed) {
+            collapsed = true
+            infoList.addClass("ILCollapse")
+            collapseName.removeClass("nameCollapse")
+            cIcon.attr("src","/static/img/arrow-left.svg");
+        } else {
+            collapsed = false
+            infoList.removeClass("ILCollapse")
+            collapseName.addClass("nameCollapse")
+            cIcon.attr("src","/static/img/arrow.svg");
+        }
+    })
 
     return true
 }
@@ -587,6 +613,45 @@ function initViewController(newView = "Map") {
     })
 }
 
+//Grid visibility for keyboard shortcut -Jaishree
+function toggleGridVisibility() {
+    const svgGrid = document.getElementById("network-map");
+    const isVisible = svgGrid.getAttribute("visibility") === "visible";
+    svgGrid.setAttribute("visibility", isVisible ? "hidden" : "visible");
+}
+
+//Switching to edit tab for keyboard shortcut -Jaishree
+function switchToEditTab() {
+    ViewController.changeView("Edit");
+
+    $("#map-button").removeClass("VBSelected");
+    $("#edit-button").addClass("VBSelected");
+}
+
+//Switching to map tab for keyboard shortcut -Jaishree
+function switchToMapTab() {
+    ViewController.changeView("Map");
+
+    $("#edit-button").removeClass("VBSelected");
+    $("#map-button").addClass("VBSelected");
+}
+
+//Keyboard Shortcuts Function - moved for readability in main
+function initShortcuts() {
+    document.addEventListener("keydown", function (event) {
+        if (event.key.toLowerCase() === "g") {
+            toggleGridVisibility();
+        }
+        if (event.key.toLowerCase() === "e") {
+            switchToEditTab();
+        }
+        if (event.key.toLowerCase() === "m") {
+            switchToMapTab();
+        }
+    })
+}
+
+
 //Main Program
 function main() {
     data = JSON.parse(decodeURIComponent(data));
@@ -595,10 +660,13 @@ function main() {
     const network = Network.toNetwork(data.network)
     console.log("Network:", network)
 
+    //Initialize Functions for Network page
     initSVG(network)
     initCamera()
     initInfoPanel(network)
     initGridButton()
     initViewController()
-    showModal();
+    initShortcuts()
+    showModal()
+
 }main();
