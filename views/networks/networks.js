@@ -560,10 +560,25 @@ const initGridButton = function() {
     return true
 }
 
-const showModal = function() {
+const showModal = function(network) {
     var modal = document.getElementById("modal");
     var btn = document.getElementById("info-button");
     var span = document.getElementsByClassName("close")[0];
+
+    if (network.name) $("#nameVal").text(network.name);
+    else $("#nameVal").text("No name for this network.");
+    
+    if (network.description) $("#descVal").text(network.description);
+    else $("#descVal").text("No description for this network.");
+
+    if (network.author) $("#authorVal").text(network.author);
+    else $("#authorVal").text("No author for this network.");
+
+    if (network.nodes.length) $("#nodesVal").text(network.nodes.length);
+    else $("#nodesVal").text("No nodes for this network.");
+
+    if (network.edges.length) $("#edgesVal").text(network.edges.length);
+    else $("#edgesVal").text("No edges for this network.");
 
     btn.onclick = function() {
         modal.style.display = "block";
@@ -667,6 +682,6 @@ function main() {
     initGridButton()
     initViewController()
     initShortcuts()
-    showModal()
+    showModal(network)
 
 }main();
