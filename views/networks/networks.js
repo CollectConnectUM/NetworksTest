@@ -499,16 +499,42 @@ const initCamera = function() {
     return true
 }
 
-//Info Panel intitialization function
+//Info Panel init text elements and collpase function
 const initInfoPanel = function(network) {
+    //Init Collapse Text
+    const collapseName = document.getElementById("collapseName")
+    collapseName.innerHTML = network.name
+
+    //Init Name/Owner Text
     const nameElement = document.getElementById("property-name")
     const authorElement = document.getElementById("owner")
-    const descDiv = document.getElementById("Description")
-    const descElement = descDiv.getElementsByClassName("propertyInfo")[0]
-
     nameElement.innerHTML = network.name
     authorElement.innerHTML = network.author
+
+    //Init Description Text
+    const descDiv = document.getElementById("Description")
+    const descElement = descDiv.getElementsByClassName("propertyInfo")[0]
     descElement.innerHTML = network.description
+
+    //Init Collapse Behavior
+    const cButton = $("#collapseButton")
+    let collapsed = false
+    cButton.on("click",(m) => {
+        const infoList = $("#infoList")
+        const collapseName = $("#collapseName")
+        const cIcon = $("#collapseIcon")
+        if (!collapsed) {
+            collapsed = true
+            infoList.addClass("ILCollapse")
+            collapseName.removeClass("nameCollapse")
+            cIcon.attr("src","/static/img/arrow-left.svg");
+        } else {
+            collapsed = false
+            infoList.removeClass("ILCollapse")
+            collapseName.addClass("nameCollapse")
+            cIcon.attr("src","/static/img/arrow.svg");
+        }
+    })
 
     return true
 }
@@ -532,6 +558,26 @@ const initGridButton = function() {
     }
 
     return true
+}
+
+const showModal = function() {
+    var modal = document.getElementById("modal");
+    var btn = document.getElementById("info-button");
+    var span = document.getElementsByClassName("close")[0];
+
+    btn.onclick = function() {
+        modal.style.display = "block";
+    }
+
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
 }
 
 //View Controller and Init Function
@@ -567,30 +613,6 @@ function initViewController(newView = "Map") {
     })
 }
 
-//Grid visibility for keyboard shortcut -Jaishree
-function toggleGridVisibility() {
-    const svgGrid = document.getElementById("network-map");
-    const isVisible = svgGrid.getAttribute("visibility") === "visible";
-    svgGrid.setAttribute("visibility", isVisible ? "hidden" : "visible");
-}
-
-//Switching to edit tab for keyboard shortcut -Jaishree
-function switchToEditTab() {
-    ViewController.changeView("Edit");
-
-    $("#map-button").removeClass("VBSelected");
-    $("#edit-button").addClass("VBSelected");
-}
-
-//Switching to map tab for keyboard shortcut -Jaishree
-function switchToMapTab() {
-    ViewController.changeView("Map");
-
-    $("#edit-button").removeClass("VBSelected");
-    $("#map-button").addClass("VBSelected");
-}
-
-
 //Main Program
 function main() {
     data = JSON.parse(decodeURIComponent(data));
@@ -599,21 +621,10 @@ function main() {
     const network = Network.toNetwork(data.network)
     console.log("Network:", network)
 
+    //Initialize Functions for Network page
     initSVG(network)
     initCamera()
     initInfoPanel(network)
     initGridButton()
     initViewController()
-    document.addEventListener("keydown", function (event) {
-        if (event.key.toLowerCase() === "g") {
-            toggleGridVisibility();
-        }
-        if (event.key.toLowerCase() === "e") {
-            switchToEditTab();
-        }
-        if (event.key.toLowerCase() === "m") {
-            switchToMapTab();
-        }
-    });
-
 }main();
