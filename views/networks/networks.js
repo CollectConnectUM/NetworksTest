@@ -695,6 +695,34 @@ function initShortcuts() {
 
 window.doOpenModal = function() {};
 function renderModal(network) {
+    function renderNodes() {
+        if (network.nodes.length > 0) {
+            let html = "", n = network.nodes.length;
+            for(let i = 0; i < n; i++) {
+                let node = network.nodes[i];
+                html += "<li>" + node.name + "</li>";
+            }
+            $("#nodesList").html(html);
+        }
+        else {
+            $("#nodesList").html("<li><p>No node for this network.</p></li>")
+        }
+    }
+
+    function renderEdges() {
+        if (network.edges.length > 0) {
+            let html = "", n = network.edges.length;
+            for(let i = 0; i < n; i++) {
+                let edge = network.edges[i];
+                html += "<li>" + edge.type + "</li>";
+            }
+            $("#edgesList").html(html);
+        }
+        else {
+            $("#edgesList").html("<li><p>No edge for this network.</p></li>")
+        }
+    }
+
     let modal = $("#modal").dialog({
         resizable: true,
         height: window.innerHeight * 0.7,
@@ -711,11 +739,8 @@ function renderModal(network) {
             if (network.author) $("#authorVal").text(network.author);
             else $("#authorVal").text("No author for this network.");
 
-            if (network.nodes.length) $("#nodesVal").text(network.nodes.length);
-            else $("#nodesVal").text("No nodes for this network.");
-
-            if (network.edges.length) $("#edgesVal").text(network.edges.length);
-            else $("#edgesVal").text("No edges for this network.");
+            renderNodes();
+            renderEdges();
         },
         close: function() {
 
@@ -724,6 +749,7 @@ function renderModal(network) {
 
     function openModal() {
         modal.dialog("open");
+        modal.focus();
     }
 
     window.doOpenModal = openModal;
