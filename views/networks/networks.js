@@ -663,13 +663,13 @@ function toggleInfoPage() {
 
 // Function to open the info page
 function openModal() {
-    $("#modal").css("display", "block");
+    $("#modal").dialog("open");
     infoPageOpen = true;
 }
 
 // Function to close the info page
 function closeModal() {
-    $("#modal").css("display", "none");
+    $("#modal").dialog("close");
     infoPageOpen = false;
 }
 
