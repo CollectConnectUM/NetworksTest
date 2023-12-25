@@ -663,13 +663,14 @@ function toggleInfoPage() {
 
 // Function to open the info page
 function openModal() {
-    $("#modal").dialog("open");
+    console.log("called open modal")
+    window.doOpenModal();
     infoPageOpen = true;
 }
 
 // Function to close the info page
 function closeModal() {
-    $("#modal").dialog("close");
+    window.doCloseModal();
     infoPageOpen = false;
 }
 
@@ -693,7 +694,9 @@ function initShortcuts() {
     })
 }
 
+// Render info modal and prepare function to be called for onclick
 window.doOpenModal = function() {};
+window.doCloseModal = function() {};
 function renderModal(network) {
     function renderNodes() {
         if (network.nodes.length > 0) {
@@ -723,6 +726,7 @@ function renderModal(network) {
         }
     }
 
+    // Initialize info modal
     let modal = $("#modal").dialog({
         resizable: true,
         height: window.innerHeight * 0.7,
@@ -747,14 +751,19 @@ function renderModal(network) {
         }
     });
 
+    // Initialize open modal function
     function openModal() {
         modal.dialog("open");
-        modal.focus();
     }
-
     window.doOpenModal = openModal;
 
-    // do resize if needed
+    // Initialize close modal function
+    function closeModal() {
+        modal.dialog("close");
+    }
+    window.doCloseModal = closeModal;
+
+    // Do resize if needed
     let queuedTimeout = null;
     function doResize() {
         modal.dialog('option', 'height', window.innerHeight * 0.7);
