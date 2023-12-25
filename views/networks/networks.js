@@ -651,6 +651,29 @@ function switchToMapTab() {
     $("#map-button").addClass("VBSelected");
 }
 
+//Open Info Page for keyboard shortcut -Jaishree
+let infoPageOpen = false;
+function toggleInfoPage() {
+    if (infoPageOpen) {
+        closeModal();
+    } else {
+        openModal();
+    }
+}
+
+// Function to open the info page
+function openModal() {
+    $("#modal").css("display", "block");
+    infoPageOpen = true;
+}
+
+// Function to close the info page
+function closeModal() {
+    $("#modal").css("display", "none");
+    infoPageOpen = false;
+}
+
+
 //Keyboard Shortcuts Function - moved for readability in main
 function initShortcuts() {
     document.addEventListener("keydown", function (event) {
@@ -663,6 +686,10 @@ function initShortcuts() {
         if (event.key.toLowerCase() === "m") {
             switchToMapTab();
         }
+        if (event.key.toLowerCase() === "i") {
+            toggleInfoPage();
+        }
+
     })
 }
 
