@@ -1,22 +1,22 @@
 @import "/static/css/variables.css";
 
+#modal {
+    overflow: hidden;
+}
+
 .modalContent {
     width:100%;
     height:100%;
     padding-top: 20px;
     padding-bottom: 20px;
-    text-align:center;
     overflow-x:hidden;
     overflow-y:auto;
-}
-
-.info {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    width: 100%;
 }
+
 .column {
     display: flex;
     flex-direction: column;

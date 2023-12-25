@@ -714,7 +714,7 @@ function renderModal(network) {
             let html = "", n = network.edges.length;
             for(let i = 0; i < n; i++) {
                 let edge = network.edges[i];
-                html += "<li>" + edge.type + "</li>";
+                html += "<li>" + edge.obj1.name + " " + edge.type.toLowerCase() + " " + edge.obj2.name + "</li>";
             }
             $("#edgesList").html(html);
         }
