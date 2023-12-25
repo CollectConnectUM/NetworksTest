@@ -8,7 +8,9 @@
     <link rel="icon" type="image/x-icon" href="/static/img/symbol.png">
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Quicksand|Noto+Sans">
+	<link rel="stylesheet" href="/static/css/jquery-ui-1.12.1/jquery-ui.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.2.0/svg.min.js"></script>
 
     <link rel="stylesheet" href="/static/css/header.css">
@@ -29,7 +31,7 @@
                 <div id="viewHeader">
                     <div id="headerButtons">
                         <button class="headerButton" id="back-button">Back</button>
-                        <button class="headerButton" id="info-button">Info</button>
+                        <button class="headerButton" id="info-button" onclick="doOpenModal()">Info</button>
                         <button class="headerButton" id="grid-button">Grid</button>
                     </div>
                     <div id="viewSelect">
@@ -61,9 +63,8 @@
 
                 </div>  
             </div>
-            <div id="modal" class="modal">
-                <div class="modal-content">
-                    <span class="close">&times;</span>
+            <div id="modal" title="Network Info">
+                <div class="modalContent">
                     <div class="info">
                         <div id="column1" class="column">
                             <div id="name" class="infoType">

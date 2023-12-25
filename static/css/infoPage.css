@@ -1,51 +1,13 @@
 @import "/static/css/variables.css";
 
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed;
-    z-index: 1; /* Sit on top */
-    padding-top: 100px;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-    font-family: 'Noto Sans', sans-serif;
-}
-.modal-content {
-    background-color: var(--bg-main);
-    margin: auto;
-    padding: 20px;
-    border: 1px solid var(--special);
-    border-radius: 4px;
-    width: 90%;
-    height: 70%;
-    color: var(--special);
-}
-  
-.close {
-    color: var(--secondary-inv);
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    background-color: var(--secondary);
-    border-radius: 5px;
-    border: 2px solid var(--secondary);
-    width: 30px;
-    height: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.close:hover,
-.close:focus {
-    color: var(--secondary);
-    background-color: var(--secondary-inv);
-    text-decoration: none;
-    cursor: pointer;
-    border: 2px solid var(--secondary);
+.modalContent {
+    width:100%;
+    height:100%;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    text-align:center;
+    overflow-x:hidden;
+    overflow-y:auto;
 }
 
 .info {
@@ -58,7 +20,7 @@
 .column {
     display: flex;
     flex-direction: column;
-    margin-right: 40px;
+    margin-right: 50px;
     min-width: calc(200px * var(--scale));
     width: 23%;
     min-height: 45vh;
@@ -69,6 +31,7 @@
     height: 33%;
     margin-top: 10px;
     width: 100%;
+    text-align: left !important;
 }
 .infoTitle {
     display: inline-block;
@@ -77,19 +40,13 @@
     margin-bottom: 5px;
     color: var(--special);
 }
-.infoTitle svg {
-    display: inline-block;
-    vertical-align: middle;
-    width: calc(24px * var(--scale));
-    height: calc(24px * var(--scale));
-}
 .infoTitle h3 {
     display: inline-block;
     vertical-align: middle;
     margin-top: 0;
     margin-bottom: 0;
     margin-left: 10px;
-    font-size: calc(20px * var(--scale));
+    font-size: calc(18px * var(--scale));
     font-weight: bold;
     text-align: left;
     word-break: break-all;

@@ -666,6 +666,54 @@ function initShortcuts() {
     })
 }
 
+window.doOpenModal = function() {};
+function renderModal(network) {
+    let modal = $("#modal").dialog({
+        resizable: true,
+        height: window.innerHeight * 0.7,
+        width: window.innerWidth * 0.9,
+        modal: true,
+        autoOpen: false,
+        open: function() {
+            if (network.name) $("#nameVal").text(network.name);
+            else $("#nameVal").text("No name for this network.");
+            
+            if (network.description) $("#descVal").text(network.description);
+            else $("#descVal").text("No description for this network.");
+
+            if (network.author) $("#authorVal").text(network.author);
+            else $("#authorVal").text("No author for this network.");
+
+            if (network.nodes.length) $("#nodesVal").text(network.nodes.length);
+            else $("#nodesVal").text("No nodes for this network.");
+
+            if (network.edges.length) $("#edgesVal").text(network.edges.length);
+            else $("#edgesVal").text("No edges for this network.");
+        },
+        close: function() {
+
+        }
+    });
+
+    function openModal() {
+        modal.dialog("open");
+    }
+
+    window.doOpenModal = openModal;
+
+    // do resize if needed
+    let queuedTimeout = null;
+    function doResize() {
+        modal.dialog('option', 'height', window.innerHeight * 0.7);
+        modal.dialog('option', 'width', window.innerWidth * 0.9);
+        queuedTimeout = null;
+    }
+    window.onresize = function() {
+        if ( queuedTimeout ) clearTimeout(queuedTimeout);
+        queuedTimeout = setTimeout(doResize, 150);
+    };
+}
+
 
 //Main Program
 function main() {
@@ -676,12 +724,11 @@ function main() {
     console.log("Network:", network)
 
     //Initialize Functions for Network page
+    renderModal(network)
     initSVG(network)
     initCamera()
     initInfoPanel(network)
     initGridButton()
     initViewController()
     initShortcuts()
-    showModal(network)
-
 }main();
