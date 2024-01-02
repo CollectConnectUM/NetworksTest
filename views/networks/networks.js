@@ -376,81 +376,98 @@ const initCamera = function() {
     camera.w = vb.w
     camera.h = vb.h
 
-    //vbmove function
-    function vbMove() {
+    function vbUpdate() {
         svg.viewbox(camera.x.toString() + " " + camera.y.toString() + " " + camera.w.toString() + " " + camera.h.toString())
     }
 
     //mouse events for controlling viewbox translation
-    const move = {x: 0, y: 0, startX: 0, startY: 0}
-    svg.mousedown((m) => {
-        if (m.buttons >= 1) {
+    const move = {x: 0, y: 0, startX: 0, startY: 0, leaveTimer: null,
+        moveUpdate: function(e) {
+            let difX = move.x - e.clientX
+            if (e.clientX > move.x) {
+                camera.x = camera.x + difX
+                camera.w = camera.w + difX / 2
+            } else {
+                camera.x = camera.x + difX
+                camera.w = camera.w + difX / 2
+            }
+
+            let difY = move.y - e.clientY
+            if (e.clientY > move.y) {
+                camera.y = camera.y + difY
+                camera.h = camera.h + difY / 2
+            } else {
+                camera.y = camera.y + difY
+                camera.h = camera.h + difY / 2
+            }
+
+            camera.w = camera.w > 0 ? camera.w : 1
+            camera.h = camera.h > 0 ? camera.h : 1
+
+            vbUpdate()
+        },
+    }
+
+    //mouse events
+    svg.on(["mousedown"], (e) => {
+        if (e.buttons >= 1) {
             camera.down = true
-            move.x = m.clientX
-            move.y = m.clientY
-            move.startX = m.clientX
-            move.startY = m.clientY
+            move.x = e.clientX
+            move.y = e.clientY
+            move.startX = e.clientX
+            move.startY = e.clientY
         }
     })
 
-    svg.mousemove((m) => {
+    svg.on(["mousemove"],(e) => {
+        if(move.leaveTimer != null) {
+            move.leaveTimer = null
+        }
         if (camera.down === true) {
-            let difX = move.x - m.clientX
-            if (m.clientX > move.x) {
-                camera.x = camera.x + difX
-                camera.w = camera.w + difX / 2
-            } else {
-                camera.x = camera.x + difX
-                camera.w = camera.w + difX / 2
-            }
+            move.moveUpdate(e)
 
-            let difY = move.y - m.clientY
-            if (m.clientY > move.y) {
-                camera.y = camera.y + difY
-                camera.h = camera.h + difY / 2
-            } else {
-                camera.y = camera.y + difY
-                camera.h = camera.h + difY / 2
-            }
-
-            camera.w = camera.w > 0 ? camera.w : 1
-            camera.h = camera.h > 0 ? camera.h : 1
-
-            vbMove()
-
-            move.x = m.clientX
-            move.y = m.clientY
+            move.x = e.clientX
+            move.y = e.clientY
         }
     })
 
-    svg.mouseup((m) => {
+    svg.on(["mouseup", "touchend", "touchcancel", "touchleave"],(e) => {
+        camera.down = false
+    })
+
+    svg.on(["mouseleave"],(e) => {
+        move.leaveTimer = setTimeout(() => {
+            if (move.leaveTimer != null) {
+                camera.down = false
+            }
+        }, 1000)
+    })
+
+
+    //touch events
+    svg.on(["touchstart"], (e) => {
+        if (e.targetTouches.length >= 1) {
+            camera.down = true
+            
+            const touch = e.targetTouches.item(0)
+
+            move.x = touch.clientX
+            move.y = touch.clientY
+            move.startX = touch.clientX
+            move.startY = touch.clientY
+        }
+    })
+
+    svg.on(["touchmove"], (e) => {
         if (camera.down === true) {
-            camera.down = false
+            const touch = e.targetTouches.item(0)
 
-            let difX = move.x - m.clientX
-            if (m.clientX > move.x) {
-                camera.x = camera.x + difX
-                camera.w = camera.w + difX / 2
-            } else {
-                camera.x = camera.x + difX
-                camera.w = camera.w + difX / 2
-            }
-
-            let difY = move.y - m.clientY
-            if (m.clientY > move.y) {
-                camera.y = camera.y + difY
-                camera.h = camera.h + difY / 2
-            } else {
-                camera.y = camera.y + difY
-                camera.h = camera.h + difY / 2
-            }
-
-            camera.w = camera.w > 0 ? camera.w : 1
-            camera.h = camera.h > 0 ? camera.h : 1
-
-            vbMove()
+            move.moveUpdate(touch)
+            move.x = touch.clientX
+            move.y = touch.clientY
         }
     })
+
 
     function roundToNearest(numToRound, numToRoundTo) {
         numToRoundTo = 1 / (numToRoundTo);
@@ -490,7 +507,7 @@ const initCamera = function() {
 
         if (newCam.w > 0 && newCam.h > 0) {
             camera = newCam
-            vbMove()
+            vbUpdate()
         }
     }
 
