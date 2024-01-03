@@ -381,58 +381,29 @@ const initCamera = function() {
     }
 
     //mouse events for controlling viewbox translation
-    const move = {x: 0, y: 0, startX: 0, startY: 0, leaveTimer: null,
-        moveUpdate: function(e) {
-            let difX = move.x - e.clientX
-            if (e.clientX > move.x) {
-                camera.x = camera.x + difX
-                camera.w = camera.w + difX / 2
-            } else {
-                camera.x = camera.x + difX
-                camera.w = camera.w + difX / 2
-            }
-
-            let difY = move.y - e.clientY
-            if (e.clientY > move.y) {
-                camera.y = camera.y + difY
-                camera.h = camera.h + difY / 2
-            } else {
-                camera.y = camera.y + difY
-                camera.h = camera.h + difY / 2
-            }
-
-            camera.w = camera.w > 0 ? camera.w : 1
-            camera.h = camera.h > 0 ? camera.h : 1
-
-            vbUpdate()
-        },
-    }
+    const move = {moving: false, leaveTimer: null,}
 
     //mouse events
     svg.on(["mousedown"], (e) => {
         if (e.buttons >= 1) {
             camera.down = true
-            move.x = e.clientX
-            move.y = e.clientY
-            move.startX = e.clientX
-            move.startY = e.clientY
         }
     })
 
-    svg.on(["mousemove"],(e) => {
+    svg.on(["mousemove"], (e) => {
         if(move.leaveTimer != null) {
+            clearTimeout(move.leaveTimer)
             move.leaveTimer = null
         }
         if (camera.down === true) {
-            move.moveUpdate(e)
+            const difX = e.movementX
+            camera.x = camera.x - difX
 
-            move.x = e.clientX
-            move.y = e.clientY
+            const difY = e.movementY
+            camera.y = camera.y - difY
+
+            vbUpdate()
         }
-    })
-
-    svg.on(["mouseup", "touchend", "touchcancel", "touchleave"],(e) => {
-        camera.down = false
     })
 
     svg.on(["mouseleave"],(e) => {
@@ -443,31 +414,68 @@ const initCamera = function() {
         }, 1000)
     })
 
+    // events
+    const touchMove = {touchList: [], action: null, actionTimer: null}
 
-    //touch events
     svg.on(["touchstart"], (e) => {
-        if (e.targetTouches.length >= 1) {
-            camera.down = true
-            
-            const touch = e.targetTouches.item(0)
+        e.preventDefault()
+        if (touchMove.action === null) {
+            touchMove.touchList.push(e.changedTouches.item(0))
 
-            move.x = touch.clientX
-            move.y = touch.clientY
-            move.startX = touch.clientX
-            move.startY = touch.clientY
-        }
+            if (touchMove.actionTimer === null) {
+                touchMove.actionTimer = setTimeout(() => {
+                    if (touchMove.actionTimer != null) {
+                        if(touchMove.touchList.length == 1) {
+                            touchMove.action = "translate"
+                        } else if (touchMove.touchList.length == 2) {
+                            touchMove.action = "zoom"
+                        }
+                        console.log(touchMove.action)
+                    }
+                }, 10)
+            } 
+        } 
     })
 
     svg.on(["touchmove"], (e) => {
-        if (camera.down === true) {
-            const touch = e.targetTouches.item(0)
+        e.preventDefault()
+        if(touchMove.action == "translate") {
+            const newTouch = e.changedTouches.item(0)
+            const oldTouch = touchMove.touchList.findIndex((val) => val.identifier === newTouch.identifier)
+            if(oldTouch != -1) {
+                const difX = touchMove.touchList[oldTouch].clientX - newTouch.clientX
+                camera.x = camera.x + difX
 
-            move.moveUpdate(touch)
-            move.x = touch.clientX
-            move.y = touch.clientY
+                const difY = touchMove.touchList[oldTouch].clientY - newTouch.clientY
+                camera.y = camera.y + difY
+
+                vbUpdate()
+
+                touchMove.touchList[oldTouch] = newTouch
+            }
+            
+        } else if(touchMove.action == "zoom") {
+
         }
     })
 
+    svg.on(["touchend"], (e) => {
+        e.preventDefault()
+
+        if (e.targetTouches.length == 0) {
+            touchMove.touchList.length = 0
+            touchMove.action = null
+            clearTimeout(touchMove.actionTimer)
+            touchMove.actionTimer = null
+        } /*else {
+            const touchI = touchList.findIndex((val,i) => val.identifier === e.changedTouches.item(0).identifier)
+            touchList.splice(touchI, 1)
+        }*/
+    })
+
+    svg.on(["mouseup", "touchcancel"],(e) => {
+        camera.down = false
+    })
 
     function roundToNearest(numToRound, numToRoundTo) {
         numToRoundTo = 1 / (numToRoundTo);
