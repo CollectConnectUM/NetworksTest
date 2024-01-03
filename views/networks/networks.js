@@ -353,8 +353,8 @@ const initSVG = function(network) {
 
     svgSize.x = 0
     svgSize.y = (-1) * cellSize.y
-    svgSize.w = (gridChildren.length * cellSize.x)
-    svgSize.h = ((gridChildren[0].children().length + 2) * cellSize.y) + (gridChildren.length * 2)
+    svgSize.w = (gridChildren[0].children().length * cellSize.x)
+    svgSize.h = ((gridChildren.length + 2) * cellSize.y)
 
     Draw.SVG.viewbox(svgSize.x.toString() + " " + svgSize.y.toString() + " " + svgSize.w.toString() + " " + svgSize.h.toString())
 
