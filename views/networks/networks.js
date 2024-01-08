@@ -563,46 +563,6 @@ const initCamera = function() {
     return true
 }
 
-//Info Panel init text elements and collpase function
-const initInfoPanel = function(network) {
-    //Init Collapse Text
-    const collapseName = document.getElementById("collapseName")
-    collapseName.innerHTML = network.name
-
-    //Init Name/Owner Text
-    const nameElement = document.getElementById("property-name")
-    const authorElement = document.getElementById("owner")
-    nameElement.innerHTML = network.name
-    authorElement.innerHTML = network.author
-
-    //Init Description Text
-    const descDiv = document.getElementById("Description")
-    const descElement = descDiv.getElementsByClassName("propertyInfo")[0]
-    descElement.innerHTML = network.description
-
-    //Init Collapse Behavior
-    const cButton = $("#collapseButton")
-    let collapsed = false
-    cButton.on("click",(m) => {
-        const infoList = $("#infoList")
-        const collapseName = $("#collapseName")
-        const cIcon = $("#collapseIcon")
-        if (!collapsed) {
-            collapsed = true
-            infoList.addClass("ILCollapse")
-            collapseName.removeClass("nameCollapse")
-            cIcon.attr("src","/static/img/arrow-left.svg");
-        } else {
-            collapsed = false
-            infoList.removeClass("ILCollapse")
-            collapseName.addClass("nameCollapse")
-            cIcon.attr("src","/static/img/arrow.svg");
-        }
-    })
-
-    return true
-}
-
 //Toggle visible of the SVG Grid when the grid button is pressed
 const initGridButton = function() {
     const gb = document.getElementById("grid-button")
@@ -624,16 +584,75 @@ const initGridButton = function() {
     return true
 }
 
+
+
+//change infoPanel contents
+const changeInfoPanel = function(item) {
+    //Change Collapse Text
+    const collapseName = document.getElementById("collapseName")
+    collapseName.innerHTML = item.name
+
+    //Change Name/Owner Text
+    const nameElement = document.getElementById("property-name")
+    const authorElement = document.getElementById("owner")
+    nameElement.innerHTML = item.name
+    authorElement.innerHTML = item.author
+
+    //Change Description Text
+    const descDiv = document.getElementById("Description")
+    const descElement = descDiv.getElementsByClassName("propertyInfo")[0]
+    descElement.innerHTML = item.description
+}
+
+//Info Panel init text elements and collpase function
+const initInfoPanel = function(network) {
+    ViewController.setActive(network)
+
+    //Init Collapse Behavior
+    const cButton = $("#collapseButton")
+    let collapsed = false
+    cButton.on("click",(m) => {
+        const infoList = $("#infoList")
+        const collapseName = $("#collapseName")
+        const cIcon = $("#collapseIcon")
+        if (!collapsed) {
+            collapsed = true
+            infoList.addClass("ILCollapse")
+            collapseName.removeClass("nameCollapse")
+            cIcon.attr("src","/static/img/arrow-left.svg");
+        } else {
+            collapsed = false
+            infoList.removeClass("ILCollapse")
+            collapseName.addClass("nameCollapse")
+            cIcon.attr("src","/static/img/arrow.svg");
+        }
+    })
+
+    //
+
+    return true
+}
+
 //View Controller and Init Function
 const ViewController = {
     view: "",
+    network: null,
+    activeItem: null,
     changeView: function(newView) {
         this.view = newView
+    },
+    setActive: function(item) {
+        this.activeItem = item
+        changeInfoPanel(item)
+    },
+    resetVC: function() {
+        this.setActive(network)
     }
 }
 
-function initViewController(newView = "Map") {
+function initViewController(newView = "Map", network) {
     ViewController.changeView(newView)
+    ViewController.network = network
 
     const mapButton = $("#map-button")
     const editButton = $("#edit-button")
@@ -818,8 +837,8 @@ function main() {
     renderModal(network)
     initSVG(network)
     initCamera()
+    initViewController()
     initInfoPanel(network)
     initGridButton()
-    initViewController()
     initShortcuts()
 }main();
