@@ -233,6 +233,12 @@ const Draw = {
         })
         objText.move(image.cx(), image.cy() + image.height() / 2).attr({"text-anchor": "middle" })
 
+        //object select function
+        object.on(["click"], (e) => {
+            ViewController.setActive(node)
+            e.stopPropagation()
+        })
+
         return this
     },
 
@@ -586,7 +592,7 @@ const initGridButton = function() {
 
 
 
-//change infoPanel contents
+//Change infoPanel contents
 const changeInfoPanel = function(item) {
     //Change Collapse Text
     const collapseName = document.getElementById("collapseName")
@@ -604,7 +610,7 @@ const changeInfoPanel = function(item) {
     descElement.innerHTML = item.description
 }
 
-//Info Panel init text elements and collpase function
+//Info Panel, init text elements and collapse function
 const initInfoPanel = function(network) {
     ViewController.setActive(network)
 
@@ -628,7 +634,15 @@ const initInfoPanel = function(network) {
         }
     })
 
-    //
+    //IP reset function
+    const svg = Draw.SVG
+
+    svg.on("click", (e) => {
+        if(ViewController.activeItem != ViewController.network) {
+            ViewController.setActive(ViewController.network)
+        }
+    })
+
 
     return true
 }
@@ -646,11 +660,11 @@ const ViewController = {
         changeInfoPanel(item)
     },
     resetVC: function() {
-        this.setActive(network)
+        this.setActive(this.network)
     }
 }
 
-function initViewController(newView = "Map", network) {
+function initViewController(network, newView = "Map") {
     ViewController.changeView(newView)
     ViewController.network = network
 
@@ -837,7 +851,7 @@ function main() {
     renderModal(network)
     initSVG(network)
     initCamera()
-    initViewController()
+    initViewController(network)
     initInfoPanel(network)
     initGridButton()
     initShortcuts()
