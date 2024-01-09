@@ -215,13 +215,41 @@ html,body{
 
 /*Edit CSS*/
 #editDiv {
+    visibility: visible;
     background-color: var(--primary);
     position: absolute;
     z-index: 10;
-    top: 0px;
-    width: 100px;
-    height: 50px;
+    bottom: 5%;
+    left: 35%;
+    width: 30%;
+    border-radius: calc(10px * var(--scale));
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transition-duration: 0.2s;
+    transition-property: height;
 }
+
+.ED-Small {
+    height: 8%;
+}
+
+.ED-Large {
+    height: 25%;
+}
+
+#editContent {
+    visibility: hidden;
+}
+
+#editButtons {
+    display: flex;
+    flex-direction: row;
+}
+
+#editButtons button {
+    width: fit-content;
+    height: 2.5rem;
+}
+
 
 /*SVG CSS*/
 #SVGDiv {
