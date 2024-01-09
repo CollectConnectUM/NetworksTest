@@ -658,9 +658,6 @@ const ViewController = {
     setActive: function(item) {
         this.activeItem = item
         changeInfoPanel(item)
-    },
-    resetVC: function() {
-        this.setActive(this.network)
     }
 }
 
