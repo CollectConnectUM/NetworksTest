@@ -652,9 +652,19 @@ const initInfoPanel = function(network) {
     //IP reset function
     const svg = Draw.SVG
 
-    svg.on(["click"], (e) => {
-        if(ViewController.activeItem != ViewController.network) {
-            ViewController.setActive(ViewController.network)
+    let mouseTarget = null
+    svg.on(["mousedown"], (e) => {
+        e.preventDefault()
+        mouseTarget = e.target
+        setTimeout(() => {mouseTarget = null}, 100)
+    })
+
+    svg.on(["mouseup"], (e) => {
+        e.preventDefault()
+        if(e.target === mouseTarget) {
+            if(ViewController.activeItem != ViewController.network) {
+                ViewController.setActive(ViewController.network)
+            }
         }
     })
 
@@ -678,6 +688,17 @@ const initInfoPanel = function(network) {
 
     return true
 }
+
+//initialize Edit UI buttons and functionality
+function initEditUI() {
+    const editUI = $("#editDiv")
+    const editButtons = $("#editButtons").children()
+
+    editButtons.each((buttons, button) => {
+        console.log(button.innerHTML)
+    })
+}
+
 
 //View Controller and Init Function
 const ViewController = {
@@ -889,17 +910,6 @@ function renderModal(network) {
         queuedTimeout = setTimeout(doResize, 150);
     };
 }
-
-//initialize Edit UI buttons and functionality
-function initEditUI() {
-    const editUI = $("#editDiv")
-    const editButtons = $("#editButtons").children()
-
-    editButtons.each((buttons, button) => {
-        console.log(button.innerHTML)
-    })
-}
-
 
 //Main Program
 function main() {
