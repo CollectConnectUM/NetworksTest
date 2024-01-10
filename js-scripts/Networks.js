@@ -178,6 +178,10 @@ const Networks = [
         id: 2,
         generate: genBabel
 
+    },
+    {
+        id:3,
+        generate: genEmpty
     }
 ]
 
@@ -272,6 +276,12 @@ function genBabel(id) {
 
     const ptm = new Edge(16, "Translated From ", network, penta, moses)
     const mte = new Edge(17, "Author", network, moses, everett)
+
+    return network
+}
+
+function genEmpty(id) {
+    const network = new Network(id, "Empty Network", "Developer", [4,4], "Empty Network to test edit functionality")
 
     return network
 }
