@@ -652,47 +652,41 @@ const initInfoPanel = function(network) {
     //IP reset function
     const svg = Draw.SVG
 
-    let mouseTarget = null
-    svg.on(["mousedown"], (e) => {
+    let eventTarget = null
+    svg.on(["mousedown", "touchstart"], (e) => {
         e.preventDefault()
-        mouseTarget = e.target
-        setTimeout(() => {mouseTarget = null}, 100)
+        eventTarget = e.target
+        setTimeout(() => {eventTarget = null}, 100)
     })
 
-    svg.on(["mouseup"], (e) => {
+    svg.on(["mouseup", "touchend"], (e) => {
         e.preventDefault()
-        if(e.target === mouseTarget) {
+        if(e.target === eventTarget) {
             if(ViewController.activeItem != ViewController.network) {
                 ViewController.setActive(ViewController.network)
             }
         }
+        eventTarget = null
     })
-
-    let touchTarget = null
-    svg.on(["touchstart"], (e) => {
-        e.preventDefault()
-        touchTarget = e.target
-        setTimeout(() => {touchTarget = null}, 100)
-    })
-
-    svg.on(["touchend"], (e) => {
-        e.preventDefault()
-        if (e.target === touchTarget) {
-            if(ViewController.activeItem != ViewController.network) {
-                ViewController.setActive(ViewController.network)
-            }
-        }
-        touchTarget = null
-    })
-
 
     return true
+}
+
+const htmlStore = {
+    default: null,
+    listItem: null,
 }
 
 //initialize Edit UI buttons and functionality
 function initEditUI() {
     const editUI = $("#editDiv")
+    const editContent = $("#editContent")
     const editButtons = $("#editButtons").children()
+
+    htmlStore.default = editContent.html()
+    htmlStore.listItem = $("#itemList").html()
+
+    console.log(htmlStore)
 
     editButtons.each((buttons, button) => {
         console.log(button.innerHTML)
