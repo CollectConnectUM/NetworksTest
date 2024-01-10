@@ -215,12 +215,13 @@ html,body{
 
 /*Edit CSS*/
 #editDiv {
-    visibility: visible;
+
     background-color: var(--primary);
     position: absolute;
     z-index: 10;
     bottom: 5%;
-    left: 35%;
+    left: 5%;
+    min-width: fit-content;
     width: 30%;
     border-radius: calc(10px * var(--scale));
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
@@ -228,26 +229,108 @@ html,body{
     transition-property: height;
 }
 
-.ED-Small {
-    height: 8%;
+.ED-Visible {
+    visibility: visible;
 }
 
-.ED-Large {
-    height: 25%;
-}
-
-#editContent {
+.ED-Hidden {
     visibility: hidden;
 }
 
-#editButtons {
+.ED-Small {
+    height: calc(60px * var(--scale));
+}
+
+.ED-Large {
+    height: calc(200px * var(--scale));
+}
+
+#editContent {
+    background-color: var(--secondary);
+    border-radius: calc(10px * var(--scale));
+}
+
+.contentHidden {
+    visibility: hidden;
+    height: 0;
+}
+
+.contentVisible {
+    visibility: visible;
+    height: calc(140px * var(--scale));
+}
+
+#itemHeader {
+    margin: 0;
+    font-size: calc(1.2rem * var(--scale));
+    border-bottom: 1px solid var(--primary-inv);
+    padding: calc(4px * var(--scale));
+    padding-left: calc(12px * var(--scale));
+    padding-right: 0;
+}
+
+#itemList {
+    margin: 0;
+}
+
+#itemList li {
     display: flex;
     flex-direction: row;
+    align-items: center;
+    border-bottom: 1px solid var(--primary-inv);
+}
+
+.itemTitle {
+    margin: 0;
+    font-size: calc(1rem * var(--scale));
+    margin-left: calc(6px * var(--scale));
+    padding: calc(2px * var(--scale));
+    padding-inline: 0;
+}
+
+.itemEdit {
+    height: fit-content;
+    width: fit-content;
+    border: 0;
+    font-size: calc(1rem * var(--scale));
+    font-weight: bold;
+    margin-left: auto;
+    margin-right: calc(6px * var(--scale));;
+    border-radius: calc(20px * var(--scale));
+    background-color: var(--secondary-inv);
+    color: var(--primary)
+}
+
+.itemEdit:hover {
+    background-color: var(--primary);
+    color: var(--primary-inv)
+}
+
+#editButtons {
+    height: calc(60px * var(--scale));
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: calc(6px * var(--scale));
+    margin-inline: calc(6px * var(--scale));
+    border-radius: calc(10px * var(--scale));
 }
 
 #editButtons button {
     width: fit-content;
-    height: 2.5rem;
+    height: 85%;
+    font-weight: bold;
+    border: 0;
+    font-size: calc(1.4rem * var(--scale));
+    border-radius: calc(10px * var(--scale));
+
+    background-color: var(--secondary);
+    color: var(--primary-inv);
+}
+
+#editButtons button:hover {
+    background-color: var(--secondary-inv);
+    color: var(--primary);
 }
 
 

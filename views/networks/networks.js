@@ -233,9 +233,25 @@ const Draw = {
         })
         objText.move(image.cx(), image.cy() + image.height() / 2).attr({"text-anchor": "middle" })
 
-        //object select function
-        object.on(["click"], (e) => {
+        //object select functions
+        object.on(["click",], (e) => {
             ViewController.setActive(node)
+            e.stopPropagation()
+        })
+
+        let touchTarget = null
+        object.on(["touchstart"], (e) => {
+            e.preventDefault()
+            touchTarget = e.target
+            setTimeout(() => {touchTarget = null}, 100)
+        })
+
+        object.on(["touchend"], (e) => {
+            e.preventDefault()
+            if (e.target === touchTarget) {
+                ViewController.setActive(node)
+            }
+            touchTarget = null
             e.stopPropagation()
         })
 
@@ -444,7 +460,6 @@ const initCamera = function() {
                                 }
                             }
                         }
-                        console.log(touchMove.action)
                     }
                 }, 15)
             } 
@@ -637,10 +652,27 @@ const initInfoPanel = function(network) {
     //IP reset function
     const svg = Draw.SVG
 
-    svg.on("click", (e) => {
+    svg.on(["click"], (e) => {
         if(ViewController.activeItem != ViewController.network) {
             ViewController.setActive(ViewController.network)
         }
+    })
+
+    let touchTarget = null
+    svg.on(["touchstart"], (e) => {
+        e.preventDefault()
+        touchTarget = e.target
+        setTimeout(() => {touchTarget = null}, 100)
+    })
+
+    svg.on(["touchend"], (e) => {
+        e.preventDefault()
+        if (e.target === touchTarget) {
+            if(ViewController.activeItem != ViewController.network) {
+                ViewController.setActive(ViewController.network)
+            }
+        }
+        touchTarget = null
     })
 
 
@@ -654,6 +686,29 @@ const ViewController = {
     activeItem: null,
     changeView: function(newView) {
         this.view = newView
+
+        const editUI = $("#editDiv")
+        const editContent = $("#editContent")
+
+        if(newView == "Edit") {
+            editUI.addClass("ED-Visible")
+            editUI.removeClass("ED-Hidden")
+
+
+        } else if(newView == "Map") {
+            editUI.addClass("ED-Hidden")
+            editUI.removeClass("ED-Visible")
+
+            if(editUI.hasClass("ED-Large")) {
+                editUI.removeClass("ED-Large")
+                editUI.addClass("ED-Small")
+            }
+
+            if(editContent.hasClass("contentVisible")) {
+                editContent.removeClass("contentVisible")
+                editContent.addClass("contentHidden")
+            }
+        }
     },
     setActive: function(item) {
         this.activeItem = item
@@ -835,6 +890,16 @@ function renderModal(network) {
     };
 }
 
+//initialize Edit UI buttons and functionality
+function initEditUI() {
+    const editUI = $("#editDiv")
+    const editButtons = $("#editButtons").children()
+
+    editButtons.each((buttons, button) => {
+        console.log(button.innerHTML)
+    })
+}
+
 
 //Main Program
 function main() {
@@ -852,4 +917,5 @@ function main() {
     initInfoPanel(network)
     initGridButton()
     initShortcuts()
+    initEditUI()
 }main();
