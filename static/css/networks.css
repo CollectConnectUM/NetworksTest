@@ -248,6 +248,8 @@ html,body{
 #editContent {
     background-color: var(--secondary);
     border-radius: calc(10px * var(--scale));
+    transition-duration: 0.2s;
+    transition-property: height;
 }
 
 .contentHidden {
@@ -271,6 +273,7 @@ html,body{
 
 #itemList {
     margin: 0;
+    overflow-y: auto;
 }
 
 #itemList li {

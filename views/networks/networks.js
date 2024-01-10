@@ -686,10 +686,55 @@ function initEditUI() {
     htmlStore.default = editContent.html()
     htmlStore.listItem = $("#itemList").html()
 
-    console.log(htmlStore)
-
     editButtons.each((buttons, button) => {
-        console.log(button.innerHTML)
+        const buttonText = button.innerHTML
+        console.log(buttonText)
+        if(buttonText == "Objects") {
+            button.onclick = (e) => {
+                if(editUI.hasClass("ED-Small")) {
+                    editUI.addClass("ED-Large")
+                    editUI.removeClass("ED-Small")
+
+                    editContent.addClass("contentVisible")
+                    editContent.removeClass("contentHidden")
+                }
+
+                if($("#itemHeader").length > 0) {
+                    $("#itemHeader").html(buttonText)
+
+                    const iList = $("#itemList")
+                    iList.html("")
+
+                    const nodeList = ViewController.network.nodes
+                    nodeList.forEach((node) => {
+                        const newLI = htmlStore.listItem
+                        newLI.replace("Item", node.name)
+                        iList.append(newLI)
+                    })
+                } 
+
+
+            } 
+        } else if(buttonText == "Relationships") {
+            button.onclick = (e) => {
+                if(editUI.hasClass("ED-Small")) {
+                    editUI.addClass("ED-Large")
+                    editUI.removeClass("ED-Small")
+
+                    editContent.addClass("contentVisible")
+                    editContent.removeClass("contentHidden")
+                }
+
+                if($("#itemHeader").length > 0) {
+                    $("#itemHeader").html(buttonText)
+                } 
+            }
+        } else if(buttonText == "New") {
+            button.onclick = (e) => {
+                console.log("New Item")
+            }
+        }
+        
     })
 }
 
