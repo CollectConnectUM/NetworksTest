@@ -135,7 +135,6 @@ html,body{
     opacity: 0.95;
 }
 
-
 #collapseDiv {
     display: flex;
     flex-direction: row;
@@ -255,8 +254,22 @@ html,body{
 
 .relText {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
-    
+
     font-size: 0.8rem;
     fill: var(--special);
     text-rendering: optimizeLegibility;
-} 
+}
+
+#nodeInfo {
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+    border: 0;
+    background-color: var(--secondary);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border-radius: calc(10px * var(--scale));
+    margin: calc(5px * var(--scale));
+    padding: calc(5px * var(--scale));
+    opacity: 0.95;
+}

@@ -447,8 +447,8 @@ const initCamera = function() {
                         console.log(touchMove.action)
                     }
                 }, 15)
-            } 
-        } 
+            }
+        }
     })
 
     svg.on(["touchmove"], (e) => {
@@ -467,10 +467,10 @@ const initCamera = function() {
 
                 touchMove.touchList[oldTouch] = newTouch
             }
-            
+
         } else if(touchMove.action == "zoom") {
             const newTouchList = []
-            for (let i = 0; i < e.changedTouches.length; i++) 
+            for (let i = 0; i < e.changedTouches.length; i++)
                 newTouchList.push(e.changedTouches.item(i))
 
             let difY = 0
@@ -504,7 +504,7 @@ const initCamera = function() {
 
     svg.on(["touchend"], (e) => {
         e.preventDefault()
-        
+
         const endTouch = e.changedTouches.item(0)
         const inTL = touchMove.touchList.findIndex((val,i) => val.identifier == endTouch.identifier ? true : false)
         if (inTL != -1) {
@@ -590,7 +590,35 @@ const initGridButton = function() {
     return true
 }
 
+let nodeInfoDiv;
 
+// Display info on selected node -Jaishree
+const displayNodeInfo = function(item) {
+
+    if (nodeInfoDiv) {
+        nodeInfoDiv.remove();
+    }
+
+    nodeInfoDiv = document.createElement('div');
+    nodeInfoDiv.id = "nodeInfo";
+
+    const relationships = `Number of relationships: ${item.edges.length}`;
+    nodeInfoDiv.innerHTML = `
+        <p>Current node: ${item.name}</p>
+        <p>${relationships}</p>
+    `;
+
+    const svgDiv = document.getElementById('SVGDiv');
+    const cellSize = Draw.CellSize;
+    const xPosition = cellSize.x * (item.position[0] - 1);
+    const yPosition = cellSize.y * item.position[1];
+
+    nodeInfoDiv.style.position = 'absolute';
+    nodeInfoDiv.style.top = `${yPosition}px`;
+    nodeInfoDiv.style.left = `${xPosition}px`;
+
+    svgDiv.appendChild(nodeInfoDiv);
+}
 
 //Change infoPanel contents
 const changeInfoPanel = function(item) {
@@ -658,6 +686,7 @@ const ViewController = {
     setActive: function(item) {
         this.activeItem = item
         changeInfoPanel(item)
+        displayNodeInfo(item)
     },
     resetVC: function() {
         this.setActive(this.network)
@@ -798,7 +827,7 @@ function renderModal(network) {
         open: function() {
             if (network.name) $("#nameVal").text(network.name);
             else $("#nameVal").text("No name for this network.");
-            
+
             if (network.description) $("#descVal").text(network.description);
             else $("#descVal").text("No description for this network.");
 
