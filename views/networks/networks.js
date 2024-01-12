@@ -656,7 +656,7 @@ const initInfoPanel = function(network) {
     svg.on(["mousedown", "touchstart"], (e) => {
         e.preventDefault()
         eventTarget = e.target
-        setTimeout(() => {eventTarget = null}, 100)
+        setTimeout(() => {eventTarget = null}, 150)
     })
 
     svg.on(["mouseup", "touchend"], (e) => {
