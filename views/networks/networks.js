@@ -688,7 +688,6 @@ function initEditUI() {
 
     editButtons.each((buttons, button) => {
         const buttonText = button.innerHTML
-        console.log(buttonText)
         if(buttonText == "Objects") {
             button.onclick = (e) => {
                 if(editUI.hasClass("ED-Small")) {
@@ -707,8 +706,9 @@ function initEditUI() {
 
                     const nodeList = ViewController.network.nodes
                     nodeList.forEach((node) => {
-                        const newLI = htmlStore.listItem
-                        newLI.replace("Item", node.name)
+                        const newLI = $(htmlStore.listItem)
+                        newLI.find("p").html(node.name)
+                        newLI.find("button").click(() => {console.log("Edit:", node.name)})
                         iList.append(newLI)
                     })
                 } 
@@ -727,6 +727,17 @@ function initEditUI() {
 
                 if($("#itemHeader").length > 0) {
                     $("#itemHeader").html(buttonText)
+
+                    const iList = $("#itemList")
+                    iList.html("")
+
+                    const nodeList = ViewController.network.edges
+                    nodeList.forEach((edge) => {
+                        const newLI = $(htmlStore.listItem)
+                        newLI.find("p").html(edge.obj1.name + " " + edge.type + " " + edge.obj2.name)
+                        newLI.find("button").click(() => {console.log("Edit:", edge.obj1.name + " " + edge.type + " " + edge.obj2.name)})
+                        iList.append(newLI)
+                    })
                 } 
             }
         } else if(buttonText == "New") {
