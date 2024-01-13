@@ -233,6 +233,12 @@ const Draw = {
         })
         objText.move(image.cx(), image.cy() + image.height() / 2).attr({"text-anchor": "middle" })
 
+        //object select function
+        object.on(["click"], (e) => {
+            ViewController.setActive(node)
+            e.stopPropagation()
+        })
+
         return this
     },
 
@@ -353,8 +359,8 @@ const initSVG = function(network) {
 
     svgSize.x = 0
     svgSize.y = (-1) * cellSize.y
-    svgSize.w = (gridChildren.length * cellSize.x)
-    svgSize.h = ((gridChildren[0].children().length + 2) * cellSize.y) + (gridChildren.length * 2)
+    svgSize.w = (gridChildren[0].children().length * cellSize.x)
+    svgSize.h = ((gridChildren.length + 2) * cellSize.y)
 
     Draw.SVG.viewbox(svgSize.x.toString() + " " + svgSize.y.toString() + " " + svgSize.w.toString() + " " + svgSize.h.toString())
 
@@ -376,80 +382,144 @@ const initCamera = function() {
     camera.w = vb.w
     camera.h = vb.h
 
-    //vbmove function
-    function vbMove() {
+    function vbUpdate() {
         svg.viewbox(camera.x.toString() + " " + camera.y.toString() + " " + camera.w.toString() + " " + camera.h.toString())
     }
 
     //mouse events for controlling viewbox translation
-    const move = {x: 0, y: 0, startX: 0, startY: 0}
-    svg.mousedown((m) => {
-        if (m.buttons >= 1) {
+    const move = {moving: false, leaveTimer: null,}
+
+    //mouse events
+    svg.on(["mousedown"], (e) => {
+        if (e.buttons >= 1) {
             camera.down = true
-            move.x = m.clientX
-            move.y = m.clientY
-            move.startX = m.clientX
-            move.startY = m.clientY
         }
     })
 
-    svg.mousemove((m) => {
+    svg.on(["mousemove"], (e) => {
+        if(move.leaveTimer != null) {
+            clearTimeout(move.leaveTimer)
+            move.leaveTimer = null
+        }
         if (camera.down === true) {
-            let difX = move.x - m.clientX
-            if (m.clientX > move.x) {
-                camera.x = camera.x + difX
-                camera.w = camera.w + difX / 2
-            } else {
-                camera.x = camera.x + difX
-                camera.w = camera.w + difX / 2
-            }
+            const difX = e.movementX
+            camera.x = camera.x - difX
 
-            let difY = move.y - m.clientY
-            if (m.clientY > move.y) {
-                camera.y = camera.y + difY
-                camera.h = camera.h + difY / 2
-            } else {
-                camera.y = camera.y + difY
-                camera.h = camera.h + difY / 2
-            }
+            const difY = e.movementY
+            camera.y = camera.y - difY
 
-            camera.w = camera.w > 0 ? camera.w : 1
-            camera.h = camera.h > 0 ? camera.h : 1
-
-            vbMove()
-
-            move.x = m.clientX
-            move.y = m.clientY
+            vbUpdate()
         }
     })
 
-    svg.mouseup((m) => {
-        if (camera.down === true) {
-            camera.down = false
+    svg.on(["mouseleave"],(e) => {
+        move.leaveTimer = setTimeout(() => {
+            if (move.leaveTimer != null) {
+                camera.down = false
+            }
+        }, 1000)
+    })
 
-            let difX = move.x - m.clientX
-            if (m.clientX > move.x) {
+    // touch events
+    const touchMove = {touchList: [], action: null, actionTimer: null, topTouch: -1}
+
+    svg.on(["touchstart"], (e) => {
+        e.preventDefault()
+        if (touchMove.action === null) {
+            touchMove.touchList.push(e.changedTouches.item(0))
+
+            if (touchMove.actionTimer === null) {
+                touchMove.actionTimer = setTimeout(() => {
+                    if (touchMove.actionTimer != null) {
+                        if(touchMove.touchList.length == 1) {
+                            touchMove.action = "translate"
+                        } else if (touchMove.touchList.length == 2) {
+                            touchMove.action = "zoom"
+                            for (let touch in touchMove.touchList) {
+                                if (touchMove.topTouch == -1) {
+                                    touchMove.topTouch = touchMove.touchList[touch].identifier
+                                } else {
+                                    if(touchMove.touchList[touchMove.topTouch].clientY < touchMove.touchList[touch].clientY)
+                                        touchMove.topTouch = touchMove.touchList[touch].identifier
+                                }
+                            }
+                        }
+                        console.log(touchMove.action)
+                    }
+                }, 15)
+            } 
+        } 
+    })
+
+    svg.on(["touchmove"], (e) => {
+        e.preventDefault()
+        if(touchMove.action == "translate") {
+            const newTouch = e.changedTouches.item(0)
+            const oldTouch = touchMove.touchList.findIndex((val) => val.identifier === newTouch.identifier)
+            if(oldTouch != -1) {
+                const difX = touchMove.touchList[oldTouch].clientX - newTouch.clientX
                 camera.x = camera.x + difX
-                camera.w = camera.w + difX / 2
-            } else {
-                camera.x = camera.x + difX
-                camera.w = camera.w + difX / 2
+
+                const difY = touchMove.touchList[oldTouch].clientY - newTouch.clientY
+                camera.y = camera.y + difY
+
+                vbUpdate()
+
+                touchMove.touchList[oldTouch] = newTouch
+            }
+            
+        } else if(touchMove.action == "zoom") {
+            const newTouchList = []
+            for (let i = 0; i < e.changedTouches.length; i++) 
+                newTouchList.push(e.changedTouches.item(i))
+
+            let difY = 0
+            for (let newTouch of newTouchList) {
+                const oldTouch = touchMove.touchList.findIndex((val, i) => val.identifier == newTouch.identifier ? true : false)
+
+                if(newTouch.identifier == touchMove.topTouch) {
+                    difY += (touchMove.touchList[oldTouch].clientY - newTouch.clientY)
+                } else {
+                    difY -= (touchMove.touchList[oldTouch].clientY - newTouch.clientY)
+                }
+
+                touchMove.touchList[oldTouch] = newTouch
             }
 
-            let difY = move.y - m.clientY
-            if (m.clientY > move.y) {
-                camera.y = camera.y + difY
-                camera.h = camera.h + difY / 2
-            } else {
-                camera.y = camera.y + difY
-                camera.h = camera.h + difY / 2
+            let newCam = {down: camera.down, x: 0, y: 0, w: 0, h: 0, scale: {value: camera.scale.value, factor: camera.scale.factor}}
+            newCam.x = camera.x - difY
+            newCam.y = camera.y - difY
+            newCam.w = camera.w + difY * 2
+            newCam.h = camera.h + difY * 2
+
+            newCam.w = newCam.w > 0 ? newCam.w : 1
+            newCam.h = newCam.h > 0 ? newCam.h : 1
+
+            if (newCam.w > 0 && newCam.h > 0) {
+                camera = newCam
+                vbUpdate()
             }
-
-            camera.w = camera.w > 0 ? camera.w : 1
-            camera.h = camera.h > 0 ? camera.h : 1
-
-            vbMove()
         }
+    })
+
+    svg.on(["touchend"], (e) => {
+        e.preventDefault()
+        
+        const endTouch = e.changedTouches.item(0)
+        const inTL = touchMove.touchList.findIndex((val,i) => val.identifier == endTouch.identifier ? true : false)
+        if (inTL != -1) {
+            touchMove.touchList.splice(inTL, 1)
+            if (touchMove.touchList.length == 0) {
+                touchMove.action = null
+                clearTimeout(touchMove.actionTimer)
+                touchMove.actionTimer = null
+                touchMove.topTouch = -1
+            }
+        }
+    })
+
+    svg.on(["mouseup", "touchcancel"],(e) => {
+        camera.down = false
     })
 
     function roundToNearest(numToRound, numToRoundTo) {
@@ -490,51 +560,11 @@ const initCamera = function() {
 
         if (newCam.w > 0 && newCam.h > 0) {
             camera = newCam
-            vbMove()
+            vbUpdate()
         }
     }
 
     svgElement.oncontextmenu = (m) => m.preventDefault()
-
-    return true
-}
-
-//Info Panel init text elements and collpase function
-const initInfoPanel = function(network) {
-    //Init Collapse Text
-    const collapseName = document.getElementById("collapseName")
-    collapseName.innerHTML = network.name
-
-    //Init Name/Owner Text
-    const nameElement = document.getElementById("property-name")
-    const authorElement = document.getElementById("owner")
-    nameElement.innerHTML = network.name
-    authorElement.innerHTML = network.author
-
-    //Init Description Text
-    const descDiv = document.getElementById("Description")
-    const descElement = descDiv.getElementsByClassName("propertyInfo")[0]
-    descElement.innerHTML = network.description
-
-    //Init Collapse Behavior
-    const cButton = $("#collapseButton")
-    let collapsed = false
-    cButton.on("click",(m) => {
-        const infoList = $("#infoList")
-        const collapseName = $("#collapseName")
-        const cIcon = $("#collapseIcon")
-        if (!collapsed) {
-            collapsed = true
-            infoList.addClass("ILCollapse")
-            collapseName.removeClass("nameCollapse")
-            cIcon.attr("src","/static/img/arrow-left.svg");
-        } else {
-            collapsed = false
-            infoList.removeClass("ILCollapse")
-            collapseName.addClass("nameCollapse")
-            cIcon.attr("src","/static/img/arrow.svg");
-        }
-    })
 
     return true
 }
@@ -560,16 +590,83 @@ const initGridButton = function() {
     return true
 }
 
+
+
+//Change infoPanel contents
+const changeInfoPanel = function(item) {
+    //Change Collapse Text
+    const collapseName = document.getElementById("collapseName")
+    collapseName.innerHTML = item.name
+
+    //Change Name/Owner Text
+    const nameElement = document.getElementById("property-name")
+    const authorElement = document.getElementById("owner")
+    nameElement.innerHTML = item.name
+    authorElement.innerHTML = item.author
+
+    //Change Description Text
+    const descDiv = document.getElementById("Description")
+    const descElement = descDiv.getElementsByClassName("propertyInfo")[0]
+    descElement.innerHTML = item.description
+}
+
+//Info Panel, init text elements and collapse function
+const initInfoPanel = function(network) {
+    ViewController.setActive(network)
+
+    //Init Collapse Behavior
+    const cButton = $("#collapseButton")
+    let collapsed = false
+    cButton.on("click",(m) => {
+        const infoList = $("#infoList")
+        const collapseName = $("#collapseName")
+        const cIcon = $("#collapseIcon")
+        if (!collapsed) {
+            collapsed = true
+            infoList.addClass("ILCollapse")
+            collapseName.removeClass("nameCollapse")
+            cIcon.attr("src","/static/img/arrow-left.svg");
+        } else {
+            collapsed = false
+            infoList.removeClass("ILCollapse")
+            collapseName.addClass("nameCollapse")
+            cIcon.attr("src","/static/img/arrow.svg");
+        }
+    })
+
+    //IP reset function
+    const svg = Draw.SVG
+
+    svg.on("click", (e) => {
+        if(ViewController.activeItem != ViewController.network) {
+            ViewController.setActive(ViewController.network)
+        }
+    })
+
+
+    return true
+}
+
 //View Controller and Init Function
 const ViewController = {
     view: "",
+    network: null,
+    activeItem: null,
     changeView: function(newView) {
         this.view = newView
+    },
+    setActive: function(item) {
+        this.activeItem = item
+        changeInfoPanel(item)
+    },
+    resetVC: function() {
+        this.setActive(this.network)
     }
 }
 
-function initViewController(newView = "Map") {
+function initViewController(network, newView = "Map") {
     ViewController.changeView(newView)
+    ViewController.network = network
 
     const mapButton = $("#map-button")
     const editButton = $("#edit-button")
@@ -754,8 +851,8 @@ function main() {
     renderModal(network)
     initSVG(network)
     initCamera()
+    initViewController(network)
     initInfoPanel(network)
     initGridButton()
-    initViewController()
     initShortcuts()
 }main();
