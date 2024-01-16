@@ -325,8 +325,12 @@ html,body{
 #editPropsList li {
     padding: calc(2px * var(--scale));
     padding-inline: calc(8px * var(--scale));
-    gap: calc(2px * var(--scale));;
+    gap: calc(4px * var(--scale));;
     display: flex;
+}
+
+#editPropsList li label {
+    font-size: calc(1rem * var(--scale));
 }
 
 #editButtons {
