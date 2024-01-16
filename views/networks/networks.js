@@ -678,6 +678,8 @@ const htmlStore = {
     listItem: null,
 
     editHTML: null,
+    objectEditHTML: null,
+    relEditHTML: null,
     
     newHTML: null,
 
@@ -694,7 +696,15 @@ function initEditUI() {
     htmlStore.listHTML = editContent.find("#listHTML").html()
     htmlStore.listItem = $("#itemList").html()
 
+
+    htmlStore.objectEditHTML = editContent.find("#objectProps").html()
+    editContent.find("#objectProps").remove()
+
+    htmlStore.relEditHTML = editContent.find("#relProps").html()
+    editContent.find("#relProps").remove()
+
     htmlStore.editHTML = editContent.find("#editHTML").html()
+
 
     htmlStore.newHTML = editContent.find("#newHTML").html()
 
@@ -713,10 +723,14 @@ function initEditUI() {
                     editContent.removeClass("contentHidden")
                 }
 
+                htmlStore.lastContent = null
+
+                changeInfoPanel(ViewController.network)
+
                 if($("#itemList").length == 0)
                     editContent.html(htmlStore.listHTML)
 
-                $("#itemHeader").html(buttonText)
+                $("#itemHeader").text(buttonText)
 
                 const iList = $("#itemList")
                 iList.empty()
@@ -739,10 +753,14 @@ function initEditUI() {
                     editContent.removeClass("contentHidden")
                 }
 
+                htmlStore.lastContent = null
+
+                changeInfoPanel(ViewController.network)
+
                 if($("#itemList").length == 0) 
                     editContent.html(htmlStore.listHTML)
 
-                $("#itemHeader").html(buttonText)
+                $("#itemHeader").text(buttonText)
 
                 const iList = $("#itemList")
                 iList.empty()
@@ -765,7 +783,7 @@ function initEditUI() {
 }
 
 //setup editItem view in edit panel
-function editItem() {
+function editItem(item) {
     const editUI = $("#editDiv")
     const editContent = $("#editContent")
 
@@ -776,10 +794,23 @@ function editItem() {
         editContent.addClass("contentVisible")
         editContent.removeClass("contentHidden")
     } else {
-        htmlStore.lastContent = editContent.html()
-        editContent.html("")
+        htmlStore.lastContent = editContent.children()
+        editContent.children().detach()
     }
     editContent.html(htmlStore.editHTML)
+
+    const itemType = item.constructor.name
+
+    const iHeader = $("#itemHeader")
+    itemType == "Node" ? iHeader.text(item.name) : iHeader.text(item.type)
+
+    const propsList = $("#editPropsList")
+    
+    if (itemType == "Node") {
+        propsList.append(htmlStore.objectEditHTML)
+    } else if (itemType == "Edge") {
+        propsList.append(htmlStore.relEditHTML)
+    }
 }
 
 function lastEditView() {
@@ -788,7 +819,7 @@ function lastEditView() {
         const editContent = $("#editContent")
 
         editContent.empty()
-        editContent.html(htmlStore.lastContent)
+        editContent.append(htmlStore.lastContent)
 
         htmlStore.lastContent = null
     } 
@@ -812,6 +843,9 @@ const ViewController = {
 
             editUI.attr("aria-hidden", "false")
 
+            if(this.activeItem != this.network) {
+                editItem(this.activeItem)
+            }
 
         } else if(newView == "Map") {
             editUI.addClass("ED-Hidden")
@@ -837,6 +871,8 @@ const ViewController = {
 
         if(!(item instanceof Edge))
             changeInfoPanel(item)
+        else
+            changeInfoPanel(this.network)
 
         if(this.view == "Edit" ) {
             if (!(item instanceof Network))
