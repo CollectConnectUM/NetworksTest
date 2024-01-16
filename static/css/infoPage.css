@@ -1,7 +1,7 @@
 @import "/static/css/variables.css";
 
 #modal {
-    overflow: hidden;
+    overflow: auto;
 }
 
 .modalContent {
@@ -10,7 +10,7 @@
     padding-top: 20px;
     padding-bottom: 20px;
     overflow-x:hidden;
-    overflow-y:auto;
+    overflow-y:hidden;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -28,7 +28,15 @@
 }
 .infoType {
     align-items: flex-start;
-    height: 33%;
+    min-height: 33%;
+    max-height: 33%;
+    margin-top: 10px;
+    width: 100%;
+    text-align: left !important;
+}
+.descType {
+    align-items: flex-start;
+    height: 62%;
     margin-top: 10px;
     width: 100%;
     text-align: left !important;
@@ -81,9 +89,6 @@ ul {
     padding: 0;
     list-style: none;
     margin-top: 0;
-}
-#desc {
-    height: 66%;
 }
 #descBox {
     height: 88%;
