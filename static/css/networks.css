@@ -219,7 +219,7 @@ html,body{
     background-color: var(--primary);
     position: absolute;
     z-index: 10;
-    bottom: 5%;
+    bottom: 10%;
     left: 5%;
     min-width: fit-content;
     width: 30%;
@@ -303,7 +303,7 @@ html,body{
     font-size: calc(1rem * var(--scale));
     font-weight: bold;
     margin-left: auto;
-    margin-right: calc(6px * var(--scale));;
+    margin-right: calc(6px * var(--scale));
     border-radius: calc(20px * var(--scale));
     background-color: var(--secondary-inv);
     color: var(--primary)
@@ -312,6 +312,25 @@ html,body{
 .itemEdit:hover {
     background-color: var(--primary);
     color: var(--primary-inv)
+}
+
+#editPropsList {
+    margin: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    list-style: none;
+    height: 75%; 
+}
+
+#editPropsList li {
+    padding: calc(2px * var(--scale));
+    padding-inline: calc(8px * var(--scale));
+    gap: calc(4px * var(--scale));;
+    display: flex;
+}
+
+#editPropsList li label {
+    font-size: calc(1rem * var(--scale));
 }
 
 #editButtons {

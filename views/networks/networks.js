@@ -177,8 +177,8 @@ const Draw = {
 
     //draw grid on svg
     init: function(SVGDiv) {
-        Draw.SVG = SVG().addTo(SVGDiv).size("100%","100%").viewbox(0,0,SVGDiv.clientWidth,SVGDiv.clientHeight).attr({id: "SVGDraw"})
-        Draw.Grid = Draw.SVG.group().addClass("Grid").attr({id: "network-map", tabindex: "0", role: "grid", "aria-label": "Network Map", "visibility": "visible"})
+        Draw.SVG = SVG().addTo(SVGDiv).size("100%","100%").viewbox(0,0,SVGDiv.clientWidth,SVGDiv.clientHeight).attr({id: "SVGDraw",})
+        Draw.Grid = Draw.SVG.group().addClass("Grid").attr({id: "network-map", tabindex: "0", role: "grid region", "aria-label": "Network Map", "visibility": "visible"})
         Draw.Relationships = Draw.SVG.group().addClass("Relationships")
         Draw.Objects = Draw.SVG.group().addClass("Objects")
 
@@ -672,9 +672,18 @@ const initInfoPanel = function(network) {
     return true
 }
 
+//Stores default HTML for Edit UI Content Views and items
 const htmlStore = {
-    default: null,
+    listHTML: null,
     listItem: null,
+
+    editHTML: null,
+    objectEditHTML: null,
+    relEditHTML: null,
+    
+    newHTML: null,
+
+    lastContent: null,
 }
 
 //initialize Edit UI buttons and functionality
@@ -683,9 +692,25 @@ function initEditUI() {
     const editContent = $("#editContent")
     const editButtons = $("#editButtons").children()
 
-    htmlStore.default = editContent.html()
+    //Store EditUI content views in htmlstore object
+    htmlStore.listHTML = editContent.find("#listHTML").html()
     htmlStore.listItem = $("#itemList").html()
 
+
+    htmlStore.objectEditHTML = editContent.find("#objectProps").html()
+    editContent.find("#objectProps").remove()
+
+    htmlStore.relEditHTML = editContent.find("#relProps").html()
+    editContent.find("#relProps").remove()
+
+    htmlStore.editHTML = editContent.find("#editHTML").html()
+
+
+    htmlStore.newHTML = editContent.find("#newHTML").html()
+
+    editContent.empty()
+
+    //initialize functionality for each edit button
     editButtons.each((buttons, button) => {
         const buttonText = button.innerHTML
         if(buttonText == "Objects") {
@@ -698,22 +723,25 @@ function initEditUI() {
                     editContent.removeClass("contentHidden")
                 }
 
-                if($("#itemHeader").length > 0) {
-                    $("#itemHeader").html(buttonText)
+                htmlStore.lastContent = null
 
-                    const iList = $("#itemList")
-                    iList.html("")
+                changeInfoPanel(ViewController.network)
 
-                    const nodeList = ViewController.network.nodes
-                    nodeList.forEach((node) => {
-                        const newLI = $(htmlStore.listItem)
-                        newLI.find("p").html(node.name)
-                        newLI.find("button").click(() => {console.log("Edit:", node.name)})
-                        iList.append(newLI)
-                    })
-                } 
+                if($("#itemList").length == 0)
+                    editContent.html(htmlStore.listHTML)
 
+                $("#itemHeader").text(buttonText)
 
+                const iList = $("#itemList")
+                iList.empty()
+
+                const nodeList = ViewController.network.nodes
+                nodeList.forEach((node) => {
+                    const newLI = $(htmlStore.listItem)
+                    newLI.find("p").html(node.name)
+                    newLI.find("button").click(() => {ViewController.setActive(node)})
+                    iList.append(newLI)
+                })
             } 
         } else if(buttonText == "Relationships") {
             button.onclick = (e) => {
@@ -725,20 +753,25 @@ function initEditUI() {
                     editContent.removeClass("contentHidden")
                 }
 
-                if($("#itemHeader").length > 0) {
-                    $("#itemHeader").html(buttonText)
+                htmlStore.lastContent = null
 
-                    const iList = $("#itemList")
-                    iList.html("")
+                changeInfoPanel(ViewController.network)
 
-                    const nodeList = ViewController.network.edges
-                    nodeList.forEach((edge) => {
-                        const newLI = $(htmlStore.listItem)
-                        newLI.find("p").html(edge.obj1.name + " " + edge.type + " " + edge.obj2.name)
-                        newLI.find("button").click(() => {console.log("Edit:", edge.obj1.name + " " + edge.type + " " + edge.obj2.name)})
-                        iList.append(newLI)
-                    })
-                } 
+                if($("#itemList").length == 0) 
+                    editContent.html(htmlStore.listHTML)
+
+                $("#itemHeader").text(buttonText)
+
+                const iList = $("#itemList")
+                iList.empty()
+
+                const nodeList = ViewController.network.edges
+                nodeList.forEach((edge) => {
+                    const newLI = $(htmlStore.listItem)
+                    newLI.find("p").html(edge.obj1.name + " " + edge.type + " " + edge.obj2.name)
+                    newLI.find("button").click(() => {ViewController.setActive(edge)})
+                    iList.append(newLI)
+                })
             }
         } else if(buttonText == "New") {
             button.onclick = (e) => {
@@ -749,8 +782,51 @@ function initEditUI() {
     })
 }
 
+//setup editItem view in edit panel
+function editItem(item) {
+    const editUI = $("#editDiv")
+    const editContent = $("#editContent")
 
-//View Controller and Init Function
+    if(editUI.hasClass("ED-Small")) {
+        editUI.addClass("ED-Large")
+        editUI.removeClass("ED-Small")
+
+        editContent.addClass("contentVisible")
+        editContent.removeClass("contentHidden")
+    } else {
+        htmlStore.lastContent = editContent.children()
+        editContent.children().detach()
+    }
+    editContent.html(htmlStore.editHTML)
+
+    const itemType = item.constructor.name
+
+    const iHeader = $("#itemHeader")
+    itemType == "Node" ? iHeader.text(item.name) : iHeader.text(item.type)
+
+    const propsList = $("#editPropsList")
+    
+    if (itemType == "Node") {
+        propsList.append(htmlStore.objectEditHTML)
+    } else if (itemType == "Edge") {
+        propsList.append(htmlStore.relEditHTML)
+    }
+}
+
+function lastEditView() {
+    if(htmlStore.lastContent != null) {
+        const editUI = $("#editDiv")
+        const editContent = $("#editContent")
+
+        editContent.empty()
+        editContent.append(htmlStore.lastContent)
+
+        htmlStore.lastContent = null
+    } 
+}
+
+
+//*View Controller and Init Function
 const ViewController = {
     view: "",
     network: null,
@@ -765,10 +841,17 @@ const ViewController = {
             editUI.addClass("ED-Visible")
             editUI.removeClass("ED-Hidden")
 
+            editUI.attr("aria-hidden", "false")
+
+            if(this.activeItem != this.network) {
+                editItem(this.activeItem)
+            }
 
         } else if(newView == "Map") {
             editUI.addClass("ED-Hidden")
             editUI.removeClass("ED-Visible")
+
+            editUI.attr("aria-hidden", "true")
 
             if(editUI.hasClass("ED-Large")) {
                 editUI.removeClass("ED-Large")
@@ -778,12 +861,25 @@ const ViewController = {
             if(editContent.hasClass("contentVisible")) {
                 editContent.removeClass("contentVisible")
                 editContent.addClass("contentHidden")
+                editContent.empty()
             }
+
         }
     },
     setActive: function(item) {
         this.activeItem = item
-        changeInfoPanel(item)
+
+        if(!(item instanceof Edge))
+            changeInfoPanel(item)
+        else
+            changeInfoPanel(this.network)
+
+        if(this.view == "Edit" ) {
+            if (!(item instanceof Network))
+                editItem(item)
+            else 
+                lastEditView()
+        }
     }
 }
 
