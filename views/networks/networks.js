@@ -909,7 +909,9 @@ const ViewController = {
                 lastEditView()
         }
 
-        displayNodeInfo(item)
+        if(item instanceof Node) {
+            displayNodeInfo(item)
+        }
     }
 }
 
