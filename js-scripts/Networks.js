@@ -177,7 +177,6 @@ const Networks = [
     {
         id: 2,
         generate: genBabel
-
     },
     {
         id:3,
