@@ -896,7 +896,6 @@ const ViewController = {
     },
     setActive: function(item) {
         this.activeItem = item
-<<<<<<< HEAD
 
         if(!(item instanceof Edge))
             changeInfoPanel(item)
@@ -913,13 +912,6 @@ const ViewController = {
         if(item instanceof Node) {
             displayNodeInfo(item)
         }
-=======
-        changeInfoPanel(item)
-        displayNodeInfo(item)
-    },
-    resetVC: function() {
-        this.setActive(this.network)
->>>>>>> 5a929bbc0c91e8e8fd2270dfa8f3a1a5cfb30cd9
     }
 }
 
