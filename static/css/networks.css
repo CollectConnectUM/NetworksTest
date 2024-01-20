@@ -159,7 +159,6 @@ html,body{
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: clip;
-    pointer-events: auto;
 }
 
 #collapseName:hover {
