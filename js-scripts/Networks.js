@@ -68,7 +68,7 @@ class Network {
         const nodes = []
         for (let i = 0; i < obj.nodes.length; i++) {
             const curNode = obj.nodes[i]
-            const node = new Node(curNode.id, curNode.name, network, curNode.position, curNode.type, curNode.author, curNode.description, curNode.image)
+            const node = new Node(curNode.id, curNode.name, network, curNode.position, curNode.type, curNode.author, curNode.description, curNode.image, curNode.reference)
             nodes.push(node)
         }
 
@@ -85,7 +85,7 @@ class Network {
 }
 
 class Node {
-    constructor(id, name, network, position, type = "Object", author="None", description = "None", image = undefined)  {
+    constructor(id, name, network, position, type = "Object", author="None", description = "None", image = undefined, reference = null)  {
         this.id = id
         this.name = name
         this.network = network
@@ -95,6 +95,7 @@ class Node {
 
         this.edges = []
         this.image = image
+        this.reference = reference
 
         this.description = description
 
@@ -114,6 +115,11 @@ class Node {
 
     addImage(image) {
         this.image = image
+        return this
+    }
+
+    setReference(reference) {
+        this.reference = reference
         return this
     }
 }
@@ -199,6 +205,8 @@ function genLinuxLarge(id){
 
     const bNode = new Node(3, "Boot", network,[3,2], "Directory") //Boot
     const brel = new Edge(2, "Contains", network, rNode, bNode)
+    
+    bNode.setReference(true)
 
     return network
 }

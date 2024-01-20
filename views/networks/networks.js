@@ -10,7 +10,7 @@ class Network {
         this.name = name
         this.author = author
         this.grid = new Grid(size,this)
-
+        
         this.root = undefined
         this.nodes = []
         this.edges = []
@@ -71,7 +71,7 @@ class Network {
         const nodes = []
         for (let i = 0; i < obj.nodes.length; i++) {
             const curNode = obj.nodes[i]
-            const node = new Node(curNode.id, curNode.name, network, curNode.position, curNode.type, curNode.author, curNode.description, curNode.image)
+            const node = new Node(curNode.id, curNode.name, network, curNode.position, curNode.type, curNode.author, curNode.description, curNode.image, curNode.reference)
             nodes.push(node)
         }
 
@@ -88,7 +88,7 @@ class Network {
 }
 
 class Node {
-    constructor(id, name, network, position, type = "Object", author="None", description = "None", image = undefined)  {
+    constructor(id, name, network, position, type = "Object", author="None", description = "None", image = undefined, reference = null)  {
         this.id = id
         this.name = name
         this.network = network
@@ -98,6 +98,7 @@ class Node {
 
         this.edges = []
         this.image = image
+        this.reference = reference
 
         this.description = description
 
@@ -117,6 +118,11 @@ class Node {
 
     addImage(image) {
         this.image = image
+        return this
+    }
+
+    setReference(reference) {
+        this.reference = reference
         return this
     }
 }
@@ -161,7 +167,7 @@ class Grid {
             this.grid[pos[0]][pos[1]] = node
         }
         return this
-    }
+    } 
 }
 //End Network Classes
 
@@ -388,10 +394,10 @@ const initSVG = function(network) {
 const initCamera = function() {
     const svg = Draw.SVG
     const svgElement = document.getElementById("SVGDraw")
+
     //setup camera object
     let camera = {down: false, x: 0, y: 0, w: 0, h: 0, scale: {value: 0, factor: 25}}
 
-    const svgDiv = document.getElementById("SVGDiv")
     const vb = svg.viewbox()
     camera.x = vb.x
     camera.y = vb.y
@@ -610,19 +616,43 @@ const initGridButton = function() {
 //Change infoPanel contents
 const changeInfoPanel = function(item) {
     //Change Collapse Text
-    const collapseName = document.getElementById("collapseName")
-    collapseName.innerHTML = item.name
+    const collapseName = $("#collapseName")
+    collapseName.text(item.name)
 
     //Change Name/Owner Text
-    const nameElement = document.getElementById("property-name")
-    const authorElement = document.getElementById("owner")
-    nameElement.innerHTML = item.name
-    authorElement.innerHTML = item.author
+    const nameElement = $("#property-name")
+    const authorElement = $("#owner")
+    nameElement.text(item.name)
+    authorElement.text(item.author)
 
     //Change Description Text
     const descDiv = document.getElementById("Description")
     const descElement = descDiv.getElementsByClassName("propertyInfo")[0]
     descElement.innerHTML = item.description
+
+    //set link if node is reference, otherwise set it to not interactable
+    let isRef = false
+    if(item instanceof Node) {
+        if(item.reference != null) {
+            isRef = true
+        }
+    }
+
+    if(isRef) {
+        collapseName.removeClass("noHover")
+        nameElement.removeClass("noHover")
+
+        collapseName.addClass("addHover")
+        nameElement.addClass("addHover")
+
+        //setup href for link element
+    } else {
+        collapseName.removeClass("addHover")
+        nameElement.removeClass("addHover")
+
+        collapseName.addClass("noHover")
+        nameElement.addClass("noHover")
+    }
 }
 
 //Info Panel, init text elements and collapse function
