@@ -837,7 +837,6 @@ function editItem(item) {
 
         propsList.children("li").children("input,textarea").each((i, element) => {
             const propertyName = element.name
-            console.log(item)
             if(propertyName == "position") {
                 element.value = item.position[0] + ", " + item.position[1]
             } else {
@@ -849,7 +848,6 @@ function editItem(item) {
 
         propsList.children("li").children("input,textarea").each((i, element) => {
             const propertyName = element.name
-            console.log(item)
             if(propertyName == "connect1") {
                 element.value = item.obj1.name
             } else if(propertyName == "connect2") {
