@@ -77,7 +77,7 @@ class Network {
             const curEdge = obj.edges[i]
             let obj1 = nodes.find((node) => node.id == curEdge.obj1)
             let obj2 = nodes.find((node) => node.id == curEdge.obj2)
-            const edge = new Edge(curEdge.id, curEdge.type, network, obj1, obj2)
+            const edge = new Edge(curEdge.id, curEdge.type, network, obj1, obj2, curEdge.style, curEdge.color)
             edges.push(edge)
         }
         return network
@@ -125,12 +125,14 @@ class Node {
 }
 
 class Edge {
-    constructor(id, type, network, obj1, obj2)  {
+    constructor(id, type, network, obj1, obj2, style = null, color = null)  {
         this.id = id
         this.type = type
         this.network = network
         this.obj1 = obj1
         this.obj2 = obj2
+        this.style = style
+        this.color = color
 
         obj1.addRelationship(this)
         obj2.addRelationship(this)

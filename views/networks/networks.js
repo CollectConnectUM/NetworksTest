@@ -80,7 +80,7 @@ class Network {
             const curEdge = obj.edges[i]
             let obj1 = nodes.find((node) => node.id == curEdge.obj1)
             let obj2 = nodes.find((node) => node.id == curEdge.obj2)
-            const edge = new Edge(curEdge.id, curEdge.type, network, obj1, obj2)
+            const edge = new Edge(curEdge.id, curEdge.type, network, obj1, obj2, curEdge.style, curEdge.color)
             edges.push(edge)
         }
         return network
@@ -128,12 +128,14 @@ class Node {
 }
 
 class Edge {
-    constructor(id, type, network, obj1, obj2)  {
+    constructor(id, type, network, obj1, obj2, style = null, color = null)  {
         this.id = id
         this.type = type
         this.network = network
         this.obj1 = obj1
         this.obj2 = obj2
+        this.style = style
+        this.color = color
 
         obj1.addRelationship(this)
         obj2.addRelationship(this)
@@ -709,8 +711,8 @@ const htmlStore = {
     listItem: null,
 
     editHTML: null,
-    objectEditHTML: null,
-    relEditHTML: null,
+    objectPropsHTML: null,
+    relPropsHTML: null,
     
     newHTML: null,
 
@@ -726,15 +728,13 @@ function initEditUI() {
     htmlStore.listHTML = editContent.find("#listHTML").html()
     htmlStore.listItem = $("#itemList").html()
 
-
-    htmlStore.objectEditHTML = editContent.find("#objectProps").html()
+    htmlStore.objectPropsHTML = editContent.find("#objectProps").html()
     editContent.find("#objectProps").remove()
 
-    htmlStore.relEditHTML = editContent.find("#relProps").html()
+    htmlStore.relPropsHTML = editContent.find("#relProps").html()
     editContent.find("#relProps").remove()
 
     htmlStore.editHTML = editContent.find("#editHTML").html()
-
 
     htmlStore.newHTML = editContent.find("#newHTML").html()
 
@@ -753,11 +753,14 @@ function initEditUI() {
         }
         
         htmlStore.lastContent = null
-
         ViewController.setActive(ViewController.network)
 
         if($("#itemList").length == 0)
             editContent.html(htmlStore.listHTML)
+
+        const newButton = editContent.find("#new-button")
+        newButton.off("click")
+        newButton.click(() => {newItem("Node")})
 
         $("#itemHeader").text("Objects")
 
@@ -782,11 +785,14 @@ function initEditUI() {
         }
 
         htmlStore.lastContent = null
-
         ViewController.setActive(ViewController.network)
 
         if($("#itemList").length == 0) 
             editContent.html(htmlStore.listHTML)
+
+        const newButton = editContent.find("#new-button")
+        newButton.off("click")
+        newButton.click(() => {newItem("Edge")})
 
         $("#itemHeader").text("Relationships")
 
@@ -827,15 +833,80 @@ function editItem(item) {
     const propsList = $("#editPropsList")
     
     if (itemType == "Node") {
-        propsList.append(htmlStore.objectEditHTML)
+        propsList.append(htmlStore.objectPropsHTML)
+
+        propsList.children("li").children("input,textarea").each((i, element) => {
+            const propertyName = element.name
+            console.log(item)
+            if(propertyName == "position") {
+                element.value = item.position[0] + ", " + item.position[1]
+            } else {
+                element.value = item[propertyName]
+            }
+        })
     } else if (itemType == "Edge") {
-        propsList.append(htmlStore.relEditHTML)
+        propsList.append(htmlStore.relPropsHTML)
+
+        propsList.children("li").children("input,textarea").each((i, element) => {
+            const propertyName = element.name
+            console.log(item)
+            if(propertyName == "connect1") {
+                element.value = item.obj1.name
+            } else if(propertyName == "connect2") {
+                element.value = item.obj2.name
+            } else if(propertyName == "style") {
+                const itemStyle = item[propertyName]
+                if (itemStyle != null) {
+                    element.value = item.style
+                } else {
+                    element.value = "None"
+                }
+            } else if(propertyName == "color") {
+                const itemColor = item[propertyName]
+                if (itemColor != null) {
+                    element.value = item.color
+                } else {
+                    element.value = "None"
+                }
+            } else {
+                element.value = item[propertyName]
+            }
+        })
+    }
+}
+
+//new item function
+function newItem(itemType) {
+    const editUI = $("#editDiv")
+    const editContent = $("#editContent")
+
+    if(editUI.hasClass("invisible")) {
+        editUI.removeClass("invisible")
+
+        editContent.addClass("contentVisible")
+        editContent.removeClass("contentHidden")
+    } else {
+        htmlStore.lastContent = editContent.children()
+        editContent.children().detach()
+    }
+    editContent.html(htmlStore.newHTML)
+
+    const iHeader = $("#itemHeader")
+    itemType == "Node" ? iHeader.text("New Object") : iHeader.text("New Relationship")
+
+    $("#cancel-button").click(lastEditView)
+
+    const propsList = $("#newPropsList")
+
+    if (itemType == "Node") {
+        propsList.append(htmlStore.objectPropsHTML)
+    } else if (itemType == "Edge") {
+        propsList.append(htmlStore.relPropsHTML)
     }
 }
 
 function lastEditView() {
     if(htmlStore.lastContent != null) {
-        const editUI = $("#editDiv")
         const editContent = $("#editContent")
 
         editContent.empty()

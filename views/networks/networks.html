@@ -34,7 +34,7 @@
                             <a id="collapseName" class="nameCollapse">Test Network</a>
                             <button id="collapseButton" aria-label="collapse info panel"><img src="/static/img/arrow.svg" aria-hidden="true" id="collapseIcon"></button>
                         </div>
-                        <div id="infoList" class="ILOpen">
+                        <div id="infoList" class="scrollbar ILOpen">
                             <div class="property" id="propertyName">
                                 <a id="infoName">Test Network</a>
                                 <p id="infoOwner"">By <span>
@@ -60,33 +60,47 @@
                     <div id="editDiv" class="invisible" role="region" aria-label="Edit Panel" aria-live="polite" aria-hidden="true">
                         <div id="editContent" class="contentHidden">
                             <div id="listHTML">
-                                <h3 id="itemHeader">Items</h3>
-                                <ul id="itemList">
+                                <div id="editHeader">
+                                    <h3 id="itemHeader">Items</h3>
+                                    <button id="new-button">New</button>
+                                </div>
+                                <ul id="itemList" class="scrollbar">
                                     <li ><p class="itemTitle">Item</p><button class="itemEdit">Edit</button></li>
                                 </ul>
                             </div>
                             <div id="editHTML" >
-                                <h3 id="itemHeader">ItemName</h3>
-                                <ul id="editPropsList">
+                                <div id="editHeader">
+                                    <h3 id="itemHeader">Items</h3>
+                                </div>
+                                <ul class="propsList" id="editPropsList">
     
                                 </ul>
                                 <ul id="objectProps">
-                                    <li><label for="Name">Name:</label><input class="editInput" id="Name" name="Name" type="text" placeholder="Name"></li>
-                                    <li><label for="Position">Position:</label><input class="editInput" id="Position" name="Position" type="text" placeholder="Position"></li>
-                                    <li><label for="Type">Type:</label><input class="editInput" id="Type" name="Type" type="text" placeholder="Type"></li>
-                                    <li><label for="Description">Description:</label><textarea class="editInput" id="Description" name="Description" type="text" placeholder="Object Description"></textarea></li>
-                                    <li><label for="Image">Image:</label><input class="editInput" id="Image" name="Image" type="url" placeholder="None"></li>
+                                    <li><label for="Name">Name:</label><input class="editInput" name="name" type="text" placeholder="Name"></li>
+                                    <li><label for="Position">Position:</label><input class="editInput" name="position" type="text" placeholder="Position"></li>
+                                    <li><label for="Type">Type:</label><input class="editInput" name="type" type="text" placeholder="Type"></li>
+                                    <li><label for="Description">Description:</label><textarea class="editInput" name="description" type="text" placeholder="Object Description"></textarea></li>
+                                    <li><label for="Image">Image:</label><input class="editInput" name="image" type="url" placeholder="None"></li>
                                 </ul>
                                 <ul id="relProps">
-                                    <li><label for="Type">Type:</label><input class="editInput" id="Type" name="Type" type="text" placeholder="Type"></li>
-                                    <li><label for="Connect1">Connection 1:</label><input class="editInput" id="Connect1" name="Connect1" type="text" placeholder="Object Name"></li>
-                                    <li><label for="Connect2">Connection 2:</label><input class="editInput" id="Connect2" name="Connect2" type="text" placeholder="Object Name"></li>
-                                    <li><label for="Style">Line Style:</label><input class="editInput" id="Style" name="Style" type="text" placeholder="Style-Temp"></li>
-                                    <li><label for="Color">Line Color:</label></label><input class="editInput" id="Color" name="Color" type="text" placeholder="Color-Temp"></li>
+                                    <li><label for="Type">Type:</label><input class="editInput" name="type" type="text" placeholder="Type"></li>
+                                    <li><label for="Connect1">Connection 1:</label><input class="editInput" name="connect1" type="text" placeholder="Object Name"></li>
+                                    <li><label for="Connect2">Connection 2:</label><input class="editInput" name="connect2" type="text" placeholder="Object Name"></li>
+                                    <li><label for="Style">Line Style:</label><input class="editInput" name="style" type="text" placeholder="Style-Temp"></li>
+                                    <li><label for="Color">Line Color:</label></label><input class="editInput" name="color" type="text" placeholder="Color-Temp"></li>
                                 </ul>
                             </div>
                             <div id="newHTML" >
+                                <div id="editHeader">
+                                    <h3 id="itemHeader">Items</h3>
+                                </div>
+                                <ul class="propsList" id="newPropsList">
     
+                                </ul>
+                                <div id="newButtons">
+                                    <button id="cancel-button">Cancel</button>
+                                    <button id="create-button">Create</button>
+                                </div>
                             </div>
                         </div>
                     </div>
