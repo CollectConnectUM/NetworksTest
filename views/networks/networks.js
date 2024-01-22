@@ -10,7 +10,7 @@ class Network {
         this.name = name
         this.author = author
         this.grid = new Grid(size,this)
-
+        
         this.root = undefined
         this.nodes = []
         this.edges = []
@@ -71,7 +71,7 @@ class Network {
         const nodes = []
         for (let i = 0; i < obj.nodes.length; i++) {
             const curNode = obj.nodes[i]
-            const node = new Node(curNode.id, curNode.name, network, curNode.position, curNode.type, curNode.author, curNode.description, curNode.image)
+            const node = new Node(curNode.id, curNode.name, network, curNode.position, curNode.type, curNode.author, curNode.description, curNode.image, curNode.reference)
             nodes.push(node)
         }
 
@@ -88,7 +88,7 @@ class Network {
 }
 
 class Node {
-    constructor(id, name, network, position, type = "Object", author="None", description = "None", image = undefined)  {
+    constructor(id, name, network, position, type = "Object", author="None", description = "None", image = undefined, reference = null)  {
         this.id = id
         this.name = name
         this.network = network
@@ -98,6 +98,7 @@ class Node {
 
         this.edges = []
         this.image = image
+        this.reference = reference
 
         this.description = description
 
@@ -117,6 +118,11 @@ class Node {
 
     addImage(image) {
         this.image = image
+        return this
+    }
+
+    setReference(reference) {
+        this.reference = reference
         return this
     }
 }
@@ -161,7 +167,7 @@ class Grid {
             this.grid[pos[0]][pos[1]] = node
         }
         return this
-    }
+    } 
 }
 //End Network Classes
 
@@ -388,10 +394,10 @@ const initSVG = function(network) {
 const initCamera = function() {
     const svg = Draw.SVG
     const svgElement = document.getElementById("SVGDraw")
+
     //setup camera object
     let camera = {down: false, x: 0, y: 0, w: 0, h: 0, scale: {value: 0, factor: 25}}
 
-    const svgDiv = document.getElementById("SVGDiv")
     const vb = svg.viewbox()
     camera.x = vb.x
     camera.y = vb.y
@@ -638,19 +644,42 @@ const displayNodeInfo = function(item) {
 //Change infoPanel contents
 const changeInfoPanel = function(item) {
     //Change Collapse Text
-    const collapseName = document.getElementById("collapseName")
-    collapseName.innerHTML = item.name
+    const collapseName = $("#collapseName")
+    collapseName.text(item.name)
 
     //Change Name/Owner Text
-    const nameElement = document.getElementById("property-name")
-    const authorElement = document.getElementById("owner")
-    nameElement.innerHTML = item.name
-    authorElement.innerHTML = item.author
+    const nameElement = $("#infoName")
+    const authorElement = $("#owner")
+    nameElement.text(item.name)
+    authorElement.text(item.author)
 
     //Change Description Text
-    const descDiv = document.getElementById("Description")
-    const descElement = descDiv.getElementsByClassName("propertyInfo")[0]
-    descElement.innerHTML = item.description
+    const descElement = $("#infoDescription")
+    descElement.text(item.description)
+
+    //set link if node is reference, otherwise set it to not interactable
+    let isRef = false
+    if(item instanceof Node) {
+        if(item.reference != null) {
+            isRef = true
+        }
+    }
+
+    if(isRef) {
+        collapseName.removeClass("noHover")
+        nameElement.removeClass("noHover")
+
+        collapseName.addClass("addHover")
+        nameElement.addClass("addHover")
+
+        //setup href for link element
+    } else {
+        collapseName.removeClass("addHover")
+        nameElement.removeClass("addHover")
+
+        collapseName.addClass("noHover")
+        nameElement.addClass("noHover")
+    }
 }
 
 //Info Panel, init text elements and collapse function
@@ -667,10 +696,12 @@ const initInfoPanel = function(network) {
         if (!collapsed) {
             collapsed = true
             infoList.addClass("ILCollapse")
+            infoList.removeClass("ILOpen")
             collapseName.removeClass("nameCollapse")
             cIcon.attr("src","/static/img/arrow-left.svg");
         } else {
             collapsed = false
+            infoList.addClass("ILOpen")
             infoList.removeClass("ILCollapse")
             collapseName.addClass("nameCollapse")
             cIcon.attr("src","/static/img/arrow.svg");
@@ -718,7 +749,6 @@ const htmlStore = {
 function initEditUI() {
     const editUI = $("#editDiv")
     const editContent = $("#editContent")
-    const editButtons = $("#editButtons").children()
 
     //Store EditUI content views in htmlstore object
     htmlStore.listHTML = editContent.find("#listHTML").html()
@@ -738,75 +768,66 @@ function initEditUI() {
 
     editContent.empty()
 
-    //initialize functionality for each edit button
-    editButtons.each((buttons, button) => {
-        const buttonText = button.innerHTML
-        if(buttonText == "Objects") {
-            button.onclick = (e) => {
-                if(editUI.hasClass("ED-Small")) {
-                    editUI.addClass("ED-Large")
-                    editUI.removeClass("ED-Small")
+    //initialize functionality for each edit button 
+    const objectsButton = $("#objects-button")
+    const relationshipsButton = $("#relationships-button")
 
-                    editContent.addClass("contentVisible")
-                    editContent.removeClass("contentHidden")
-                }
-
-                htmlStore.lastContent = null
-
-                changeInfoPanel(ViewController.network)
-
-                if($("#itemList").length == 0)
-                    editContent.html(htmlStore.listHTML)
-
-                $("#itemHeader").text(buttonText)
-
-                const iList = $("#itemList")
-                iList.empty()
-
-                const nodeList = ViewController.network.nodes
-                nodeList.forEach((node) => {
-                    const newLI = $(htmlStore.listItem)
-                    newLI.find("p").html(node.name)
-                    newLI.find("button").click(() => {ViewController.setActive(node)})
-                    iList.append(newLI)
-                })
-            } 
-        } else if(buttonText == "Relationships") {
-            button.onclick = (e) => {
-                if(editUI.hasClass("ED-Small")) {
-                    editUI.addClass("ED-Large")
-                    editUI.removeClass("ED-Small")
-
-                    editContent.addClass("contentVisible")
-                    editContent.removeClass("contentHidden")
-                }
-
-                htmlStore.lastContent = null
-
-                changeInfoPanel(ViewController.network)
-
-                if($("#itemList").length == 0) 
-                    editContent.html(htmlStore.listHTML)
-
-                $("#itemHeader").text(buttonText)
-
-                const iList = $("#itemList")
-                iList.empty()
-
-                const nodeList = ViewController.network.edges
-                nodeList.forEach((edge) => {
-                    const newLI = $(htmlStore.listItem)
-                    newLI.find("p").html(edge.obj1.name + " " + edge.type + " " + edge.obj2.name)
-                    newLI.find("button").click(() => {ViewController.setActive(edge)})
-                    iList.append(newLI)
-                })
-            }
-        } else if(buttonText == "New") {
-            button.onclick = (e) => {
-                console.log("New Item")
-            }
+    objectsButton.click((e) => {
+        if(editUI.hasClass("invisible")) {
+            editUI.removeClass("invisible")
+    
+            editContent.addClass("contentVisible")
+            editContent.removeClass("contentHidden")
         }
         
+        htmlStore.lastContent = null
+
+        changeInfoPanel(ViewController.network)
+
+        if($("#itemList").length == 0)
+            editContent.html(htmlStore.listHTML)
+
+        $("#itemHeader").text("Objects")
+
+        const iList = $("#itemList")
+        iList.empty()
+
+        const nodeList = ViewController.network.nodes
+        nodeList.forEach((node) => {
+            const newLI = $(htmlStore.listItem)
+            newLI.find("p").html(node.name)
+            newLI.find("button").click(() => {ViewController.setActive(node)})
+            iList.append(newLI)
+        })
+    })
+
+    relationshipsButton.click((e) => {
+        if(editUI.hasClass("invisible")) {
+            editUI.removeClass("invisible")
+    
+            editContent.addClass("contentVisible")
+            editContent.removeClass("contentHidden")
+        }
+
+        htmlStore.lastContent = null
+
+        changeInfoPanel(ViewController.network)
+
+        if($("#itemList").length == 0) 
+            editContent.html(htmlStore.listHTML)
+
+        $("#itemHeader").text("Relationships")
+
+        const iList = $("#itemList")
+        iList.empty()
+
+        const nodeList = ViewController.network.edges
+        nodeList.forEach((edge) => {
+            const newLI = $(htmlStore.listItem)
+            newLI.find("p").html(edge.obj1.name + " " + edge.type + " " + edge.obj2.name)
+            newLI.find("button").click(() => {ViewController.setActive(edge)})
+            iList.append(newLI)
+        })
     })
 }
 
@@ -815,9 +836,8 @@ function editItem(item) {
     const editUI = $("#editDiv")
     const editContent = $("#editContent")
 
-    if(editUI.hasClass("ED-Small")) {
-        editUI.addClass("ED-Large")
-        editUI.removeClass("ED-Small")
+    if(editUI.hasClass("invisible")) {
+        editUI.removeClass("invisible")
 
         editContent.addClass("contentVisible")
         editContent.removeClass("contentHidden")
@@ -830,7 +850,7 @@ function editItem(item) {
     const itemType = item.constructor.name
 
     const iHeader = $("#itemHeader")
-    itemType == "Node" ? iHeader.text(item.name) : iHeader.text(item.type)
+    itemType == "Node" ? iHeader.text(item.name) : iHeader.text(item.obj1.name + " " + item.type + " " + item.obj2.name)
 
     const propsList = $("#editPropsList")
     
@@ -866,25 +886,30 @@ const ViewController = {
         const editContent = $("#editContent")
 
         if(newView == "Edit") {
-            editUI.addClass("ED-Visible")
-            editUI.removeClass("ED-Hidden")
+            editUI.removeClass("invisible")
 
             editUI.attr("aria-hidden", "false")
+
+            if(editContent.hasClass("contentHidden")) {
+                editContent.addClass("contentVisible")
+                editContent.removeClass("contentHidden")
+            }
 
             if(this.activeItem != this.network) {
                 editItem(this.activeItem)
             }
 
+            //set visibility of edit buttons
+            const objectsButton = $("#objects-button")
+            const relationshipsButton = $("#relationships-button")
+
+            objectsButton.removeClass("invisible")
+            relationshipsButton.removeClass("invisible")
+
         } else if(newView == "Map") {
-            editUI.addClass("ED-Hidden")
-            editUI.removeClass("ED-Visible")
+            editUI.addClass("invisible")
 
             editUI.attr("aria-hidden", "true")
-
-            if(editUI.hasClass("ED-Large")) {
-                editUI.removeClass("ED-Large")
-                editUI.addClass("ED-Small")
-            }
 
             if(editContent.hasClass("contentVisible")) {
                 editContent.removeClass("contentVisible")
@@ -892,6 +917,12 @@ const ViewController = {
                 editContent.empty()
             }
 
+            //set visibility of edit buttons
+            const objectsButton = $("#objects-button")
+            const relationshipsButton = $("#relationships-button")
+
+            objectsButton.addClass("invisible")
+            relationshipsButton.addClass("invisible")
         }
     },
     setActive: function(item) {
@@ -902,7 +933,7 @@ const ViewController = {
         else
             changeInfoPanel(this.network)
 
-        if(this.view == "Edit" ) {
+        if(this.view == "Edit") {
             if (!(item instanceof Network))
                 editItem(item)
             else 
@@ -919,25 +950,22 @@ function initViewController(network, newView = "Map") {
     ViewController.changeView(newView)
     ViewController.network = network
 
-    const mapButton = $("#map-button")
     const editButton = $("#edit-button")
 
     if (newView == "Map") {
-        mapButton.addClass("VBSelected")
+        editButton.removeClass("editSelected")
     } else if(newView == "Edit") {
-        editButton.addClass("VBSelected")
+        editButton.addClass("editSelected")
     }
 
-    mapButton.click((m) => {
-        ViewController.changeView("Map")
-        mapButton.addClass("VBSelected")
-        editButton.removeClass("VBSelected")
-    })
-
-    editButton.click((m) => {
-        ViewController.changeView("Edit")
-        editButton.addClass("VBSelected")
-        mapButton.removeClass("VBSelected")
+    editButton.click((e) => {
+        if(ViewController.view == "Map") {
+            ViewController.changeView("Edit")
+            editButton.addClass("editSelected")
+        } else if(ViewController.view == "Edit") {
+            ViewController.changeView("Map")
+            editButton.removeClass("editSelected")
+        }
     })
 }
 
@@ -951,17 +979,13 @@ function toggleGridVisibility() {
 //Switching to edit tab for keyboard shortcut -Jaishree
 function switchToEditTab() {
     ViewController.changeView("Edit");
-
-    $("#map-button").removeClass("VBSelected");
-    $("#edit-button").addClass("VBSelected");
+    $("#edit-button").addClass("editSelected");
 }
 
 //Switching to map tab for keyboard shortcut -Jaishree
 function switchToMapTab() {
     ViewController.changeView("Map");
-
-    $("#edit-button").removeClass("VBSelected");
-    $("#map-button").addClass("VBSelected");
+    $("#edit-button").removeClass("editSelected");
 }
 
 //Open Info Page for keyboard shortcut -Jaishree
@@ -1106,4 +1130,6 @@ function main() {
     initGridButton()
     initShortcuts()
     initEditUI()
-}main();
+}
+
+window.onload = main()

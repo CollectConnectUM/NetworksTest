@@ -29,81 +29,71 @@
         <main id="main-content" role="main" aria-labelledby="property-name">
             <div id="view" aria-live="polite">
                 <div id="viewHeader">
-                    <div id="headerButtons">
-                        <button class="headerButton" id="back-button">Back</button>
-                        <button class="headerButton" id="info-button" onclick="doOpenModal()">Info</button>
-                        <button class="headerButton" id="grid-button">Grid</button>
-                    </div>
-                    <div id="viewSelect">
-                        <div id="vsBox">
-                            <button class="viewSButton" id="map-button" style="margin-right: 2px;">Map</button>
-                            <button class="viewSButton" id="edit-button" style="margin-left: 2px;">Edit</button>
-                        </div>
-                    </div>
                     <div id="infoPanel" aria-live="polite">
                         <div id="collapseDiv" >
-                            <h2 id="collapseName" class="nameCollapse">Test Network</h2>
+                            <a id="collapseName" class="nameCollapse">Test Network</a>
                             <button id="collapseButton" aria-label="collapse info panel"><img src="/static/img/arrow.svg" aria-hidden="true" id="collapseIcon"></button>
                         </div>
-                        <ul id="infoList">
-                            <li class="property" id="Name" style="flex-grow: 0; padding-bottom:0; padding-top:0;">
-                                <h2 id="property-name">Test Network</h2>
-                                <p class="propertyInfo">By <span>
+                        <div id="infoList" class="ILOpen">
+                            <div class="property" id="propertyName">
+                                <a id="infoName">Test Network</a>
+                                <p id="infoOwner"">By <span>
                                     <a id="owner">Developer</a>
                                 </span></p>
-                            </li>
-                            <li class="property" id="Description">
-                                <h2 class="propertyName">Description</h2>
-                                <p class="propertyInfo">Network Description</p>
-                            </li>
-                        </ul>
+                            </div>
+                            <div class="property" id="propertyDescription">
+                                <h2 id="infoDescriptionTitle">Description</h2>
+                                <p id="infoDescription">Network Description</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="grid-button">Grid</button>
+
+                    <div id="headerButtons">
+                        <button id="info-button" onclick="doOpenModal()">Info</button>
+                        <button id="edit-button">Edit</button>
+                        <button class="invisible" id="objects-button">Objects</button>
+                        <button class="invisible" id="relationships-button">Relationships</button>
+                    </div>
+
+                    <div id="editDiv" class="invisible" role="region" aria-label="Edit Panel" aria-live="polite" aria-hidden="true">
+                        <div id="editContent" class="contentHidden">
+                            <div id="listHTML">
+                                <h3 id="itemHeader">Items</h3>
+                                <ul id="itemList">
+                                    <li ><p class="itemTitle">Item</p><button class="itemEdit">Edit</button></li>
+                                </ul>
+                            </div>
+                            <div id="editHTML" >
+                                <h3 id="itemHeader">ItemName</h3>
+                                <ul id="editPropsList">
+    
+                                </ul>
+                                <ul id="objectProps">
+                                    <li><label for="Name">Name:</label><input class="editInput" id="Name" name="Name" type="text" placeholder="Name"></li>
+                                    <li><label for="Position">Position:</label><input class="editInput" id="Position" name="Position" type="text" placeholder="Position"></li>
+                                    <li><label for="Type">Type:</label><input class="editInput" id="Type" name="Type" type="text" placeholder="Type"></li>
+                                    <li><label for="Description">Description:</label><textarea class="editInput" id="Description" name="Description" type="text" placeholder="Object Description"></textarea></li>
+                                    <li><label for="Image">Image:</label><input class="editInput" id="Image" name="Image" type="url" placeholder="None"></li>
+                                </ul>
+                                <ul id="relProps">
+                                    <li><label for="Type">Type:</label><input class="editInput" id="Type" name="Type" type="text" placeholder="Type"></li>
+                                    <li><label for="Connect1">Connection 1:</label><input class="editInput" id="Connect1" name="Connect1" type="text" placeholder="Object Name"></li>
+                                    <li><label for="Connect2">Connection 2:</label><input class="editInput" id="Connect2" name="Connect2" type="text" placeholder="Object Name"></li>
+                                    <li><label for="Style">Line Style:</label><input class="editInput" id="Style" name="Style" type="text" placeholder="Style-Temp"></li>
+                                    <li><label for="Color">Line Color:</label></label><input class="editInput" id="Color" name="Color" type="text" placeholder="Color-Temp"></li>
+                                </ul>
+                            </div>
+                            <div id="newHTML" >
+    
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div id="SVGDiv">
-                    
+
                 </div>  
-                <div id="editDiv" class="ED-Small ED-Hidden" role="region" aria-label="Edit Panel" aria-live="polite" aria-hidden="true">
-                    <div id="editContent" class="contentHidden">
-                        <div id="listHTML">
-                            <h3 id="itemHeader">Items</h3>
-                            <ul id="itemList">
-                                <li ><p class="itemTitle">Item</p><button class="itemEdit">Edit</button></li>
-                            </ul>
-                        </div>
-                        <div id="editHTML" >
-                            <h3 id="itemHeader">ItemName</h3>
-                            <ul id="editPropsList">
-
-                            </ul>
-                            <ul id="objectProps">
-                                <li><label for="Name">Name:</label><input id="Name" name="Name" type="text" placeholder="Name"></li>
-                                <li><label for="Position">Position:</label><input id="Position" name="Position" type="text" placeholder="Position"></li>
-                                <li><label for="Type">Type:</label><input id="Type" name="Type" type="text" placeholder="Type"></li>
-                                <li><label for="Description">Description:</label><textarea id="Description" name="Description" type="text" placeholder="Object Description"></textarea></li>
-                                <li><label for="Image">Image:</label><input id="Image" name="Image" type="url" placeholder="None"></li>
-                            </ul>
-                            <ul id="relProps">
-                                <li><label for="Type">Type:</label><input id="Type" name="Type" type="text" placeholder="Type"></li>
-                                <li>
-                                    <div>
-                                        <label for="Connect1">Connection 1:</label><input id="Connect1" name="Connect1" type="text" placeholder="Object Name">
-                                        <label for="Connect2">Connection 2:</label><input id="Connect2" name="Connect2" type="text" placeholder="Object Name">
-                                    </div>
-                                </li>
-                                <li><label for="Style">Line Style:</label><input id="Style" name="Style" type="text" placeholder="Style-Temp"></li>
-                                <li><label for="Color">Line Color:</label></label><input id="Color" name="Color" type="text" placeholder="Color-Temp"></li>
-                            </ul>
-                        </div>
-                        <div id="newHTML" >
-
-                        </div>
-                    </div>
-                    <div id="editButtons">
-                        <button>Objects</button>
-                        <button>Relationships</button>
-                        <button>New</button>
-                    </div>
-                </div>
             </div>
             <div id="modal" title="Network Info" tabindex="-1"  class="modalContent">
                 <div id="column1" class="column">
