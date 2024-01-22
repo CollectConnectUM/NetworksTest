@@ -754,7 +754,7 @@ function initEditUI() {
         
         htmlStore.lastContent = null
 
-        changeInfoPanel(ViewController.network)
+        ViewController.setActive(ViewController.network)
 
         if($("#itemList").length == 0)
             editContent.html(htmlStore.listHTML)
@@ -783,7 +783,7 @@ function initEditUI() {
 
         htmlStore.lastContent = null
 
-        changeInfoPanel(ViewController.network)
+        ViewController.setActive(ViewController.network)
 
         if($("#itemList").length == 0) 
             editContent.html(htmlStore.listHTML)
