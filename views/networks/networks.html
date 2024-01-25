@@ -51,7 +51,7 @@
                     <button id="grid-button">Grid</button>
 
                     <div id="headerButtons">
-                        <button id="info-button" onclick="doOpenModal()">Info</button>
+                        <button id="info-button">Info</button>
                         <button id="edit-button">Edit</button>
                         <button class="invisible" id="objects-button">Objects</button>
                         <button class="invisible" id="relationships-button">Relationships</button>
@@ -90,12 +90,28 @@
                             </div>
                         </div>
                     </div>
+                    <div id="infoDiv" class="invisible" role="region" aria-label="Edit Panel" aria-live="polite" aria-hidden="true">
+                        <div id="infoContent" class="contentHidden">
+                            <div id="infoListHTML">
+                                <ul id="infoItemList">
+                                    <li><p class="infoTitle">Name</p><ul id="nameList" class="infoBox"></ul></li>
+                                    <li><p class="infoTitle">Description</p><ul id="descList" class="infoBox"></ul></li>
+                                    <li><p class="infoTitle">Created By</p><ul id="createdByList" class="infoBox"></ul></li>
+                                    <li><p class="infoTitle">Created Date</p><ul id="createdDateList" class="infoBox"></ul></li>
+                                    <li><p class="infoTitle">Last Modified Date</p><ul id="lastModifiedList" class="infoBox"></ul></li>
+                                    <li><p class="infoTitle">Node(s)</p><ul id="nodesList" class="infoBox"></ul></li>
+                                    <li><p class="infoTitle">Edge(s)</p><ul id="edgesList" class="infoBox"></ul></li>
+                                    <li><p class="infoTitle">Collaboration Setting</p><ul id="collabSettingList" class="infoBox"></ul></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div id="SVGDiv">
 
                 </div>  
             </div>
-            <div id="modal" title="Network Info" tabindex="-1"  class="modalContent">
+            <!-- <div id="modal" title="Network Info" tabindex="-1"  class="modalContent">
                 <div id="column1" class="column">
                     <div id="name" class="infoType">
                         <div class="infoTitle" tabindex="0">
@@ -166,7 +182,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </main>
     </div>
     </div>

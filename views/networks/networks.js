@@ -845,6 +845,59 @@ function lastEditView() {
     } 
 }
 
+//initialize Info UI buttons and functionality
+function initInfoUI() {
+    const infoUI = $("#infoDiv")
+    const infoContent = $("#infoContent")
+
+    if (ViewController.network.name) $("#nameList").html("<li><p>" + ViewController.network.name + "</p></li>");
+    else $("#nameList").html("<li><p>No name for this network.</p></li>");
+    
+    if (ViewController.network.description) $("#descList").html("<li><p>" + ViewController.network.description + "</p></li>");
+    else $("#descList").html("<li><p>No description for this network.</p></li>");
+
+    if (ViewController.network.author) $("#createdByList").html("<li><p>" + ViewController.network.author + "</p></li>");
+    else $("#createdByList").html("<li><p>No author for this network.</p></li>");
+
+    $("#createdDateList").html("<li><p>11/01/2023</p></li>");
+    $("#lastModifiedList").html("<li><p>12/01/2023</p></li>");
+
+    const nodeList = ViewController.network.nodes;
+    if (nodeList.length > 0) {
+        let html = "";
+        nodeList.forEach((node) => {
+            html += "<li>" + node.name + "</li>";
+        })
+        $("#nodesList").html(html);
+    }
+    else {
+        $("#nodesList").html("<li><p>No node for this network.</p></li>")
+    }
+
+    const edgeList = ViewController.network.edges;
+    if (edgeList.length > 0) {
+        let html = "";
+        edgeList.forEach((edge) => {
+            html += "<li>" + edge.obj1.name + " " + edge.type.toLowerCase() + " " + edge.obj2.name + "</li>";
+        })
+        $("#edgesList").html(html);
+    }
+    else {
+        $("#edgesList").html("<li><p>No edge for this network.</p></li>")
+    }
+
+    $("#collabSettingList").html("<li><p>Public</p></li>");
+
+    infoUI.removeClass("invisible")
+
+    infoUI.attr("aria-hidden", "false")
+
+    if(infoContent.hasClass("contentHidden")) {
+        infoContent.addClass("contentVisible")
+        infoContent.removeClass("contentHidden")
+    }
+}
+
 
 //*View Controller and Init Function
 const ViewController = {
@@ -1090,7 +1143,7 @@ function main() {
     console.log("Network:", network)
 
     //Initialize Functions for Network page
-    renderModal(network)
+    // renderModal(network)
     initSVG(network)
     initCamera()
     initViewController(network)
@@ -1098,6 +1151,7 @@ function main() {
     initGridButton()
     initShortcuts()
     initEditUI()
+    initInfoUI()
 }
 
 window.onload = main()
