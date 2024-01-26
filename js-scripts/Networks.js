@@ -2,17 +2,20 @@
 
 //Start Network Classes
 class Network {
-    constructor(id, name, author, size, description = "None")  {
+    constructor(id, name, owner, size, description = "None", visibility = "public", courses = [], collaborators = [])  {
         this.id = id
         this.name = name
-        this.author = author
+        this.owner = owner
         this.grid = new Grid(size,this)
+        this.description = description
+        this.visibility = visibility
         
         this.root = undefined
         this.nodes = []
         this.edges = []
 
-        this.description = description
+        this.courses = courses
+        this.collaborators = collaborators
 
         return this
     }
@@ -44,16 +47,24 @@ class Network {
         return this
     }
 
+    addCollaborator(user, role) {
+        this.collaborators.push({user, role})
+    }
+
+    addCourse(course) {
+        this.courses.push(course)
+    }
+
     toJSON(key) {
         if (key === "network") {
             this.grid = this.grid.size
             this.root = undefined
             for (let i = 0; i < this.nodes.length; i++) {
-                this.nodes[i].network = undefined
+                this.nodes[i].network = this.id
                 this.nodes[i].edges = []
             }
             for (let i = 0; i < this.edges.length; i++) {
-                this.edges[i].network = undefined
+                this.edges[i].network = this.id
                 this.edges[i].obj1 = this.edges[i].obj1.id
                 this.edges[i].obj2 = this.edges[i].obj2.id
             }
@@ -61,9 +72,9 @@ class Network {
         return this
     }
 
-    static toNetwork(networkObject) {
+    static objectToNetwork(networkObject) {
         const obj = networkObject
-        const network = new Network(obj.id, obj.name, obj.author, obj.grid, obj.description)
+        const network = new Network(obj.id, obj.name, obj.owner, obj.grid, obj.description, obj.visibility, obj.courses, obj.collaborators)
 
         const nodes = []
         for (let i = 0; i < obj.nodes.length; i++) {
@@ -77,7 +88,28 @@ class Network {
             const curEdge = obj.edges[i]
             let obj1 = nodes.find((node) => node.id == curEdge.obj1)
             let obj2 = nodes.find((node) => node.id == curEdge.obj2)
-            const edge = new Edge(curEdge.id, curEdge.type, network, obj1, obj2)
+            const edge = new Edge(curEdge.id, curEdge.type, network, obj1, obj2, curEdge.style, curEdge.color)
+            edges.push(edge)
+        }
+        return network
+    }
+
+    static propsToNetwork(propsList) {
+        const network = new network(propsList[0], propsList[1], propsList[2], propsList[3], propsList[4], propsList[5], propsList[6], propsList[7])
+
+        const nodes = []
+        for (let i = 0; i < propsList[8].length; i++) {
+            const curNode = propsList[8][i]
+            const node = new Node(curNode.id, curNode.name, network, curNode.position, curNode.type, curNode.author, curNode.description, curNode.image, curNode.reference)
+            nodes.push(node)
+        }
+
+        const edges = []
+        for (let i = 0; i < propsList[9]; i++) {
+            const curEdge = propsList[9][i]
+            let obj1 = nodes.find((node) => node.id == curEdge.obj1)
+            let obj2 = nodes.find((node) => node.id == curEdge.obj2)
+            const edge = new Edge(curEdge.id, curEdge.type, network, obj1, obj2, curEdge.style, curEdge.color)
             edges.push(edge)
         }
         return network
@@ -125,12 +157,14 @@ class Node {
 }
 
 class Edge {
-    constructor(id, type, network, obj1, obj2)  {
+    constructor(id, type, network, obj1, obj2, style = null, color = null)  {
         this.id = id
         this.type = type
         this.network = network
         this.obj1 = obj1
         this.obj2 = obj2
+        this.style = style
+        this.color = color
 
         obj1.addRelationship(this)
         obj2.addRelationship(this)
