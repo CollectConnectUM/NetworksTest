@@ -1,5 +1,7 @@
 //Jenna Mathison
 
+//const { ForeignObject } = require("@svgdotjs/svg.js")
+
 //SVG.js imported through client side html for drawing Network Map
 //Docs: https://svgjs.dev/docs/3.1/
 
@@ -10,7 +12,7 @@ class Network {
         this.name = name
         this.author = author
         this.grid = new Grid(size,this)
-        
+
         this.root = undefined
         this.nodes = []
         this.edges = []
@@ -167,7 +169,7 @@ class Grid {
             this.grid[pos[0]][pos[1]] = node
         }
         return this
-    } 
+    }
 }
 //End Network Classes
 
@@ -611,34 +613,59 @@ const initGridButton = function() {
     return true
 }
 
-let nodeInfoDiv;
+let nodeInfoDiv = document.createElement('div');
 
 // Display info on selected node -Jaishree
 const displayNodeInfo = function(item) {
 
+    //Removes current node info when another node is selected
     if (nodeInfoDiv) {
         nodeInfoDiv.remove();
     }
 
-    nodeInfoDiv = document.createElement('div');
+    let nodeForeignObject = document.createElementNS('http://www.w3.org/2000/svg',"foreignObject");
+    nodeForeignObject.id = "foreignObject";
+    nodeForeignObject.setAttribute('width', '200');
+    nodeForeignObject.setAttribute('height', '300');
+
+    const cellSize = Draw.CellSize;
+    const xPosition = cellSize.x * (item.position[0] - 0.5);
+    const yPosition = cellSize.y * (item.position[1] - 0.3);
+
+    nodeForeignObject.setAttribute('x', `${xPosition}px`);
+    nodeForeignObject.setAttribute('y', `${yPosition}px`);
+
     nodeInfoDiv.id = "nodeInfo";
 
-    const relationships = `Number of relationships: ${item.edges.length}`;
     nodeInfoDiv.innerHTML = `
         <p>Current node: ${item.name}</p>
-        <p>${relationships}</p>
+        <p>List of relationships: </p>
     `;
 
-    const svgDiv = document.getElementById('SVGDiv');
-    const cellSize = Draw.CellSize;
-    const xPosition = cellSize.x * (item.position[0] - 1);
-    const yPosition = cellSize.y * item.position[1];
+    //List out relationships of node
+    for(let i = 0; i < item.edges.length; i++) {
+        nodeInfoDiv.innerHTML += `
+        <li>${item.edges[i].obj1.name} ${item.edges[i].type} ${item.edges[i].obj2.name}</li>
+        `;
+    }
 
-    nodeInfoDiv.style.position = 'absolute';
-    nodeInfoDiv.style.top = `${yPosition}px`;
-    nodeInfoDiv.style.left = `${xPosition}px`;
 
-    svgDiv.appendChild(nodeInfoDiv);
+    //All but last node displays next node info
+    if(item.id != item.network.nodes.length - 1) {
+        nodeInfoDiv.innerHTML += `
+        <p>Next node: ${item.network.nodes[item.id+1].name}</p>
+    `;
+    }
+
+    nodeForeignObject.appendChild(nodeInfoDiv);
+
+    const svgElement = document.getElementById('SVGDraw');
+    svgElement.appendChild(nodeForeignObject);
+}
+
+//Remove Node Info -Jaishree
+function removeNodeInfo() {
+    nodeInfoDiv.remove();
 }
 
 //Change infoPanel contents
@@ -739,7 +766,7 @@ const htmlStore = {
     editHTML: null,
     objectEditHTML: null,
     relEditHTML: null,
-    
+
     newHTML: null,
 
     lastContent: null,
@@ -768,18 +795,18 @@ function initEditUI() {
 
     editContent.empty()
 
-    //initialize functionality for each edit button 
+    //initialize functionality for each edit button
     const objectsButton = $("#objects-button")
     const relationshipsButton = $("#relationships-button")
 
     objectsButton.click((e) => {
         if(editUI.hasClass("invisible")) {
             editUI.removeClass("invisible")
-    
+
             editContent.addClass("contentVisible")
             editContent.removeClass("contentHidden")
         }
-        
+
         htmlStore.lastContent = null
 
         ViewController.setActive(ViewController.network)
@@ -804,7 +831,7 @@ function initEditUI() {
     relationshipsButton.click((e) => {
         if(editUI.hasClass("invisible")) {
             editUI.removeClass("invisible")
-    
+
             editContent.addClass("contentVisible")
             editContent.removeClass("contentHidden")
         }
@@ -813,7 +840,7 @@ function initEditUI() {
 
         ViewController.setActive(ViewController.network)
 
-        if($("#itemList").length == 0) 
+        if($("#itemList").length == 0)
             editContent.html(htmlStore.listHTML)
 
         $("#itemHeader").text("Relationships")
@@ -853,7 +880,7 @@ function editItem(item) {
     itemType == "Node" ? iHeader.text(item.name) : iHeader.text(item.obj1.name + " " + item.type + " " + item.obj2.name)
 
     const propsList = $("#editPropsList")
-    
+
     if (itemType == "Node") {
         propsList.append(htmlStore.objectEditHTML)
     } else if (itemType == "Edge") {
@@ -870,7 +897,7 @@ function lastEditView() {
         editContent.append(htmlStore.lastContent)
 
         htmlStore.lastContent = null
-    } 
+    }
 }
 
 
@@ -936,12 +963,15 @@ const ViewController = {
         if(this.view == "Edit") {
             if (!(item instanceof Network))
                 editItem(item)
-            else 
+            else
                 lastEditView()
         }
 
         if(item instanceof Node) {
             displayNodeInfo(item)
+        }
+        else {
+            removeNodeInfo()
         }
     }
 }

@@ -426,7 +426,7 @@ html,body{
 }
 
 #nodeInfo {
-    height: fit-content;
+    max-height: fit-content;
     display: flex;
     flex-direction: column;
     justify-content: left;
@@ -437,4 +437,9 @@ html,body{
     margin: calc(5px * var(--scale));
     padding: calc(5px * var(--scale));
     opacity: 0.95;
+    list-style: none;
+}
+
+#foreignObject {
+    overflow: auto;
 }
