@@ -1115,88 +1115,6 @@ function initShortcuts() {
     })
 }
 
-// Render info modal and prepare function to be called for onclick
-window.doOpenModal = function() {};
-window.doCloseModal = function() {};
-function renderModal(network) {
-    function renderNodes() {
-        if (network.nodes.length > 0) {
-            let html = "", n = network.nodes.length;
-            for(let i = 0; i < n; i++) {
-                let node = network.nodes[i];
-                html += "<li>" + node.name + "</li>";
-            }
-            $("#nodesList").html(html);
-        }
-        else {
-            $("#nodesList").html("<li><p>No node for this network.</p></li>")
-        }
-    }
-
-    function renderEdges() {
-        if (network.edges.length > 0) {
-            let html = "", n = network.edges.length;
-            for(let i = 0; i < n; i++) {
-                let edge = network.edges[i];
-                html += "<li>" + edge.obj1.name + " " + edge.type.toLowerCase() + " " + edge.obj2.name + "</li>";
-            }
-            $("#edgesList").html(html);
-        }
-        else {
-            $("#edgesList").html("<li><p>No edge for this network.</p></li>")
-        }
-    }
-
-    // Initialize info modal
-    let modal = $("#modal").dialog({
-        resizable: true,
-        height: window.innerHeight * 0.7,
-        width: window.innerWidth * 0.9,
-        modal: true,
-        autoOpen: false,
-        open: function() {
-            if (network.name) $("#nameVal").text(network.name);
-            else $("#nameVal").text("No name for this network.");
-            
-            if (network.description) $("#descVal").text(network.description);
-            else $("#descVal").text("No description for this network.");
-
-            if (network.author) $("#authorVal").text(network.author);
-            else $("#authorVal").text("No author for this network.");
-
-            renderNodes();
-            renderEdges();
-        },
-        close: function() {
-
-        }
-    });
-
-    // Initialize open modal function
-    function openModal() {
-        modal.dialog("open");
-    }
-    window.doOpenModal = openModal;
-
-    // Initialize close modal function
-    function closeModal() {
-        modal.dialog("close");
-    }
-    window.doCloseModal = closeModal;
-
-    // Do resize if needed
-    let queuedTimeout = null;
-    function doResize() {
-        modal.dialog('option', 'height', window.innerHeight * 0.7);
-        modal.dialog('option', 'width', window.innerWidth * 0.9);
-        queuedTimeout = null;
-    }
-    window.onresize = function() {
-        if ( queuedTimeout ) clearTimeout(queuedTimeout);
-        queuedTimeout = setTimeout(doResize, 150);
-    };
-}
-
 //Main Program
 function main() {
     data = JSON.parse(decodeURIComponent(data));
@@ -1206,7 +1124,6 @@ function main() {
     console.log("Network:", network)
 
     //Initialize Functions for Network page
-    // renderModal(network)
     initSVG(network)
     initCamera()
     initViewController(network)

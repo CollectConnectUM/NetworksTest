@@ -426,3 +426,77 @@ html,body{
     fill: var(--special);
     text-rendering: optimizeLegibility;
 } 
+
+/*Info CSS*/
+#infoDiv {
+    background-color: var(--secondary);
+    position: absolute;
+    z-index: 2;
+    top: calc(3rem * var(--scale));
+    left: calc(0.5rem * var(--scale));
+    width: 25%;
+    border-radius: calc(10px * var(--scale));
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    height: fit-content;
+    max-height: calc(100% - (3.5rem * var(--scale)));
+}
+#infoDiv p{
+    margin: 0;
+}
+
+#infoContent {
+    background-color: var(--secondary);
+    border-radius: calc(10px * var(--scale));
+    transition-duration: 0.2s;
+    transition-property: height;
+    overflow-y: auto;
+}
+
+#infoItemList {
+    margin: 0;
+    height: 100%;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    padding: calc(10px * var(--scale));
+    display: flex;
+    flex-direction: column;
+    gap: calc(4px * var(--scale));
+}
+#infoItemList li {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    margin-bottom: 1px;
+    gap: calc(4px * var(--scale));;
+    padding: 0;
+}
+
+.infoTitle {
+    margin: 0;
+    font-size: calc(0.8rem * var(--scale));
+    padding-inline: 0;
+    overflow-x: clip;
+    font-weight: bold;
+    width: 30%;
+}
+
+.infoBox {
+    height: fit-content;
+    width: 70%;
+    margin-right: calc(1px * var(--scale));
+    padding: 0;
+    padding-left: calc(10px * var(--scale));
+    list-style: none;
+    margin-top: 0;
+}
+.infoBox a {
+    color: var(--primary-inv);
+}
+.infoBox a:hover {
+    color: var(--primary-inv);
+    text-decoration: underline;
+    font-weight: normal;
+}
+.infoBox li{
+    margin: 0px;
+}
