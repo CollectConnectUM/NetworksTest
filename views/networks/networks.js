@@ -1064,37 +1064,22 @@ function toggleGridVisibility() {
 function switchToEditTab() {
     ViewController.changeView("Edit");
     $("#edit-button").addClass("editSelected");
+    $("#info-button").removeClass("editSelected");
 }
 
 //Switching to map tab for keyboard shortcut -Jaishree
 function switchToMapTab() {
     ViewController.changeView("Map");
     $("#edit-button").removeClass("editSelected");
+    $("#info-button").removeClass("editSelected");
 }
 
-//Open Info Page for keyboard shortcut -Jaishree
-let infoPageOpen = false;
-function toggleInfoPage() {
-    if (infoPageOpen) {
-        closeModal();
-    } else {
-        openModal();
-    }
+//Switching to info tab for keyboard shortcut
+function switchToInfoTab() {
+    ViewController.changeView("Info");
+    $("#info-button").addClass("editSelected");
+    $("#edit-button").removeClass("editSelected");
 }
-
-// Function to open the info page
-function openModal() {
-    console.log("called open modal")
-    window.doOpenModal();
-    infoPageOpen = true;
-}
-
-// Function to close the info page
-function closeModal() {
-    window.doCloseModal();
-    infoPageOpen = false;
-}
-
 
 //Keyboard Shortcuts Function - moved for readability in main
 function initShortcuts() {
@@ -1109,9 +1094,8 @@ function initShortcuts() {
             switchToMapTab();
         }
         if (event.key.toLowerCase() === "i") {
-            toggleInfoPage();
+            switchToInfoTab();
         }
-
     })
 }
 
