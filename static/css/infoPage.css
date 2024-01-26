@@ -10,6 +10,7 @@
     border-radius: calc(10px * var(--scale));
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     height: fit-content;
+    max-height: calc(100% - (3.5rem * var(--scale)));
 }
 #infoDiv p{
     margin: 0;
@@ -26,7 +27,6 @@
 #infoItemList {
     margin: 0;
     height: 100%;
-    /* max-height: calc(250px * var(--scale)); */
     overflow-y: auto;
     scrollbar-width: thin;
     padding: calc(10px * var(--scale));

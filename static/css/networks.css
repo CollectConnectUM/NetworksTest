@@ -292,6 +292,7 @@ html,body{
     max-height: calc(250px * var(--scale));
     overflow-y: auto;
     scrollbar-width: thin;
+    padding: 0;
 }
 
 #itemList li {

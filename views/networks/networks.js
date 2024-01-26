@@ -887,15 +887,6 @@ function initInfoUI() {
     }
 
     $("#collabSettingList").html("<li><p>Public</p></li>");
-
-    infoUI.removeClass("invisible")
-
-    infoUI.attr("aria-hidden", "false")
-
-    if(infoContent.hasClass("contentHidden")) {
-        infoContent.addClass("contentVisible")
-        infoContent.removeClass("contentHidden")
-    }
 }
 
 
@@ -910,7 +901,21 @@ const ViewController = {
         const editUI = $("#editDiv")
         const editContent = $("#editContent")
 
+        const infoUI = $("#infoDiv")
+        const infoContent = $("#infoContent")
+
         if(newView == "Edit") {
+            // Make info UI invisible
+            infoUI.addClass("invisible")
+
+            infoUI.attr("aria-hidden", "true")
+
+            if(infoContent.hasClass("contentVisible")) {
+                infoContent.removeClass("contentVisible")
+                infoContent.addClass("contentHidden")
+            }
+
+            // Render edit UI
             editUI.removeClass("invisible")
 
             editUI.attr("aria-hidden", "false")
@@ -931,6 +936,35 @@ const ViewController = {
             objectsButton.removeClass("invisible")
             relationshipsButton.removeClass("invisible")
 
+        } else if (newView == "Info") {
+            // Make edit UI invisible
+            editUI.addClass("invisible")
+
+            editUI.attr("aria-hidden", "true")
+
+            if(editContent.hasClass("contentVisible")) {
+                editContent.removeClass("contentVisible")
+                editContent.addClass("contentHidden")
+                editContent.empty()
+            }
+
+            // Set visibility of edit buttons
+            const objectsButton = $("#objects-button")
+            const relationshipsButton = $("#relationships-button")
+
+            objectsButton.addClass("invisible")
+            relationshipsButton.addClass("invisible")
+
+            // Render info UI
+            infoUI.removeClass("invisible")
+
+            infoUI.attr("aria-hidden", "false")
+
+            if(infoContent.hasClass("contentHidden")) {
+                infoContent.addClass("contentVisible")
+                infoContent.removeClass("contentHidden")
+            }
+
         } else if(newView == "Map") {
             editUI.addClass("invisible")
 
@@ -948,6 +982,16 @@ const ViewController = {
 
             objectsButton.addClass("invisible")
             relationshipsButton.addClass("invisible")
+
+            // Make info UI invisible
+            infoUI.addClass("invisible")
+
+            infoUI.attr("aria-hidden", "true")
+
+            if(infoContent.hasClass("contentVisible")) {
+                infoContent.removeClass("contentVisible")
+                infoContent.addClass("contentHidden")
+            }
         }
     },
     setActive: function(item) {
@@ -972,6 +1016,7 @@ function initViewController(network, newView = "Map") {
     ViewController.network = network
 
     const editButton = $("#edit-button")
+    const infoButton = $("#info-button")
 
     if (newView == "Map") {
         editButton.removeClass("editSelected")
@@ -983,9 +1028,27 @@ function initViewController(network, newView = "Map") {
         if(ViewController.view == "Map") {
             ViewController.changeView("Edit")
             editButton.addClass("editSelected")
-        } else if(ViewController.view == "Edit") {
+        } else if (ViewController.view == "Info") {
+            ViewController.changeView("Edit")
+            infoButton.removeClass("editSelected")
+            editButton.addClass("editSelected")
+        } else if (ViewController.view == "Edit") {
             ViewController.changeView("Map")
             editButton.removeClass("editSelected")
+        }
+    })
+
+    infoButton.click((e) => {
+        if(ViewController.view == "Map") {
+            ViewController.changeView("Info")
+            infoButton.addClass("editSelected")
+        } else if (ViewController.view == "Edit") {
+            ViewController.changeView("Info")
+            editButton.removeClass("editSelected")
+            infoButton.addClass("editSelected")
+        } else if (ViewController.view == "Info") {
+            ViewController.changeView("Map")
+            infoButton.removeClass("editSelected")
         }
     })
 }
