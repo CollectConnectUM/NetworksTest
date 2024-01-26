@@ -17,7 +17,6 @@
 	<link rel="stylesheet" href="/static/css/footer.css">
 
     <link rel="stylesheet" href="/static/css/networks.css">
-    <link rel="stylesheet" href="/static/css/infoPage.css">
 </head>
 <body>
     <div id="page-container">
@@ -34,7 +33,7 @@
                             <a id="collapseName" class="nameCollapse">Test Network</a>
                             <button id="collapseButton" aria-label="collapse info panel"><img src="/static/img/arrow.svg" aria-hidden="true" id="collapseIcon"></button>
                         </div>
-                        <div id="infoList" class="ILOpen">
+                        <div id="infoList" class="scrollbar ILOpen">
                             <div class="property" id="propertyName">
                                 <a id="infoName">Test Network</a>
                                 <p id="infoOwner"">By <span>
@@ -51,7 +50,7 @@
                     <button id="grid-button">Grid</button>
 
                     <div id="headerButtons">
-                        <button id="info-button" onclick="doOpenModal()">Info</button>
+                        <button id="info-button">Info</button>
                         <button id="edit-button">Edit</button>
                         <button class="invisible" id="objects-button">Objects</button>
                         <button class="invisible" id="relationships-button">Relationships</button>
@@ -60,33 +59,64 @@
                     <div id="editDiv" class="invisible" role="region" aria-label="Edit Panel" aria-live="polite" aria-hidden="true">
                         <div id="editContent" class="contentHidden">
                             <div id="listHTML">
-                                <h3 id="itemHeader">Items</h3>
-                                <ul id="itemList">
+                                <div id="editHeader">
+                                    <h3 id="itemHeader">Items</h3>
+                                    <button id="new-button">New</button>
+                                </div>
+                                <ul id="itemList" class="scrollbar">
                                     <li ><p class="itemTitle">Item</p><button class="itemEdit">Edit</button></li>
                                 </ul>
                             </div>
                             <div id="editHTML" >
-                                <h3 id="itemHeader">ItemName</h3>
-                                <ul id="editPropsList">
+                                <div id="editHeader">
+                                    <h3 id="itemHeader">Items</h3>
+                                </div>
+                                <ul class="propsList" id="editPropsList">
     
                                 </ul>
                                 <ul id="objectProps">
-                                    <li><label for="Name">Name:</label><input class="editInput" id="Name" name="Name" type="text" placeholder="Name"></li>
-                                    <li><label for="Position">Position:</label><input class="editInput" id="Position" name="Position" type="text" placeholder="Position"></li>
-                                    <li><label for="Type">Type:</label><input class="editInput" id="Type" name="Type" type="text" placeholder="Type"></li>
-                                    <li><label for="Description">Description:</label><textarea class="editInput" id="Description" name="Description" type="text" placeholder="Object Description"></textarea></li>
-                                    <li><label for="Image">Image:</label><input class="editInput" id="Image" name="Image" type="url" placeholder="None"></li>
+                                    <li><label for="Name">Name:</label><input class="editInput" name="name" type="text" placeholder="Name"></li>
+                                    <li><label for="Name">Author:</label><input class="editInput" name="author" type="text" placeholder="Author"></li>
+                                    <li><label for="Position">Position:</label><input class="editInput" name="position" type="text" placeholder="Position"></li>
+                                    <li><label for="Type">Type:</label><input class="editInput" name="type" type="text" placeholder="Type"></li>
+                                    <li><label for="Description">Description:</label><textarea class="editInput" name="description" type="text" placeholder="Object Description"></textarea></li>
+                                    <li><label for="Image">Image:</label><input class="editInput" name="image" type="url" placeholder="None"></li>
                                 </ul>
                                 <ul id="relProps">
-                                    <li><label for="Type">Type:</label><input class="editInput" id="Type" name="Type" type="text" placeholder="Type"></li>
-                                    <li><label for="Connect1">Connection 1:</label><input class="editInput" id="Connect1" name="Connect1" type="text" placeholder="Object Name"></li>
-                                    <li><label for="Connect2">Connection 2:</label><input class="editInput" id="Connect2" name="Connect2" type="text" placeholder="Object Name"></li>
-                                    <li><label for="Style">Line Style:</label><input class="editInput" id="Style" name="Style" type="text" placeholder="Style-Temp"></li>
-                                    <li><label for="Color">Line Color:</label></label><input class="editInput" id="Color" name="Color" type="text" placeholder="Color-Temp"></li>
+                                    <li><label for="Type">Type:</label><input class="editInput" name="type" type="text" placeholder="Type"></li>
+                                    <li><label for="Connect1">Connection 1:</label><input class="editInput" name="connect1" type="text" placeholder="Object Name"></li>
+                                    <li><label for="Connect2">Connection 2:</label><input class="editInput" name="connect2" type="text" placeholder="Object Name"></li>
+                                    <li><label for="Style">Line Style:</label><input class="editInput" name="style" type="text" placeholder="Style-Temp"></li>
+                                    <li><label for="Color">Line Color:</label></label><input class="editInput" name="color" type="text" placeholder="Color-Temp"></li>
                                 </ul>
                             </div>
                             <div id="newHTML" >
+                                <div id="editHeader">
+                                    <h3 id="itemHeader">Items</h3>
+                                </div>
+                                <ul class="propsList" id="newPropsList">
     
+                                </ul>
+                                <div id="newButtons">
+                                    <button id="cancel-button">Cancel</button>
+                                    <button id="create-button">Create</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="infoDiv" class="invisible" role="region" aria-label="Edit Panel" aria-live="polite" aria-hidden="true">
+                        <div id="infoContent" class="contentHidden">
+                            <div id="infoListHTML">
+                                <ul id="infoItemList">
+                                    <li><p class="infoTitle">Name</p><ul id="nameList" class="infoBox"></ul></li>
+                                    <li><p class="infoTitle">Description</p><ul id="descList" class="infoBox"></ul></li>
+                                    <li><p class="infoTitle">Created By</p><ul id="createdByList" class="infoBox"></ul></li>
+                                    <li><p class="infoTitle">Created Date</p><ul id="createdDateList" class="infoBox"></ul></li>
+                                    <li><p class="infoTitle">Last Modified Date</p><ul id="lastModifiedList" class="infoBox"></ul></li>
+                                    <li><p class="infoTitle">Node(s)</p><ul id="nodesList" class="infoBox"></ul></li>
+                                    <li><p class="infoTitle">Edge(s)</p><ul id="edgesList" class="infoBox"></ul></li>
+                                    <li><p class="infoTitle">Collaboration Setting</p><ul id="collabSettingList" class="infoBox"></ul></li>
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -94,78 +124,6 @@
                 <div id="SVGDiv">
 
                 </div>  
-            </div>
-            <div id="modal" title="Network Info" tabindex="-1"  class="modalContent">
-                <div id="column1" class="column">
-                    <div id="name" class="infoType">
-                        <div class="infoTitle" tabindex="0">
-                            <h3>Name</h3>
-                        </div>
-                        <div class="infoBox">
-                            <p id="nameVal">Testing name</p>
-                        </div>
-                    </div>
-                    <div id="desc" class="descType">
-                        <div class="infoTitle" tabindex="0">
-                            <h3>Description</h3>
-                        </div>
-                        <div id="descBox" class="infoBox">
-                            <p id="descVal">Testing description</p>
-                        </div>
-                    </div>
-                </div>
-                <div id="column2" class="column">
-                    <div id="createdBy" class="infoType">
-                        <div class="infoTitle" tabindex="0">
-                            <h3>Created By</h3>
-                        </div>
-                        <div class="infoBox">
-                            <p id="authorVal">Testing created by</p>
-                        </div>
-                    </div>
-                    <div id="creationDate" class="infoType">
-                        <div class="infoTitle" tabindex="0">
-                            <h3>Created Date</h3>
-                        </div>
-                        <div class="infoBox">
-                            <p id="createdVal">11/01/2023</p>
-                        </div>
-                    </div>
-                    <div id="modifiedDate" class="infoType">
-                        <div class="infoTitle" tabindex="0">
-                            <h3>Last Modified Date</h3>
-                        </div>
-                        <div class="infoBox">
-                            <p id="modifiedVal">12/01/2023</p>
-                        </div>
-                    </div>
-                </div>
-                <div id="column3" class="column">
-                    <div id="nodes" class="infoType">
-                        <div class="infoTitle" tabindex="0">
-                            <h3>Nodes</h3>
-                        </div>
-                        <div class="infoBox">
-                            <ul id="nodesList"></ul>
-                        </div>
-                    </div>
-                    <div id="edges" class="infoType">
-                        <div class="infoTitle" tabindex="0">
-                            <h3>Edges</h3>
-                        </div>
-                        <div class="infoBox">
-                            <ul id="edgesList"></ul>
-                        </div>
-                    </div>
-                    <div id="collabSettings" class="infoType">
-                        <div class="infoTitle" tabindex="0">
-                            <h3>Collaboration Settings</h3>
-                        </div>
-                        <div class="infoBox">
-                            <p id="collabVal">Public</p>
-                        </div>
-                    </div>
-                </div>
             </div>
         </main>
     </div>

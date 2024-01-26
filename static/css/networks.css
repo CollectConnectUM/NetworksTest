@@ -22,7 +22,7 @@ html,body{
     justify-content:flex-start;
     align-items: center;
     height: 100%;
-    width: 100vw;
+    width: 100%;
 
 }
 
@@ -40,6 +40,11 @@ html,body{
 
 .invisible {
     visibility: hidden;
+}
+
+.scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--secondary-inv) var(--secondary);
 }
 
 
@@ -131,7 +136,7 @@ html,body{
     background-color: var(--secondary);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     border-radius: calc(10px * var(--scale));
-    pointer-events: none;
+    pointer-events: auto;
 }
 
 #collapseDiv {
@@ -144,6 +149,7 @@ html,body{
 
 #collapseName {
     width: fit-content;
+    max-width: 90%;
     margin: 0;
     margin-right: auto;
     font-size: calc(1rem * var(--scale));
@@ -175,8 +181,8 @@ html,body{
 #infoList {
     display: flex;
     flex-direction: column;
-    margin: 0;
     gap: calc(12px * var(--scale));
+    border-radius: calc(10px * var(--scale));
     overflow-y: auto;
     overflow-x: hidden;
     transition-duration: 0;
@@ -184,9 +190,10 @@ html,body{
 }
 
 .ILOpen {
-    padding: calc(12px * var(--scale));
+    padding: 0;
     padding-inline: calc(10px * var(--scale));
-    padding-top: calc(0px * var(--scale));
+    margin: 0;
+    margin-bottom: calc(12px * var(--scale));
 }
 
 .ILCollapse {
@@ -265,6 +272,27 @@ html,body{
     overflow-y: clip;
 }
 
+#editContent button {
+    height: fit-content;
+    width: fit-content;
+    border: 0;
+    font-size: calc(1rem * var(--scale));
+    font-weight: bold;
+    padding: calc(2px * var(--scale));
+    padding-inline: calc(4px * var(--scale));
+    margin: calc(2px * var(--scale));
+    margin-left: auto;
+    margin-right: calc(12px * var(--scale));
+    border-radius: calc(20px * var(--scale));
+    background-color: var(--primary);
+    color: var(--primary-inv);
+}
+
+#editContent button:hover {
+    background-color: var(--primary-inv);
+    color: var(--primary)
+}
+
 .contentHidden {
     visibility: hidden;
     height: 0;
@@ -275,22 +303,55 @@ html,body{
     height: fit-content;
 }
 
+/* editheader css*/
+#editHeader {
+    display: flex;
+    align-items: center;
+    border: 0;
+    border-bottom: 1px solid var(--primary-inv);
+}
+
 #itemHeader {
     margin: 0;
+    border: 0;
+    width: fit-content;
     height: fit-content;
     font-size: calc(1rem * var(--scale));
-    border-bottom: 1px solid var(--primary-inv);
     padding: calc(4px * var(--scale));
     padding-left: calc(12px * var(--scale));
     padding-right: calc(12px * var(--scale));
 }
 
+/*#new-button {
+    height: fit-content;
+    width: fit-content;
+    border: 0;
+    font-size: calc(1rem * var(--scale));
+    font-weight: bold;
+    padding: calc(2px * var(--scale));
+    padding-inline: calc(4px * var(--scale));
+    margin: calc(2px * var(--scale));
+    margin-left: auto;
+    margin-right: calc(12px * var(--scale));
+    border-radius: calc(20px * var(--scale));
+    background-color: var(--primary);
+    color: var(--primary-inv);
+} 
+
+#new-button:hover {
+    background-color: var(--primary-inv);
+    color: var(--primary)
+}*/
+
+
+/* object/relationships list css*/
 #itemList {
     margin: 0;
     height: fit-content;
     max-height: calc(250px * var(--scale));
     overflow-y: auto;
     scrollbar-width: thin;
+    padding: 0;
 }
 
 #itemList li {
@@ -310,11 +371,10 @@ html,body{
     overflow-x: clip;
 }
 
-.itemEdit {
+/*.itemEdit {
     height: fit-content;
     width: fit-content;
     border: 0;
-    text-align: center;
     font-size: calc(0.8rem * var(--scale));
     font-weight: bold;
     padding: calc(2px * var(--scale));
@@ -330,9 +390,11 @@ html,body{
 .itemEdit:hover {
     background-color: var(--primary-inv);
     color: var(--primary)
-}
+}*/
 
-#editPropsList {
+
+/* edit/new item css*/
+.propsList {
     margin: 0;
     overflow-y: auto;
     scrollbar-width: thin;
@@ -342,21 +404,21 @@ html,body{
     padding-inline: 0;
 }
 
-#editPropsList li {
+.propsList li {
     display: flex;
     flex-direction: row;
     align-items: center;
     padding: calc(2px * var(--scale));
     padding-inline: calc(8px * var(--scale));
-    gap: calc(4px * var(--scale));;
+    gap: calc(4px * var(--scale));
 }
 
-#editPropsList li label {
+.propsList li label {
     font-size: calc(0.8rem * var(--scale));
     vertical-align: baseline;
 }
 
-#editPropsList li textarea {
+.propsList li textarea {
     resize: vertical;
     max-height: calc(8rem * var(--scale));
 }
@@ -367,6 +429,19 @@ html,body{
     width: 60%;
 }
 
+#newButtons {
+    display: flex;
+    justify-content: right;
+    height: fit-content;
+    gap: calc(8px * var(--scale));
+    padding-right: calc(8px * var(--scale));
+    padding-bottom: calc(4px * var(--scale));
+}
+
+#newButtons button {
+    margin-left: 0;
+    margin-right: 0;
+}
 
 
 
@@ -425,6 +500,7 @@ html,body{
     text-rendering: optimizeLegibility;
 }
 
+/* explore ui css */
 #nodeInfo {
     max-height: fit-content;
     display: flex;
@@ -442,4 +518,78 @@ html,body{
 
 #foreignObject {
     overflow: auto;
+}
+
+/*Info CSS*/
+#infoDiv {
+    background-color: var(--secondary);
+    position: absolute;
+    z-index: 2;
+    top: calc(3rem * var(--scale));
+    left: calc(0.5rem * var(--scale));
+    width: 25%;
+    border-radius: calc(10px * var(--scale));
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    height: fit-content;
+    max-height: calc(100% - (3.5rem * var(--scale)));
+}
+#infoDiv p{
+    margin: 0;
+}
+
+#infoContent {
+    background-color: var(--secondary);
+    border-radius: calc(10px * var(--scale));
+    transition-duration: 0.2s;
+    transition-property: height;
+    overflow-y: auto;
+}
+
+#infoItemList {
+    margin: 0;
+    height: 100%;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    padding: calc(10px * var(--scale));
+    display: flex;
+    flex-direction: column;
+    gap: calc(4px * var(--scale));
+}
+#infoItemList li {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    margin-bottom: 1px;
+    gap: calc(4px * var(--scale));;
+    padding: 0;
+}
+
+.infoTitle {
+    margin: 0;
+    font-size: calc(0.8rem * var(--scale));
+    padding-inline: 0;
+    overflow-x: clip;
+    font-weight: bold;
+    width: 30%;
+}
+
+.infoBox {
+    height: fit-content;
+    width: 70%;
+    margin-right: calc(1px * var(--scale));
+    padding: 0;
+    padding-left: calc(10px * var(--scale));
+    list-style: none;
+    margin-top: 0;
+}
+.infoBox a {
+    color: var(--primary-inv);
+}
+.infoBox a:hover {
+    color: var(--primary-inv);
+    text-decoration: underline;
+    font-weight: normal;
+}
+.infoBox li{
+    margin: 0px;
 }

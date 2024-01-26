@@ -7,17 +7,20 @@
 
 //Start Network Classes
 class Network {
-    constructor(id, name, author, size, description = "None")  {
+    constructor(id, name, owner, size, description = "None", visibility = "public", courses = [], collaborators = [])  {
         this.id = id
         this.name = name
-        this.author = author
+        this.owner = owner
         this.grid = new Grid(size,this)
-
+        this.description = description
+        this.visibility = visibility
+        
         this.root = undefined
         this.nodes = []
         this.edges = []
 
-        this.description = description
+        this.courses = courses
+        this.collaborators = collaborators
 
         return this
     }
@@ -49,16 +52,24 @@ class Network {
         return this
     }
 
+    addCollaborator(user, role) {
+        this.collaborators.push({user, role})
+    }
+
+    addCourse(course) {
+        this.courses.push(course)
+    }
+
     toJSON(key) {
         if (key === "network") {
             this.grid = this.grid.size
             this.root = undefined
             for (let i = 0; i < this.nodes.length; i++) {
-                this.nodes[i].network = undefined
+                this.nodes[i].network = this.id
                 this.nodes[i].edges = []
             }
             for (let i = 0; i < this.edges.length; i++) {
-                this.edges[i].network = undefined
+                this.edges[i].network = this.id
                 this.edges[i].obj1 = this.edges[i].obj1.id
                 this.edges[i].obj2 = this.edges[i].obj2.id
             }
@@ -66,9 +77,9 @@ class Network {
         return this
     }
 
-    static toNetwork(networkObject) {
+    static objectToNetwork(networkObject) {
         const obj = networkObject
-        const network = new Network(obj.id, obj.name, obj.author, obj.grid, obj.description)
+        const network = new Network(obj.id, obj.name, obj.owner, obj.grid, obj.description, obj.visibility, obj.courses, obj.collaborators)
 
         const nodes = []
         for (let i = 0; i < obj.nodes.length; i++) {
@@ -82,7 +93,28 @@ class Network {
             const curEdge = obj.edges[i]
             let obj1 = nodes.find((node) => node.id == curEdge.obj1)
             let obj2 = nodes.find((node) => node.id == curEdge.obj2)
-            const edge = new Edge(curEdge.id, curEdge.type, network, obj1, obj2)
+            const edge = new Edge(curEdge.id, curEdge.type, network, obj1, obj2, curEdge.style, curEdge.color)
+            edges.push(edge)
+        }
+        return network
+    }
+
+    static propsToNetwork(propsList) {
+        const network = new network(propsList[0], propsList[1], propsList[2], propsList[3], propsList[4], propsList[5], propsList[6], propsList[7])
+
+        const nodes = []
+        for (let i = 0; i < propsList[8].length; i++) {
+            const curNode = propsList[8][i]
+            const node = new Node(curNode.id, curNode.name, network, curNode.position, curNode.type, curNode.author, curNode.description, curNode.image, curNode.reference)
+            nodes.push(node)
+        }
+
+        const edges = []
+        for (let i = 0; i < propsList[9]; i++) {
+            const curEdge = propsList[9][i]
+            let obj1 = nodes.find((node) => node.id == curEdge.obj1)
+            let obj2 = nodes.find((node) => node.id == curEdge.obj2)
+            const edge = new Edge(curEdge.id, curEdge.type, network, obj1, obj2, curEdge.style, curEdge.color)
             edges.push(edge)
         }
         return network
@@ -130,12 +162,14 @@ class Node {
 }
 
 class Edge {
-    constructor(id, type, network, obj1, obj2)  {
+    constructor(id, type, network, obj1, obj2, style = null, color = null)  {
         this.id = id
         this.type = type
         this.network = network
         this.obj1 = obj1
         this.obj2 = obj2
+        this.style = style
+        this.color = color
 
         obj1.addRelationship(this)
         obj2.addRelationship(this)
@@ -678,7 +712,7 @@ const changeInfoPanel = function(item) {
     const nameElement = $("#infoName")
     const authorElement = $("#owner")
     nameElement.text(item.name)
-    authorElement.text(item.author)
+    authorElement.text(item instanceof Network ? item.owner : item.author)
 
     //Change Description Text
     const descElement = $("#infoDescription")
@@ -764,9 +798,9 @@ const htmlStore = {
     listItem: null,
 
     editHTML: null,
-    objectEditHTML: null,
-    relEditHTML: null,
-
+    objectPropsHTML: null,
+    relPropsHTML: null,
+    
     newHTML: null,
 
     lastContent: null,
@@ -781,15 +815,13 @@ function initEditUI() {
     htmlStore.listHTML = editContent.find("#listHTML").html()
     htmlStore.listItem = $("#itemList").html()
 
-
-    htmlStore.objectEditHTML = editContent.find("#objectProps").html()
+    htmlStore.objectPropsHTML = editContent.find("#objectProps").html()
     editContent.find("#objectProps").remove()
 
-    htmlStore.relEditHTML = editContent.find("#relProps").html()
+    htmlStore.relPropsHTML = editContent.find("#relProps").html()
     editContent.find("#relProps").remove()
 
     htmlStore.editHTML = editContent.find("#editHTML").html()
-
 
     htmlStore.newHTML = editContent.find("#newHTML").html()
 
@@ -808,11 +840,14 @@ function initEditUI() {
         }
 
         htmlStore.lastContent = null
-
         ViewController.setActive(ViewController.network)
 
         if($("#itemList").length == 0)
             editContent.html(htmlStore.listHTML)
+
+        const newButton = editContent.find("#new-button")
+        newButton.off("click")
+        newButton.click(() => {newItem("Node")})
 
         $("#itemHeader").text("Objects")
 
@@ -837,11 +872,14 @@ function initEditUI() {
         }
 
         htmlStore.lastContent = null
-
         ViewController.setActive(ViewController.network)
 
         if($("#itemList").length == 0)
             editContent.html(htmlStore.listHTML)
+
+        const newButton = editContent.find("#new-button")
+        newButton.off("click")
+        newButton.click(() => {newItem("Edge")})
 
         $("#itemHeader").text("Relationships")
 
@@ -882,15 +920,78 @@ function editItem(item) {
     const propsList = $("#editPropsList")
 
     if (itemType == "Node") {
-        propsList.append(htmlStore.objectEditHTML)
+        propsList.append(htmlStore.objectPropsHTML)
+
+        propsList.children("li").children("input,textarea").each((i, element) => {
+            const propertyName = element.name
+            if(propertyName == "position") {
+                element.value = item.position[0] + ", " + item.position[1]
+            } else {
+                element.value = item[propertyName]
+            }
+        })
     } else if (itemType == "Edge") {
-        propsList.append(htmlStore.relEditHTML)
+        propsList.append(htmlStore.relPropsHTML)
+
+        propsList.children("li").children("input,textarea").each((i, element) => {
+            const propertyName = element.name
+            if(propertyName == "connect1") {
+                element.value = item.obj1.name
+            } else if(propertyName == "connect2") {
+                element.value = item.obj2.name
+            } else if(propertyName == "style") {
+                const itemStyle = item[propertyName]
+                if (itemStyle != null) {
+                    element.value = item.style
+                } else {
+                    element.value = "None"
+                }
+            } else if(propertyName == "color") {
+                const itemColor = item[propertyName]
+                if (itemColor != null) {
+                    element.value = item.color
+                } else {
+                    element.value = "None"
+                }
+            } else {
+                element.value = item[propertyName]
+            }
+        })
+    }
+}
+
+//new item function
+function newItem(itemType) {
+    const editUI = $("#editDiv")
+    const editContent = $("#editContent")
+
+    if(editUI.hasClass("invisible")) {
+        editUI.removeClass("invisible")
+
+        editContent.addClass("contentVisible")
+        editContent.removeClass("contentHidden")
+    } else {
+        htmlStore.lastContent = editContent.children()
+        editContent.children().detach()
+    }
+    editContent.html(htmlStore.newHTML)
+
+    const iHeader = $("#itemHeader")
+    itemType == "Node" ? iHeader.text("New Object") : iHeader.text("New Relationship")
+
+    $("#cancel-button").click(lastEditView)
+
+    const propsList = $("#newPropsList")
+
+    if (itemType == "Node") {
+        propsList.append(htmlStore.objectPropsHTML)
+    } else if (itemType == "Edge") {
+        propsList.append(htmlStore.relPropsHTML)
     }
 }
 
 function lastEditView() {
     if(htmlStore.lastContent != null) {
-        const editUI = $("#editDiv")
         const editContent = $("#editContent")
 
         editContent.empty()
@@ -898,6 +999,50 @@ function lastEditView() {
 
         htmlStore.lastContent = null
     }
+}
+
+//initialize Info UI buttons and functionality
+function initInfoUI() {
+    const infoUI = $("#infoDiv")
+    const infoContent = $("#infoContent")
+
+    if (ViewController.network.name) $("#nameList").html("<li><p>" + ViewController.network.name + "</p></li>");
+    else $("#nameList").html("<li><p>No name for this network.</p></li>");
+    
+    if (ViewController.network.description) $("#descList").html("<li><p>" + ViewController.network.description + "</p></li>");
+    else $("#descList").html("<li><p>No description for this network.</p></li>");
+
+    if (ViewController.network.author) $("#createdByList").html("<li><p>" + ViewController.network.author + "</p></li>");
+    else $("#createdByList").html("<li><p>No author for this network.</p></li>");
+
+    $("#createdDateList").html("<li><p>11/01/2023</p></li>");
+    $("#lastModifiedList").html("<li><p>12/01/2023</p></li>");
+
+    const nodeList = ViewController.network.nodes;
+    if (nodeList.length > 0) {
+        let html = "";
+        nodeList.forEach((node) => {
+            html += "<li>" + node.name + "</li>";
+        })
+        $("#nodesList").html(html);
+    }
+    else {
+        $("#nodesList").html("<li><p>No node for this network.</p></li>")
+    }
+
+    const edgeList = ViewController.network.edges;
+    if (edgeList.length > 0) {
+        let html = "";
+        edgeList.forEach((edge) => {
+            html += "<li>" + edge.obj1.name + " " + edge.type.toLowerCase() + " " + edge.obj2.name + "</li>";
+        })
+        $("#edgesList").html(html);
+    }
+    else {
+        $("#edgesList").html("<li><p>No edge for this network.</p></li>")
+    }
+
+    $("#collabSettingList").html("<li><p>Public</p></li>");
 }
 
 
@@ -912,7 +1057,21 @@ const ViewController = {
         const editUI = $("#editDiv")
         const editContent = $("#editContent")
 
+        const infoUI = $("#infoDiv")
+        const infoContent = $("#infoContent")
+
         if(newView == "Edit") {
+            // Make info UI invisible
+            infoUI.addClass("invisible")
+
+            infoUI.attr("aria-hidden", "true")
+
+            if(infoContent.hasClass("contentVisible")) {
+                infoContent.removeClass("contentVisible")
+                infoContent.addClass("contentHidden")
+            }
+
+            // Render edit UI
             editUI.removeClass("invisible")
 
             editUI.attr("aria-hidden", "false")
@@ -933,6 +1092,35 @@ const ViewController = {
             objectsButton.removeClass("invisible")
             relationshipsButton.removeClass("invisible")
 
+        } else if (newView == "Info") {
+            // Make edit UI invisible
+            editUI.addClass("invisible")
+
+            editUI.attr("aria-hidden", "true")
+
+            if(editContent.hasClass("contentVisible")) {
+                editContent.removeClass("contentVisible")
+                editContent.addClass("contentHidden")
+                editContent.empty()
+            }
+
+            // Set visibility of edit buttons
+            const objectsButton = $("#objects-button")
+            const relationshipsButton = $("#relationships-button")
+
+            objectsButton.addClass("invisible")
+            relationshipsButton.addClass("invisible")
+
+            // Render info UI
+            infoUI.removeClass("invisible")
+
+            infoUI.attr("aria-hidden", "false")
+
+            if(infoContent.hasClass("contentHidden")) {
+                infoContent.addClass("contentVisible")
+                infoContent.removeClass("contentHidden")
+            }
+
         } else if(newView == "Map") {
             editUI.addClass("invisible")
 
@@ -950,6 +1138,16 @@ const ViewController = {
 
             objectsButton.addClass("invisible")
             relationshipsButton.addClass("invisible")
+
+            // Make info UI invisible
+            infoUI.addClass("invisible")
+
+            infoUI.attr("aria-hidden", "true")
+
+            if(infoContent.hasClass("contentVisible")) {
+                infoContent.removeClass("contentVisible")
+                infoContent.addClass("contentHidden")
+            }
         }
     },
     setActive: function(item) {
@@ -981,6 +1179,7 @@ function initViewController(network, newView = "Map") {
     ViewController.network = network
 
     const editButton = $("#edit-button")
+    const infoButton = $("#info-button")
 
     if (newView == "Map") {
         editButton.removeClass("editSelected")
@@ -992,9 +1191,27 @@ function initViewController(network, newView = "Map") {
         if(ViewController.view == "Map") {
             ViewController.changeView("Edit")
             editButton.addClass("editSelected")
-        } else if(ViewController.view == "Edit") {
+        } else if (ViewController.view == "Info") {
+            ViewController.changeView("Edit")
+            infoButton.removeClass("editSelected")
+            editButton.addClass("editSelected")
+        } else if (ViewController.view == "Edit") {
             ViewController.changeView("Map")
             editButton.removeClass("editSelected")
+        }
+    })
+
+    infoButton.click((e) => {
+        if(ViewController.view == "Map") {
+            ViewController.changeView("Info")
+            infoButton.addClass("editSelected")
+        } else if (ViewController.view == "Edit") {
+            ViewController.changeView("Info")
+            editButton.removeClass("editSelected")
+            infoButton.addClass("editSelected")
+        } else if (ViewController.view == "Info") {
+            ViewController.changeView("Map")
+            infoButton.removeClass("editSelected")
         }
     })
 }
@@ -1010,37 +1227,22 @@ function toggleGridVisibility() {
 function switchToEditTab() {
     ViewController.changeView("Edit");
     $("#edit-button").addClass("editSelected");
+    $("#info-button").removeClass("editSelected");
 }
 
 //Switching to map tab for keyboard shortcut -Jaishree
 function switchToMapTab() {
     ViewController.changeView("Map");
     $("#edit-button").removeClass("editSelected");
+    $("#info-button").removeClass("editSelected");
 }
 
-//Open Info Page for keyboard shortcut -Jaishree
-let infoPageOpen = false;
-function toggleInfoPage() {
-    if (infoPageOpen) {
-        closeModal();
-    } else {
-        openModal();
-    }
+//Switching to info tab for keyboard shortcut
+function switchToInfoTab() {
+    ViewController.changeView("Info");
+    $("#info-button").addClass("editSelected");
+    $("#edit-button").removeClass("editSelected");
 }
-
-// Function to open the info page
-function openModal() {
-    console.log("called open modal")
-    window.doOpenModal();
-    infoPageOpen = true;
-}
-
-// Function to close the info page
-function closeModal() {
-    window.doCloseModal();
-    infoPageOpen = false;
-}
-
 
 //Keyboard Shortcuts Function - moved for readability in main
 function initShortcuts() {
@@ -1055,92 +1257,9 @@ function initShortcuts() {
             switchToMapTab();
         }
         if (event.key.toLowerCase() === "i") {
-            toggleInfoPage();
+            switchToInfoTab();
         }
-
     })
-}
-
-// Render info modal and prepare function to be called for onclick
-window.doOpenModal = function() {};
-window.doCloseModal = function() {};
-function renderModal(network) {
-    function renderNodes() {
-        if (network.nodes.length > 0) {
-            let html = "", n = network.nodes.length;
-            for(let i = 0; i < n; i++) {
-                let node = network.nodes[i];
-                html += "<li>" + node.name + "</li>";
-            }
-            $("#nodesList").html(html);
-        }
-        else {
-            $("#nodesList").html("<li><p>No node for this network.</p></li>")
-        }
-    }
-
-    function renderEdges() {
-        if (network.edges.length > 0) {
-            let html = "", n = network.edges.length;
-            for(let i = 0; i < n; i++) {
-                let edge = network.edges[i];
-                html += "<li>" + edge.obj1.name + " " + edge.type.toLowerCase() + " " + edge.obj2.name + "</li>";
-            }
-            $("#edgesList").html(html);
-        }
-        else {
-            $("#edgesList").html("<li><p>No edge for this network.</p></li>")
-        }
-    }
-
-    // Initialize info modal
-    let modal = $("#modal").dialog({
-        resizable: true,
-        height: window.innerHeight * 0.7,
-        width: window.innerWidth * 0.9,
-        modal: true,
-        autoOpen: false,
-        open: function() {
-            if (network.name) $("#nameVal").text(network.name);
-            else $("#nameVal").text("No name for this network.");
-
-            if (network.description) $("#descVal").text(network.description);
-            else $("#descVal").text("No description for this network.");
-
-            if (network.author) $("#authorVal").text(network.author);
-            else $("#authorVal").text("No author for this network.");
-
-            renderNodes();
-            renderEdges();
-        },
-        close: function() {
-
-        }
-    });
-
-    // Initialize open modal function
-    function openModal() {
-        modal.dialog("open");
-    }
-    window.doOpenModal = openModal;
-
-    // Initialize close modal function
-    function closeModal() {
-        modal.dialog("close");
-    }
-    window.doCloseModal = closeModal;
-
-    // Do resize if needed
-    let queuedTimeout = null;
-    function doResize() {
-        modal.dialog('option', 'height', window.innerHeight * 0.7);
-        modal.dialog('option', 'width', window.innerWidth * 0.9);
-        queuedTimeout = null;
-    }
-    window.onresize = function() {
-        if ( queuedTimeout ) clearTimeout(queuedTimeout);
-        queuedTimeout = setTimeout(doResize, 150);
-    };
 }
 
 //Main Program
@@ -1148,11 +1267,10 @@ function main() {
     data = JSON.parse(decodeURIComponent(data));
     console.log("Data:", data.network)
 
-    const network = Network.toNetwork(data.network)
+    const network = Network.objectToNetwork(data.network)
     console.log("Network:", network)
 
     //Initialize Functions for Network page
-    renderModal(network)
     initSVG(network)
     initCamera()
     initViewController(network)
@@ -1160,6 +1278,7 @@ function main() {
     initGridButton()
     initShortcuts()
     initEditUI()
+    initInfoUI()
 }
 
 window.onload = main()
